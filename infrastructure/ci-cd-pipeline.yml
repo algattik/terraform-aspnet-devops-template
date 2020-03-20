@@ -314,7 +314,8 @@ jobs:
   # Do not delete AKS namespace:
   # - if deploying on master branch
   # - if namespace was manually set with RUN_SET_NAMESPACE
-  condition: and(always(), not(variables['RUN_SET_NAMESPACE']))
+  # condition: and(always(), not(variables['RUN_SET_NAMESPACE']))
+  condition: false
   steps:
 
   - template: setup-k8s-clients-template.yml
