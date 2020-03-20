@@ -210,6 +210,9 @@ jobs:
       pathToSources: '$(Build.SourcesDirectory)/Contoso/'
       failIfCoverageEmpty: true
 
+  #FIXME
+  - bash: sudo apt install -y unzip
+
   - task: HelmInstaller@1
     displayName: Helm installer
     inputs:
