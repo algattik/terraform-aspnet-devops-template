@@ -170,6 +170,7 @@ jobs:
 
 - job: build
   displayName: Build with UnitTests
+  pool: $(AGENT_POOL_NAME)
   steps:
 
   - bash: |

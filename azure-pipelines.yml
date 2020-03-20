@@ -42,7 +42,7 @@ variables:
 - name: KUSTO_NAME
   value: tttemplate01
 - name: RESOURCE_GROUP
-  value: dataops2-tf
+  value: tttemplate01
 - name: TENANT_ID
   value: 72f988bf-86f1-41af-91ab-2d7cd011db47
 - name: TERRAFORM_SERVICE_CONNECTION
@@ -50,6 +50,8 @@ variables:
 - name: TERRAFORM_STORAGE_ACCOUNT
   value: tttemplate01terraform
 - name: VNET_NAME
+  value: tttemplate01
+- name: AGENT_POOL_NAME
   value: tttemplate01
 
 pool:
