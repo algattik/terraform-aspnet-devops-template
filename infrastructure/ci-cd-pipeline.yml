@@ -41,6 +41,7 @@ jobs:
         -var environment=cd \
         -var resource_group=$(RESOURCE_GROUP) \
         -var vnet_name=$(VNET_NAME) \
+        -var acr_name=$(ACR_NAME) \
         -var aks_name=$(AKS_NAME) \
         -var aks_version=$(AKS_VERSION) \
         -var aks_sp_client_id=$(AKS_SP_CLIENT_ID) \
