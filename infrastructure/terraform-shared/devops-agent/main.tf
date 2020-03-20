@@ -1,27 +1,22 @@
-resource "azurerm_resource_group" "devops" {
-  name   = "rg-${var.appname}-${var.environment}-devops"
-  location = var.location
-}
-
 # Create virtual network
 
 resource "azurerm_virtual_network" "devops" {
   name                = "vnet-${var.appname}-devops-${var.environment}"
   address_space       = ["10.100.0.0/16"]
   location            = var.location
-  resource_group_name = azurerm_resource_group.devops.name
+  resource_group_name = var.resource_group_name
 }
 
 resource "azurerm_subnet" "devops" {
   name                 = "agents-subnet"
-  resource_group_name  = azurerm_resource_group.devops.name
+  resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.devops.name
   address_prefix       = "10.100.1.0/24"
 }
 
 resource "azurerm_storage_account" "devops" {
   name                     = "stado${var.appname}${var.environment}"
-  resource_group_name      = azurerm_resource_group.devops.name
+  resource_group_name      = var.resource_group_name
   location                 = azurerm_resource_group.devops.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
@@ -64,7 +59,7 @@ data "azurerm_storage_account_blob_container_sas" "devops_agent_init" {
 resource "azurerm_public_ip" "devops" {
   name                = "pip-${var.appname}-devops-${var.environment}-${format("%03d", count.index + 1)}"
   location            = var.location
-  resource_group_name = azurerm_resource_group.devops.name
+  resource_group_name = var.resource_group_name
   allocation_method   = "Dynamic"
   count               = var.az_devops_agent_vm_count
 }
@@ -73,7 +68,7 @@ resource "azurerm_public_ip" "devops" {
 resource "azurerm_network_interface" "devops" {
   name                      = "nic-${var.appname}-devops-${var.environment}-${format("%03d", count.index + 1)}"
   location                  = var.location
-  resource_group_name       = azurerm_resource_group.devops.name
+  resource_group_name       = var.resource_group_name
 
   ip_configuration {
     name                          = "AzureDevOpsNicConfiguration"
@@ -100,7 +95,7 @@ resource "random_password" "agent_vms" {
 resource "azurerm_virtual_machine" "devops" {
   name                  = "vm${var.appname}devops${var.environment}-${format("%03d", count.index + 1)}"
   location              = var.location
-  resource_group_name   = azurerm_resource_group.devops.name
+  resource_group_name   = var.resource_group_name
   network_interface_ids = [azurerm_network_interface.devops[count.index].id]
   vm_size               = var.az_devops_agent_vm_size
 
@@ -165,7 +160,7 @@ resource "azurerm_virtual_machine_extension" "devops" {
 
 resource "azurerm_template_deployment" "devops_shutdown" {
   name = format("shutdown-vm-%03d", count.index + 1)
-  resource_group_name = azurerm_resource_group.devops.name
+  resource_group_name = var.resource_group_name
 
   template_body = file("${path.module}/shutdown_schedule_arm_template.json")
 

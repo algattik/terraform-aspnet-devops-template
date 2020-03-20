@@ -15,6 +15,7 @@ module "devops-agent" {
   appname = var.appname
   environment = var.environment
   location = var.location
+  resource_group_name = var.resource_group
   az_devops_url = var.az_devops_url
   az_devops_pat = var.az_devops_pat
   az_devops_agent_pool = var.az_devops_agent_pool
