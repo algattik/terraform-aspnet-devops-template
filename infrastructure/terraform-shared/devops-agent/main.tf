@@ -17,7 +17,7 @@ resource "azurerm_subnet" "devops" {
 resource "azurerm_storage_account" "devops" {
   name                     = "stado${var.appname}${var.environment}"
   resource_group_name      = var.resource_group_name
-  location                 = azurerm_resource_group.devops.location
+  location                 = var.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
