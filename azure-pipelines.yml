@@ -14,6 +14,7 @@ pr:
 name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
 variables:
+- group: tttemplate01
 - name: MAJOR_MINOR_VERSION
   value: "0.1" # update between releases
 - name: SEMANTIC_VERSION
@@ -31,7 +32,7 @@ variables:
 - name: AKS_NAME
   value: tttemplate01
 - name: AKS_SP_CLIENT_ID
-  value: tttemplate01
+  value: cd0ad856-af8e-424e-b935-ce7ad6da5c9d
 #- name: AKS_SP_CLIENT_SECRET
 #  value: ENTER
 - name: AKS_VERSION
