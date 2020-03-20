@@ -21,7 +21,7 @@ RUN dotnet build
 
 FROM build AS testrunner
 WORKDIR /app/Contoso.UnitTests
-ENTRYPOINT ["dotnet", "test", "--logger:trx", "--collect:"XPlat Code Coverage"]
+ENTRYPOINT ["dotnet", "test", "--logger:trx", "--collect:XPlat Code Coverage"]
 
 
 FROM build AS test
