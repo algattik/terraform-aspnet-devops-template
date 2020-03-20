@@ -15,7 +15,7 @@ resource "azurerm_subnet" "aks" {
   address_prefix       = "10.100.1.0/24"
 }
 
-resource "azurerm_subnet" "devops" {
+resource "azurerm_subnet" "agents" {
   name                 = "agents-subnet"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.main.name
