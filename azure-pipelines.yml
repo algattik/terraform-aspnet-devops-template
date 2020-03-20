@@ -34,6 +34,8 @@ variables:
 #- name: TERRAFORM_SP_CLIENT_SECRET
 - name: AKS_SP_CLIENT_ID
   value: cd0ad856-af8e-424e-b935-ce7ad6da5c9d
+- name: AKS_SP_OBJECT_ID
+  value: ddf63018-48fb-4738-a3f5-0062fb16dbb0
 #- name: AKS_SP_CLIENT_SECRET
 #  value: ENTER
 - name: AKS_VERSION
