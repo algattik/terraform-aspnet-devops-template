@@ -32,7 +32,8 @@ apt-get install -y --no-install-recommends \
         ca-certificates \
         jq \
         apt-transport-https \
-        docker.io
+        docker.io \
+        unzip
 
 
 echo "Allowing agent to run docker"
