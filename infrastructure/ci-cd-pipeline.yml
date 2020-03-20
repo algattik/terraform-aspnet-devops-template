@@ -31,6 +31,8 @@ jobs:
       provisionStorage: true
       TerraformStateKey: cd
 
+  - bash: env
+
   - bash: |
       set -eu
       export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
