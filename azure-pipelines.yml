@@ -29,6 +29,9 @@ variables:
   value: Terraform
 - name: AKS_NAME
   value: tttemplate01
+- name: TERRAFORM_SP_CLIENT_ID
+  value: cd0ad856-af8e-424e-b935-ce7ad6da5c9d
+#- name: TERRAFORM_SP_CLIENT_SECRET
 - name: AKS_SP_CLIENT_ID
   value: cd0ad856-af8e-424e-b935-ce7ad6da5c9d
 #- name: AKS_SP_CLIENT_SECRET
@@ -43,6 +46,8 @@ variables:
   value: tttemplate01
 - name: RESOURCE_GROUP
   value: tttemplate01
+- name: SUBSCRIPTION_ID
+  value: a4ed7b9a-b128-49b4-a6ee-fd07ff6e296d
 - name: TENANT_ID
   value: 72f988bf-86f1-41af-91ab-2d7cd011db47
 - name: TERRAFORM_SERVICE_CONNECTION
