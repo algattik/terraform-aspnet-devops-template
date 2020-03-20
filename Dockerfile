@@ -24,9 +24,9 @@ WORKDIR /app/Contoso.UnitTests
 ENTRYPOINT ["dotnet", "test", "--logger:trx"]
 
 
-#FROM build AS test
-#WORKDIR /app/Contoso.UnitTests
-#RUN dotnet test
+FROM build AS test
+WORKDIR /app/Contoso.UnitTests
+RUN dotnet test
 
 FROM build AS publish
 WORKDIR /app/Contoso
