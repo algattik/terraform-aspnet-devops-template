@@ -3,7 +3,7 @@
 
 module "acr" {
   source = "./acr"
-  aks_name = var.acr_name
+  acr_name = var.acr_name
   resource_group_name = var.resource_group
   location = var.location
 }
