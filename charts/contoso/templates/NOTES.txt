@@ -1,0 +1,28 @@
+1. Wait for the pods to be fully started.
+    kubectl get pods --namespace {{ .Release.Namespace }}
+
+2. Endpoint to connect to, is:
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ . }}
+  {{- end }}
+{{- end }}
+{{- else if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "contoso.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "contoso.fullname" . }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "contoso.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  http://$SERVICE_IP:{{ .Values.service.port }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+    http://127.0.0.1:8080. This is an internal address in the cluster and you should run this to access it locally:
+    kubectl port-forward service/{{ include "contoso.fullname" .}} 8080 --namespace {{ .Release.Namespace }}
+{{- end }}
+
+3. Optionally deploy Kibana by running these commands:
+    helm install kibana elastic/kibana --namespace {{ .Release.Namespace }} --set image=docker.elastic.co/kibana/kibana-oss --set imageTag={{ .Values.elasticsearch.imageTag }} --set elasticsearchHosts=http://{{ include "contoso.fullname" . }}:{{ .Values.service.port }}
+    kubectl port-forward service/kibana-kibana 5601 --namespace {{ .Release.Namespace }}
+    Use http://127.0.0.1:5601 to connect to Kibana
