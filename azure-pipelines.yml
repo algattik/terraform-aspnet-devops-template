@@ -25,9 +25,9 @@ variables:
 - name: ACR_NAME
   value: tttemplate01
 - name: ACR_PULL_SERVICE_CONNECTION
-  value: Container Registry
+  value: Terraform
 - name: ACR_PUSH_SERVICE_CONNECTION
-  value: Container Registry
+  value: Terraform
 - name: AKS_NAME
   value: tttemplate01
 - name: AKS_SP_CLIENT_ID
