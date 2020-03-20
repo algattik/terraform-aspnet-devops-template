@@ -97,7 +97,7 @@ jobs:
     workingDirectory: $(TERRAFORM_DIRECTORY)
 
 - job: security_analysis
-  displayName: Security Analysis
+  displayName: Security analysis
   condition: false
 
   pool:
@@ -195,7 +195,7 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       testRunner: VSTest
-      testResultsFiles: 'TestResults/*.trx'
+      testResultsFiles: '**/*.trx'
       failTaskOnFailedTests: true
       testRunTitle: 'Unit Tests'
 
@@ -206,7 +206,7 @@ jobs:
     displayName: 'Publish code coverage'
     inputs:
       codeCoverageTool: 'Cobertura'
-      summaryFileLocation: 'coverage.cobertura.xml'
+      summaryFileLocation: '**/coverage.cobertura.xml'
       pathToSources: '$(Build.SourcesDirectory)/Contoso/'
       failIfCoverageEmpty: true
 
