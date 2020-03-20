@@ -201,6 +201,7 @@ jobs:
 
   #FIXME
   - bash: sudo apt install -y unzip; env
+  - bash: echo "##vso[task.setvariable variable=HOME]."
 
   - task: UseDotNet@2
     displayName: Use .NET Core for coverage report generation
