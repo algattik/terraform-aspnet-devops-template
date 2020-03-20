@@ -9,4 +9,6 @@ terraform {
 provider "azurerm" {
   # It is recommended to pin to a given version of the Provider
   version = "=2.2.0"
+  skip_provider_registration = true
+  features {}
 }
