@@ -199,6 +199,15 @@ jobs:
       failTaskOnFailedTests: true
       testRunTitle: 'Unit Tests'
 
+  #FIXME
+  - bash: sudo apt install -y unzip
+
+  - task: UseDotNet@2
+    displayName: Use .NET Core for coverage report generation
+    inputs:
+      packageType: runtime
+      version: 3.1.2
+
   # Publish the code coverage result (summary and web site)
   # The summary allows to view the coverage percentage in the summary tab
   # The web site allows to view which lines are covered directly in Azure Pipeline
@@ -210,8 +219,6 @@ jobs:
       pathToSources: '$(Build.SourcesDirectory)/Contoso/'
       failIfCoverageEmpty: true
 
-  #FIXME
-  - bash: sudo apt install -y unzip
 
   - task: HelmInstaller@1
     displayName: Helm installer
