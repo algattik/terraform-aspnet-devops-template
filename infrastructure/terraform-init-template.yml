@@ -27,9 +27,9 @@ steps:
       -backend-config=container_name=${{ parameters.TerraformBackendStorageContainer }} \
       -backend-config=key=${{ parameters.TerraformStateKey }}.tfstate \
       -backend-config=resource_group_name=${{ parameters.TerraformBackendResourceGroup }} \
-      -backend-config=subscription_id=${{ parameter.TerraformSubscriptionId }} \
-      -backend-config=tenant_id=${{ parameter.TerraformTenantId }} \
-      -backend-config=client_id=${{ parameter.TerraformServicePrincipalId }} \
-      -backend-config=client_secret=${{ parameter.TerraformServicePrincipalKey }}
+      -backend-config=subscription_id=${{ parameters.TerraformSubscriptionId }} \
+      -backend-config=tenant_id=${{ parameters.TerraformTenantId }} \
+      -backend-config=client_id=${{ parameters.TerraformServicePrincipalId }} \
+      -backend-config=client_secret=${{ parameters.TerraformServicePrincipalKey }}
   workingDirectory: ${{ parameters.TerraformDirectory }}
   displayName: Terraform init
