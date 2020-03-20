@@ -31,7 +31,7 @@ jobs:
       provisionStorage: true
       TerraformStateKey: cd
 
-  - bash:
+  - bash: |
       set -eu
       export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
       terraform apply -input=false -auto-approve \
@@ -79,7 +79,7 @@ jobs:
 
   - bash: env
 
-  - bash:
+  - bash: |
       set -eu
       export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
       terraform apply -input=false -auto-approve \
