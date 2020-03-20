@@ -25,6 +25,7 @@ steps:
       export AZURE_STORAGE_ACCOUNT='${{ parameters.TerraformBackendStorageAccount }}'
       export AZURE_STORAGE_KEY="$(az storage account keys list -g "$RG" -n "$AZURE_STORAGE_ACCOUNT" --query '[0].value' -o tsv)"
       if test -z "$AZURE_STORAGE_KEY"; then
+        echo "Creating Terraform storage account..."
         az configure --defaults group="$RG" location='${{ parameters.TerraformBackendLocation }}'
         az group create -n "$RG" -o none
         az storage account create -n "$AZURE_STORAGE_ACCOUNT" -o none
