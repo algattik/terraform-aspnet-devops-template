@@ -21,8 +21,6 @@ variables:
   value: "$(MAJOR_MINOR_VERSION).$(Build.BuildId)"
 - name: KUSTO_DB
   value: "build$(Build.BuildId)"
-- name: TERRAFORM_SERVICE_CONNECTION
-  value: Terraform
 - name: ACR_NAME
   value: tttemplate01
 - name: ACR_PULL_SERVICE_CONNECTION
@@ -47,6 +45,10 @@ variables:
   value: dataops2-tf
 - name: TENANT_ID
   value: 72f988bf-86f1-41af-91ab-2d7cd011db47
+- name: TERRAFORM_SERVICE_CONNECTION
+  value: Terraform
+- name: TERRAFORM_STORAGE_ACCOUNT
+  value: tttemplate01terraform
 - name: VNET_NAME
   value: tttemplate01
 
