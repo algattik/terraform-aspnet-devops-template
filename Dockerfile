@@ -8,13 +8,13 @@ FROM mcr.microsoft.com/dotnet/core/sdk:$ASPNET_VERSION AS build
 WORKDIR /app
 
 # copy csproj and restore as distinct layers
-COPY *.sln .
-COPY Contoso/*.csproj ./Contoso/
-COPY Contoso.UnitTests/*.csproj ./Contoso.UnitTests/
+COPY Src/*.sln .
+COPY Src/Contoso/*.csproj ./Contoso/
+COPY Src/Contoso.UnitTests/*.csproj ./Contoso.UnitTests/
 RUN dotnet restore
 
 # copy everything else and build app
-COPY . .
+COPY Src/. .
 WORKDIR /app/Contoso
 RUN dotnet build
 
