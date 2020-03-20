@@ -9,9 +9,6 @@
 #   the `master` AKS namespace if run on the master branch, and otherwise to a
 #   temporary AKS namespace that is deleted at the end of the build.
 
-pool:
-  vmImage: ubuntu-latest
-
 jobs:
 - job: Terraform_shared
   # Avoid concurrent Terraform runs on PRs, which would result in failures due to exclusive lock on remote state file.

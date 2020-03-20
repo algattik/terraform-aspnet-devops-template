@@ -21,5 +21,9 @@ variables:
 - name: KUSTO_DB
   value: "build$(Build.BuildId)"
 
-stages:
+pool:
+  vmImage: ubuntu-latest
+
+
+jobs:
 - template: infrastructure/ci-cd-pipeline.yml
