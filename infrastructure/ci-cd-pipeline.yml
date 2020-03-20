@@ -48,7 +48,7 @@ jobs:
         -var kusto_admin_sp_object_id=$(AKS_SP_OBJECT_ID) \
         -var az_devops_agent_pool=$(AGENT_POOL_NAME) \
         -var az_devops_url=$(System.CollectionUri) \
-        -var az_devops_pat=$(System.AccessToken) \
+        -var az_devops_pat=$(AGENT_POOL_MANAGEMENT_TOKEN) \
         ;
     displayName: Terraform apply
     workingDirectory: $(TERRAFORM_DIRECTORY)
