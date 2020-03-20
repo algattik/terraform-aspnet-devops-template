@@ -21,7 +21,7 @@ module "devops-agent" {
   environment = var.environment
   location = var.location
   resource_group_name = var.resource_group
-  subnet_id = agents_subnet_id
+  subnet_id = module.vnet.agents_subnet_id
   az_devops_url = var.az_devops_url
   az_devops_pat = var.az_devops_pat
   az_devops_agent_pool = var.az_devops_agent_pool
