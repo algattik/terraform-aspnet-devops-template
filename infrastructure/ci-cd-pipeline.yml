@@ -221,7 +221,6 @@ jobs:
       pathToSources: '$(Build.SourcesDirectory)/Contoso/'
       failIfCoverageEmpty: true
 
-
   - task: HelmInstaller@1
     displayName: Helm installer
     inputs:
@@ -240,27 +239,16 @@ jobs:
 
         # Build runtime Docker image
         # Reuses the cached build stage from the previous docker build task
-        docker build --build-arg VersionPrefix="$SEMANTIC_VERSION" \
-          -t "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION" \
+        docker build --build-arg VersionPrefix="$(SEMANTIC_VERSION)" \
+          -t "$ACR_NAME.azurecr.io/contoso:$(SEMANTIC_VERSION)" \
           .
-
-        # Build end-to-end test image
-        docker build --target end2endtest \
-          --build-arg VersionPrefix="$SEMANTIC_VERSION" \
-          -t "$ACR_NAME.azurecr.io/contoso-test:$SEMANTIC_VERSION" \
-        .
 
         # Push Docker image to ACR
         docker push "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION"
-        docker push "$ACR_NAME.azurecr.io/contoso-test:$SEMANTIC_VERSION"
 
         # Push Helm chart to ACR
-        helm repo add elastic https://helm.elastic.co
-        helm repo update
-        helm dependency update charts/contoso
-        empty_dir="$(Build.StagingDirectory)/charts_out"
-        helm package --version "$SEMANTIC_VERSION" charts/contoso -d $empty_dir
-        az acr helm push --force "$(ls $empty_dir/*)"
+        helm package --version "$SEMANTIC_VERSION" charts/contoso -d charts_out
+        az acr helm push --force "$(ls charts_out/*)"
 
 - job: integration_tests
   displayName: Integration tests
