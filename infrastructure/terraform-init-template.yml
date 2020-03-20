@@ -18,8 +18,3 @@ steps:
       -backend-config=resource_group_name=$(RESOURCE_GROUP) \
   workingDirectory: $(TERRAFORM_DIRECTORY)
   displayName: Terraform init
-  env:
-    ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
-    ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
-    ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
-    ARM_TENANT_ID: $(TENANT_ID)
