@@ -26,7 +26,7 @@ jobs:
     env:
       password: $(AKS_SP_CLIENT_SECRET)
 
-  - template: ../infrastructure/terraform-init-template.yml
+  - template: terraform-init-template.yml
     parameters:
       provisionStorage: true
       TerraformStateKey: cd
@@ -51,7 +51,7 @@ jobs:
     env:
       TF_VAR_aks_sp_client_secret: $(AKS_SP_CLIENT_SECRET)
 
-  - template: ../infrastructure/terraform-outputs-template.yml
+  - template: terraform-outputs-template.yml
 
   - task: AzureCLI@1
     displayName: Start agents
@@ -72,7 +72,7 @@ jobs:
     TERRAFORM_DIRECTORY: terraform-exclusive
   steps:
 
-  - template: ../infrastructure/terraform-init-template.yml
+  - template: terraform-init-template.yml
     parameters:
       TerraformStateKey: cd-$(Build.BuildId)
 
@@ -246,7 +246,7 @@ jobs:
   - terraform
   steps:
 
-  - template: infrastructure/setup-k8s-clients-template.yml
+  - template: setup-k8s-clients-template.yml
 
   - task: AzureCLI@1
     displayName: Log into ACR Helm repo
@@ -319,7 +319,7 @@ jobs:
   condition: and(always(), not(variables['RUN_SET_NAMESPACE']))
   steps:
 
-  - template: infrastructure/setup-k8s-clients-template.yml
+  - template: setup-k8s-clients-template.yml
 
   - task: AzureCLI@1
     displayName: Delete AKS namespace and Kusto database
