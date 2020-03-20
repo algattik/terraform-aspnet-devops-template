@@ -31,19 +31,20 @@ jobs:
       provisionStorage: true
       TerraformStateKey: cd
 
-  - bash: >
-      set -eux;
-      export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET);
-      terraform apply -input=false -auto-approve
-            -var environment=cd
-            -var resource_group=$(RESOURCE_GROUP)
-            -var vnet_name=$(VNET_NAME)
-            -var aks_name=$(AKS_NAME)
-            -var aks_version=$(AKS_VERSION)
-            -var aks_sp_client_id=$(AKS_SP_CLIENT_ID)
-            -var aks_sp_object_id=$(AKS_SP_OBJECT_ID)
-            -var kusto_name=$(KUSTO_NAME)
-            -var kusto_admin_sp_object_id=$(AKS_SP_OBJECT_ID)
+  - bash:
+      set -eu
+      export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
+      terraform apply -input=false -auto-approve \
+        -var environment=cd \
+        -var resource_group=$(RESOURCE_GROUP) \
+        -var vnet_name=$(VNET_NAME) \
+        -var aks_name=$(AKS_NAME) \
+        -var aks_version=$(AKS_VERSION) \
+        -var aks_sp_client_id=$(AKS_SP_CLIENT_ID) \
+        -var aks_sp_object_id=$(AKS_SP_OBJECT_ID) \
+        -var kusto_name=$(KUSTO_NAME) \
+        -var kusto_admin_sp_object_id=$(AKS_SP_OBJECT_ID) \
+        ;
     displayName: Terraform apply
     workingDirectory: $(TERRAFORM_DIRECTORY)
     # For additional security, pass secret through environment instead of command line.
@@ -78,12 +79,13 @@ jobs:
 
   - bash: env
 
-  - bash: >
-      set -eu;
-      export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET);
-      terraform apply -input=false -auto-approve
-            -var resource_group=$(RESOURCE_GROUP)
-            -var kusto_name=$(KUSTO_NAME)
+  - bash:
+      set -eu
+      export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
+      terraform apply -input=false -auto-approve \
+        -var resource_group=$(RESOURCE_GROUP) \
+        -var kusto_name=$(KUSTO_NAME) \
+        ;
     displayName: Terraform apply
     workingDirectory: $(TERRAFORM_DIRECTORY)
 
