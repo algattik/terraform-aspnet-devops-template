@@ -200,7 +200,7 @@ jobs:
       testRunTitle: 'Unit Tests'
 
   #FIXME
-  - bash: sudo apt install -y unzip
+  - bash: sudo apt install -y unzip; env
 
   - task: UseDotNet@2
     displayName: Use .NET Core for coverage report generation
