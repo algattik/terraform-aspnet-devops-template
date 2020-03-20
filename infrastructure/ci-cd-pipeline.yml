@@ -206,8 +206,10 @@ jobs:
   - task: UseDotNet@2
     displayName: Use .NET Core for coverage report generation
     inputs:
-      packageType: runtime
+      packageType: sdk
       version: 3.1.2
+
+  - bash: dotnet --info
 
   # Publish the code coverage result (summary and web site)
   # The summary allows to view the coverage percentage in the summary tab
