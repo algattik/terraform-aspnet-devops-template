@@ -66,12 +66,6 @@ variable "az_devops_agents_per_vm" {
   default = 4
 }
 
-variable "az_devops_agent_vm_shutdown_time" {
-  type    = string
-  description = "UTC Time at which to shutdown the agent VMs daily, for example '2000' for 8 PM. If null, no shutdown will configured."
-  default = null
-}
-
 variable "acr_name" {
   type = string
   description = "Name of the generated Azure Container Registry instance."

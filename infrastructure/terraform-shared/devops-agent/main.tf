@@ -1,17 +1,7 @@
-# Create virtual network
-
-resource "azurerm_virtual_network" "devops" {
-  name                = "vnet-${var.appname}-devops-${var.environment}"
-  address_space       = ["10.100.0.0/16"]
-  location            = var.location
+resource "azurerm_user_assigned_identity" "devops" {
   resource_group_name = var.resource_group_name
-}
-
-resource "azurerm_subnet" "devops" {
-  name                 = "agents-subnet"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = azurerm_virtual_network.devops.name
-  address_prefix       = "10.100.1.0/24"
+  location            = var.location
+  name                = "agent${var.appname}${var.environment}"
 }
 
 resource "azurerm_storage_account" "devops" {
@@ -55,31 +45,6 @@ data "azurerm_storage_account_blob_container_sas" "devops_agent_init" {
 }
 
 
-# Create public IPs
-resource "azurerm_public_ip" "devops" {
-  name                = "pip-${var.appname}-devops-${var.environment}-${format("%03d", count.index + 1)}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  allocation_method   = "Dynamic"
-  count               = var.az_devops_agent_vm_count
-}
-
-# Create network interface
-resource "azurerm_network_interface" "devops" {
-  name                      = "nic-${var.appname}-devops-${var.environment}-${format("%03d", count.index + 1)}"
-  location                  = var.location
-  resource_group_name       = var.resource_group_name
-
-  ip_configuration {
-    name                          = "AzureDevOpsNicConfiguration"
-    subnet_id                     = azurerm_subnet.devops.id
-    private_ip_address_allocation = "dynamic"
-    public_ip_address_id          = azurerm_public_ip.devops[count.index].id
-  }
-
-  count                     = var.az_devops_agent_vm_count
-}
-
 # Create virtual machine
 
 resource "random_password" "agent_vms" {
@@ -92,18 +57,23 @@ resource "random_password" "agent_vms" {
   min_special = 1
 }
 
-resource "azurerm_virtual_machine" "devops" {
-  name                  = "vm${var.appname}devops${var.environment}-${format("%03d", count.index + 1)}"
+resource "azurerm_linux_virtual_machine_scale_set" "devops" {
+  name                  = "vm${var.appname}devops${var.environment}"
   location              = var.location
   resource_group_name   = var.resource_group_name
-  network_interface_ids = [azurerm_network_interface.devops[count.index].id]
+  network_interface {
+    name                      = "nic"
+    
+    ip_configuration {
+      name                          = "AzureDevOpsNicConfiguration"
+      subnet_id                     = var.subnet_id
+    }
+  }
   vm_size               = var.az_devops_agent_vm_size
 
-  storage_os_disk {
-    name              = "osdisk${var.appname}devops${var.environment}${format("%03d", count.index + 1)}"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Premium_LRS"
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Premium_LRS"
   }
 
   storage_image_reference {
@@ -113,35 +83,40 @@ resource "azurerm_virtual_machine" "devops" {
     version   = "latest"
   }
 
-  os_profile {
-    computer_name  = "AzureDevOps"
-    admin_username = "azuredevopsuser"
-    admin_password = random_password.agent_vms.result
-  }
+  admin_username = "azuredevopsuser"
+  admin_password = random_password.agent_vms.result
 
-  os_profile_linux_config {
-    disable_password_authentication = false
+  disable_password_authentication = false
 
-    dynamic "ssh_keys" {
-      for_each = var.az_devops_agent_sshkeys
-      content {
-        key_data = each.key
-        path = "/home/azuredevopsuser/.ssh/authorized_keys"
-      }
+  dynamic "ssh_keys" {
+    for_each = var.az_devops_agent_sshkeys
+    content {
+      username = "azuredevopsuser"
+      public_key = each.key
     }
   }
 
   boot_diagnostics {
-    enabled     = "true"
     storage_uri = azurerm_storage_account.devops.primary_blob_endpoint
   }
 
-  count = var.az_devops_agent_vm_count
+  identity {
+    type = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.devops.id]
+  }
+
+  instances = var.az_devops_agent_vm_count
+
+  lifecycle {
+    ignore_changes = [
+      instances
+    ]
+  }
 }
 
-resource "azurerm_virtual_machine_extension" "devops" {
-  name                 = format("install_azure_devops_agent-%03d", count.index + 1)
-  virtual_machine_id   = azurerm_virtual_machine.devops[count.index].id
+resource "azurerm_virtual_machine_scale_set_extension" "devops" {
+  name                 = "install_azure_devops_agent"
+  virtual_machine_scale_set_id = azurerm_linux_virtual_machine_scale_set.devops.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
   type_handler_version = "2.0"
@@ -155,28 +130,4 @@ resource "azurerm_virtual_machine_extension" "devops" {
   "fileUris": ["${azurerm_storage_blob.devops.url}${data.azurerm_storage_account_blob_container_sas.devops_agent_init.sas}"],
   "commandToExecute": "bash ${azurerm_storage_blob.devops.name} '${var.az_devops_url}' '${var.az_devops_pat}' '${var.az_devops_agent_pool}' '${var.az_devops_agents_per_vm}'"
   })
-  count = var.az_devops_agent_vm_count
 }
-
-resource "azurerm_template_deployment" "devops_shutdown" {
-  name = format("shutdown-vm-%03d", count.index + 1)
-  resource_group_name = var.resource_group_name
-
-  template_body = file("${path.module}/shutdown_schedule_arm_template.json")
-
-  parameters = {
-    name = "shutdown-computevm-${azurerm_virtual_machine.devops[count.index].name}"
-    shutdown_enabled = var.az_devops_agent_vm_shutdown_time != null ? "Enabled" : "Disabled"
-    shutdown_time = coalesce(var.az_devops_agent_vm_shutdown_time, "0000")
-    vm_id = azurerm_virtual_machine.devops[count.index].id
-  }
-
-  depends_on = [
-    azurerm_virtual_machine.devops
-  ]
-
-  deployment_mode = "Incremental"
-
-  count = var.az_devops_agent_vm_count
-}
-

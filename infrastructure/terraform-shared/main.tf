@@ -21,6 +21,7 @@ module "devops-agent" {
   environment = var.environment
   location = var.location
   resource_group_name = var.resource_group
+  subnet_id = agents_subnet_id
   az_devops_url = var.az_devops_url
   az_devops_pat = var.az_devops_pat
   az_devops_agent_pool = var.az_devops_agent_pool
@@ -28,7 +29,6 @@ module "devops-agent" {
   az_devops_agent_sshkeys = var.az_devops_agent_sshkeys
   az_devops_agent_vm_size = var.az_devops_agent_vm_size
   az_devops_agent_vm_count = var.az_devops_agent_vm_count
-  az_devops_agent_vm_shutdown_time = var.az_devops_agent_vm_shutdown_time
 }
 
 module "aks" {

@@ -6,10 +6,18 @@ resource "azurerm_virtual_network" "main" {
   resource_group_name = var.resource_group_name
 }
 
-# Create subnet
+# Create subnets
+
 resource "azurerm_subnet" "aks" {
   name                 = "aks-subnet"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefix       = "10.100.1.0/24"
+}
+
+resource "azurerm_subnet" "devops" {
+  name                 = "agents-subnet"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefix       = "10.100.2.0/24"
 }
