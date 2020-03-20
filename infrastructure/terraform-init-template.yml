@@ -21,15 +21,15 @@ steps:
     terraformVersion: ${{ parameters.TerraformVersion }}
 
 - bash: |
-      set -eux  # fail on error
-      terraform init \
-        -backend-config=storage_account_name=${{ parameters.TerraformBackendStorageAccount }} \
-        -backend-config=container_name=${{ parameters.TerraformBackendStorageContainer }} \
-        -backend-config=key=${{ parameters.TerraformStateKey }}.tfstate \
-        -backend-config=resource_group_name=${{ parameters.TerraformBackendResourceGroup }} \
-        -backend-config=subscription_id=${{ parameter.TerraformSubscriptionId }} \
-        -backend-config=tenant_id=${{ parameter.TerraformTenantId }} \
-        -backend-config=client_id=${{ parameter.TerraformServicePrincipalId }} \
-        -backend-config=client_secret=${{ parameter.TerraformServicePrincipalKey }}
-    workingDirectory: ${{ parameters.TerraformDirectory }}
-    displayName: Terraform init
+    set -eux  # fail on error
+    terraform init \
+      -backend-config=storage_account_name=${{ parameters.TerraformBackendStorageAccount }} \
+      -backend-config=container_name=${{ parameters.TerraformBackendStorageContainer }} \
+      -backend-config=key=${{ parameters.TerraformStateKey }}.tfstate \
+      -backend-config=resource_group_name=${{ parameters.TerraformBackendResourceGroup }} \
+      -backend-config=subscription_id=${{ parameter.TerraformSubscriptionId }} \
+      -backend-config=tenant_id=${{ parameter.TerraformTenantId }} \
+      -backend-config=client_id=${{ parameter.TerraformServicePrincipalId }} \
+      -backend-config=client_secret=${{ parameter.TerraformServicePrincipalKey }}
+  workingDirectory: ${{ parameters.TerraformDirectory }}
+  displayName: Terraform init
