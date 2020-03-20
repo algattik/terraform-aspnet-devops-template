@@ -131,4 +131,5 @@ resource "azurerm_virtual_machine_scale_set_extension" "devops" {
   "fileUris": ["${azurerm_storage_blob.devops.url}${data.azurerm_storage_account_blob_container_sas.devops_agent_init.sas}"],
   "commandToExecute": "bash ${azurerm_storage_blob.devops.name} '${var.az_devops_url}' '${var.az_devops_pat}' '${var.az_devops_agent_pool}' '${var.az_devops_agents_per_vm}'"
   })
+  # output goes to /var/lib/waagent/custom-script
 }

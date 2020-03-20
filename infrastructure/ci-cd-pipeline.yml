@@ -57,7 +57,7 @@ jobs:
       scriptLocation: inlineScript
       inlineScript: |
         set -eux  # fail on error
-        az vm start --ids $(echo $AGENT_VM_IDS | jq -r '.[]') -o none
+        az vmss scale --id $AGENT_VMSS_ID --new-capacity 2 -o table
 
 - job: Terraform_exclusive
   displayName: Terraform exclusive
