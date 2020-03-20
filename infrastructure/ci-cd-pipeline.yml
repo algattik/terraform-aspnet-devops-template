@@ -11,6 +11,7 @@
 
 jobs:
 - job: Terraform_shared
+  displayName: Terraform shared
   # Avoid concurrent Terraform runs on PRs, which would result in failures due to exclusive lock on remote state file.
   condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), variables['RUN_FLAG_TERRAFORM']))
   variables:
@@ -69,6 +70,7 @@ jobs:
         az vm start --ids $(echo $AGENT_VM_IDS | jq -r '.[]') -o none
 
 - job: Terraform_exclusive
+  displayName: Terraform exclusive
   dependsOn:
   - Terraform_shared
   condition: |
@@ -184,9 +186,8 @@ jobs:
   - bash: |
       set -eux  # fail on error
       # Only build first stage of Dockerfile (build and unit test)
-      mkdir TestResults
       docker build --pull --target testrunner --build-arg VersionPrefix="$(SEMANTIC_VERSION)" -t contoso-build-$(Build.BuildId):test .
-      docker run --rm -v $PWD/TestResults:/app/tests/TestResults contoso-build-$(Build.BuildId):test
+      docker run --rm -v $PWD/TestResults:/app/Contoso.UnitTests/TestResults contoso-build-$(Build.BuildId):test
     displayName: Docker build & test
 
   - task: PublishTestResults@2
@@ -194,7 +195,7 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       testRunner: VSTest
-      testResultsFiles: 'TestResults/*.xml'
+      testResultsFiles: 'TestResults/*.trx'
       failTaskOnFailedTests: true
       testRunTitle: 'Unit Tests'
 
@@ -250,6 +251,7 @@ jobs:
         az acr helm push --force "$(ls $empty_dir/*)"
 
 - job: integration_tests
+  displayName: Integration tests
   dependsOn:
   - build
   - Terraform_exclusive
@@ -339,7 +341,7 @@ jobs:
         az kusto database delete -g "$(RESOURCE_GROUP)" --cluster-name "$(KUSTO_NAME)" -n "$(KUSTO_DB)" -y
 
 - job: Promote
-  displayName: Promote Latest Image
+  displayName: Promote latest image
   dependsOn: integration_tests
   condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), variables['RUN_FLAG_PROMOTE']))
   steps:
