@@ -2,23 +2,39 @@
 
 ARG ASPNET_VERSION=3.1
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:$ASPNET_VERSION AS base
-
-WORKDIR /app
-EXPOSE 5000
 
 FROM mcr.microsoft.com/dotnet/core/sdk:$ASPNET_VERSION AS build
-WORKDIR /src
-COPY ["Contoso/Contoso.csproj", "Contoso/"]
-RUN dotnet restore "Contoso/Contoso.csproj"
+
+WORKDIR /app
+
+# copy csproj and restore as distinct layers
+COPY *.sln .
+COPY Contoso/*.csproj ./Contoso/
+COPY Contoso.UnitTests/*.csproj ./Contoso.UnitTests/
+RUN dotnet restore
+
+# copy everything else and build app
 COPY . .
-WORKDIR "/src/Contoso"
-RUN dotnet build "Contoso.csproj" -c Release -o /app/build
+WORKDIR /app/Contoso
+RUN dotnet build
+
+
+FROM build AS testrunner
+WORKDIR /app/Contoso.UnitTests
+ENTRYPOINT ["dotnet", "test", "--logger:trx"]
+
+
+#FROM build AS test
+#WORKDIR /app/Contoso.UnitTests
+#RUN dotnet test
 
 FROM build AS publish
-RUN dotnet publish "Contoso.csproj" -c Release -o /app/publish
+WORKDIR /app/Contoso
+RUN dotnet publish -c Release -o /out
 
-FROM base AS final
+
+FROM mcr.microsoft.com/dotnet/core/aspnet:$ASPNET_VERSION AS runtime
+
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=publish /out .
 ENTRYPOINT ["dotnet", "Contoso.dll"]
