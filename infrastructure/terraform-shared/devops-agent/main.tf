@@ -63,6 +63,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "devops" {
   resource_group_name   = var.resource_group_name
   network_interface {
     name                      = "nic"
+    primary                   = true
     
     ip_configuration {
       name                          = "AzureDevOpsNicConfiguration"
