@@ -32,7 +32,7 @@ jobs:
       TerraformStateKey: cd
 
   - bash: >
-      set -eu;
+      set -eux;
       export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET);
       terraform apply -input=false -auto-approve
             -var environment=cd
@@ -80,7 +80,6 @@ jobs:
 
   - bash: >
       set -eu;
-      set -x;
       export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET);
       terraform apply -input=false -auto-approve
             -var resource_group=$(RESOURCE_GROUP)
