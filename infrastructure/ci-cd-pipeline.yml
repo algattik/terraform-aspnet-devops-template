@@ -80,6 +80,7 @@ jobs:
 
   - bash: >
       set -eu;
+      set -x;
       export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET);
       terraform apply -input=false -auto-approve
             -var resource_group=$(RESOURCE_GROUP)
