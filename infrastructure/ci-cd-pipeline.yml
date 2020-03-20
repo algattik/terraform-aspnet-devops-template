@@ -29,7 +29,6 @@ jobs:
 
   - template: terraform-init-template.yml
     parameters:
-      provisionStorage: true
       TerraformStateKey: cd
 
   - bash: env

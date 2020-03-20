@@ -1,17 +1,6 @@
 parameters:
-  provisionStorage: false
   TerraformVersion: 0.12.24
   TerraformStateKey:
-  TerraformDirectory: $(TERRAFORM_DIRECTORY)
-  TerraformEnvironmentServiceConnection: $(TERRAFORM_SERVICE_CONNECTION)
-  TerraformBackendResourceGroup: $(RESOURCE_GROUP)
-  TerraformBackendStorageAccount: $(TERRAFORM_STORAGE_ACCOUNT)
-  TerraformBackendStorageContainer: terraformstate
-  TerraformBackendLocation: North Europe
-  TerraformSubscriptionId: $(SUBSCRIPTION_ID)
-  TerraformTenantId: $(TENANT_ID)
-  TerraformServicePrincipalId: $(TERRAFORM_SP_CLIENT_ID)
-  TerraformServicePrincipalKey: $(TERRAFORM_SP_CLIENT_SECRET)
 
 steps:
 
@@ -23,13 +12,14 @@ steps:
 - bash: |
     set -eux  # fail on error
     terraform init \
-      -backend-config=storage_account_name=${{ parameters.TerraformBackendStorageAccount }} \
-      -backend-config=container_name=${{ parameters.TerraformBackendStorageContainer }} \
+      -backend-config=storage_account_name=$(TERRAFORM_STORAGE_ACCOUNT) \
+      -backend-config=container_name=terraformstate \
       -backend-config=key=${{ parameters.TerraformStateKey }}.tfstate \
-      -backend-config=resource_group_name=${{ parameters.TerraformBackendResourceGroup }} \
-      -backend-config=subscription_id=${{ parameters.TerraformSubscriptionId }} \
-      -backend-config=tenant_id=${{ parameters.TerraformTenantId }} \
-      -backend-config=client_id=${{ parameters.TerraformServicePrincipalId }} \
-      -backend-config=client_secret=${{ parameters.TerraformServicePrincipalKey }}
-  workingDirectory: ${{ parameters.TerraformDirectory }}
+      -backend-config=resource_group_name=$(RESOURCE_GROUP) \
+  workingDirectory: $(TERRAFORM_DIRECTORY)
   displayName: Terraform init
+  env:
+    ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
+    ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+    ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+    ARM_TENANT_ID: $(TENANT_ID)
