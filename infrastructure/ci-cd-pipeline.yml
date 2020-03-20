@@ -168,7 +168,7 @@ jobs:
       alertWarningLevel: 'Medium'
       failOnAlert: true
 
-- job: build_and_unittest
+- job: build
   displayName: Build with UnitTests
   steps:
 
@@ -240,10 +240,11 @@ jobs:
         helm package --version "$SEMANTIC_VERSION" charts/contoso -d $empty_dir
         az acr helm push --force "$(ls $empty_dir/*)"
 
-- job: Tests
+- job: integration_tests
   dependsOn:
   - build
-  - terraform
+  - Terraform_exclusive
+  - Terraform_shared
   steps:
 
   - template: setup-k8s-clients-template.yml
