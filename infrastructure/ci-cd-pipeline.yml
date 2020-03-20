@@ -180,7 +180,7 @@ jobs:
       failOnAlert: true
 
 - job: build
-  displayName: Build with UnitTests
+  displayName: Build and unit tests
   pool: $(AGENT_POOL_NAME)
   steps:
 
@@ -218,7 +218,7 @@ jobs:
     inputs:
       codeCoverageTool: 'Cobertura'
       summaryFileLocation: '**/coverage.cobertura.xml'
-      pathToSources: '$(Build.SourcesDirectory)/Contoso/'
+      pathToSources: '$(Build.SourcesDirectory)/Src'
       failIfCoverageEmpty: true
 
   - task: HelmInstaller@1
