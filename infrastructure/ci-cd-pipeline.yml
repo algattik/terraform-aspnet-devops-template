@@ -23,6 +23,7 @@ jobs:
       az login --service-principal --username $(AKS_SP_CLIENT_ID) --password "$password" --tenant $(TENANT_ID)
       oid=$(az ad sp show --id  $(AKS_SP_CLIENT_ID) --query objectId -o tsv)
       echo "##vso[task.setvariable variable=AKS_SP_OBJECT_ID]$oid"
+      echo "ID:$oid"
     displayName: Get AKS SP object ID
     env:
       password: $(AKS_SP_CLIENT_SECRET)
