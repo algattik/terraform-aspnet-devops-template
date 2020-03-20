@@ -14,7 +14,7 @@ jobs:
   # Avoid concurrent Terraform runs on PRs, which would result in failures due to exclusive lock on remote state file.
   condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), variables['RUN_FLAG_TERRAFORM']))
   variables:
-    TERRAFORM_DIRECTORY: terraform-shared
+    TERRAFORM_DIRECTORY: infrastructure/terraform-shared
   steps:
 
   - bash: |
@@ -69,7 +69,7 @@ jobs:
     in(dependencies.Terraform_shared.result, 'Succeeded', 'SucceededWithIssues', 'Skipped')
   variables:
     KUSTO_NAME: $[ dependencies.Terraform_shared.outputs['Outputs.kusto_name'] ]
-    TERRAFORM_DIRECTORY: terraform-exclusive
+    TERRAFORM_DIRECTORY: infrastructure/terraform-exclusive
   steps:
 
   - template: terraform-init-template.yml
@@ -85,7 +85,7 @@ jobs:
             -var resource_group=$(RESOURCE_GROUP) \
             -var kusto_name=$(KUSTO_NAME)
     displayName: Terraform apply
-    workingDirectory: terraform-exclusive
+    workingDirectory: $(TERRAFORM_DIRECTORY)
 
 - job: security_analysis
   displayName: Security Analysis
