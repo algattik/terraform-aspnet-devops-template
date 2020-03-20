@@ -49,8 +49,6 @@ jobs:
       TF_VAR_aks_sp_client_secret: $(AKS_SP_CLIENT_SECRET)
       ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
       ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
-      ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
-      ARM_TENANT_ID: $(TENANT_ID)
 
   - template: terraform-outputs-template.yml
 
@@ -278,7 +276,7 @@ jobs:
         --set settings.adxDefaultDatabaseName="$(KUSTO_DB)" \
         --set settings.aadClientId="$(AKS_SP_CLIENT_ID)" \
         --set settings.aadClientSecret="$secret" \
-        --set settings.aadTenantId="$TENANT_ID" \
+        --set settings.aadTenantId="$ARM_TENANT_ID" \
         --set settings.collectTelemetry="$COLLECT_TELEMETRY" \
         --set settings.instrumentationKey="$TELEMETRY_KEY" \
         --set settings.enableQueryLogging=true \

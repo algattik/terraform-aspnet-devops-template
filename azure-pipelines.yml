@@ -48,9 +48,9 @@ variables:
   value: tttemplate01
 - name: RESOURCE_GROUP
   value: tttemplate01
-- name: SUBSCRIPTION_ID
+- name: ARM_SUBSCRIPTION_ID
   value: a4ed7b9a-b128-49b4-a6ee-fd07ff6e296d
-- name: TENANT_ID
+- name: ARM_TENANT_ID
   value: 72f988bf-86f1-41af-91ab-2d7cd011db47
 - name: TERRAFORM_SERVICE_CONNECTION
   value: Terraform
