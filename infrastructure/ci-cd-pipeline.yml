@@ -26,7 +26,6 @@ jobs:
 
   - bash: |
       set -eu
-      export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
       terraform apply -input=false -auto-approve \
         -var environment=cd \
         -var resource_group=$(RESOURCE_GROUP) \
@@ -79,7 +78,6 @@ jobs:
 
   - bash: |
       set -eu
-      export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
       terraform apply -input=false -auto-approve \
         -var resource_group=$(RESOURCE_GROUP) \
         -var kusto_name=$(KUSTO_NAME) \
