@@ -69,14 +69,14 @@ resource "azurerm_linux_virtual_machine_scale_set" "devops" {
       subnet_id                     = var.subnet_id
     }
   }
-  vm_size               = var.az_devops_agent_vm_size
+  sku                   = var.az_devops_agent_vm_size
 
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }
 
-  storage_image_reference {
+  source_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
     sku       = "16.04.0-LTS"
@@ -88,7 +88,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "devops" {
 
   disable_password_authentication = false
 
-  dynamic "ssh_keys" {
+  dynamic "admin_ssh_key" {
     for_each = var.az_devops_agent_sshkeys
     content {
       username = "azuredevopsuser"
@@ -97,7 +97,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "devops" {
   }
 
   boot_diagnostics {
-    storage_uri = azurerm_storage_account.devops.primary_blob_endpoint
+    storage_account_uri = azurerm_storage_account.devops.primary_blob_endpoint
   }
 
   identity {
