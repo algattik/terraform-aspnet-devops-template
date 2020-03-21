@@ -352,6 +352,7 @@ jobs:
         --set image.repository=$(ACR_NAME).azurecr.io/contoso \
         --set image.tag=$SEMANTIC_VERSION \
         --set replicaCount=2 \
+        --set ingress.enabled=true \
         --set settings.adxClusterUrl="$KUSTO_URI" \
         --set settings.adxDefaultDatabaseName="$(KUSTO_DB)" \
         --set settings.aadClientId="$(AKS_SP_CLIENT_ID)" \
@@ -390,26 +391,6 @@ jobs:
       taurusVersion: 1.14.1
       pythonCommand: python3.6
 
-  - task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
-    displayName: 'Run Taurus'
-    inputs:
-      taurusConfig: |
-
-       execution:
-       - scenario:
-           requests:
-           - https://www.bing.com
-           # You can also reference a JMeter test plan (recommended)
-           # script: website-test.jmx
-         concurrency: 5
-         iterations: 10
-         ramp-up: 2s
-
-       reporting:
-       - module: junit-xml
-         filename: taurus-output/TEST-Taurus.xml
-
-
   - bash: kubectl rollout status deployment "$(CHART_NAME)" --timeout 5m --namespace "$KUBERNETES_NAMESPACE"
     displayName: Await K2 deployment
 
@@ -421,6 +402,22 @@ jobs:
         'http://$(CHART_NAME)'
 
     displayName: Smoke test
+
+  - task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
+    displayName: 'Run Taurus'
+    inputs:
+      taurusConfig: |
+       execution:
+       - scenario:
+           requests:
+           - http://$(CHART_NAME)
+         concurrency: 5
+         iterations: 10
+         ramp-up: 2s
+       reporting:
+       - module: junit-xml
+         filename: taurus-output/TEST-Taurus.xml
+
 
 - job: Cleanup
   displayName: Delete build-specific infrastructure
