@@ -183,7 +183,6 @@ jobs:
         TF_VAR_aks_sp_client_id: $(AKS_SP_CLIENT_ID)
         TF_VAR_aks_sp_client_secret: $(AKS_SP_CLIENT_SECRET)
         TF_VAR_aks_sp_object_id: $(AKS_SP_OBJECT_ID)
-        TF_VAR_kusto_name: $(KUSTO_NAME)
         TF_VAR_kusto_admin_sp_object_id: $(AKS_SP_OBJECT_ID)
         TF_VAR_az_devops_agent_pool: $(AGENT_POOL_NAME)
         TF_VAR_az_devops_url: $(System.CollectionUri)
@@ -243,7 +242,7 @@ jobs:
         ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
         TF_VAR_resource_group: $(RESOURCE_GROUP)
         TF_VAR_kusto_cluster_name: $(KUSTO_NAME)
-        TF_VAR_kusto_database_name: $(KUSTO_DB)
+        TF_VAR_kusto_database_name: build$(Build.BuildId)
         TF_VAR_kubernetes_namespace: $(KUBERNETES_NAMESPACE)
 
 - job: Terraform_app
@@ -256,7 +255,6 @@ jobs:
   variables:
     KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-app
   steps:
 

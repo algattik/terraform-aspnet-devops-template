@@ -46,7 +46,8 @@ module "aks" {
 
 module "kusto" {
   source = "./kusto"
-  kusto_name = var.kusto_name
+  appname = var.appname
+  environment = var.environment
   resource_group_name = var.resource_group
   location = var.location
   kusto_admin_sp_object_id = var.kusto_admin_sp_object_id

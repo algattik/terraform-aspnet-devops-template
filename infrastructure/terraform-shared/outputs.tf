@@ -18,10 +18,9 @@ output "aks_name" {
   value = module.aks.name
 }
 
-output "aks_name" {
-  value = module.aks.id
+output "kusto_name" {
+  value = module.kusto.name
 }
-
 
 output "kube_config_base64" {
   value     = base64encode(module.aks.kube_config_raw)

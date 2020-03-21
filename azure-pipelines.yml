@@ -19,8 +19,6 @@ variables:
   value: "0.1" # update between releases
 - name: SEMANTIC_VERSION
   value: "$(MAJOR_MINOR_VERSION).$(Build.BuildId)"
-- name: KUSTO_DB
-  value: "build$(Build.BuildId)"
 - name: ACR_NAME
   value: tttemplate01
 - name: TERRAFORM_SP_CLIENT_ID
@@ -35,8 +33,6 @@ variables:
   value: 1.15.7
 - name: HELM_RELEASE_NAME
   value: contoso
-- name: KUSTO_NAME
-  value: tttemplate01
 - name: RESOURCE_GROUP
   value: tttemplate01
 - name: ARM_SUBSCRIPTION_ID
