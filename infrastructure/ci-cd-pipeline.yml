@@ -391,26 +391,25 @@ jobs:
       taurusVersion: 1.14.1
       pythonCommand: python3.6
 
-  - bash: kubectl rollout status deployment "$(CHART_NAME)" --timeout 5m --namespace "$KUBERNETES_NAMESPACE"
+  - bash: kubectl -n "$KUBERNETES_NAMESPACE" rollout status deployment "$(CHART_NAME)" --timeout 5m
     displayName: Await K2 deployment
 
   - bash: |
       set -eux  # fail on error
-      kubectl run --namespace "$KUBERNETES_NAMESPACE" --attach --rm --restart=Never --image=busybox smoke-test-$(CHART_NAME) -- \
+      kubectl -n "$KUBERNETES_NAMESPACE" run --attach --rm --restart=Never --image=busybox smoke-test-$(CHART_NAME) -- \
         wget -O- \
         'http://$(CHART_NAME)'
     displayName: Smoke test
 
   - bash: |
       set -euxo pipefail  # fail on error
-      kubectl get svc "$(CHART_NAME)" -o jsonpath="{.spec.ports[0].name}://{.spec.clusterIP}:{.spec.ports[0].port}" | read -r url
+      kubectl -n "$KUBERNETES_NAMESPACE" get svc "$(CHART_NAME)" -o jsonpath="{.spec.ports[0].name}://{.spec.clusterIP}:{.spec.ports[0].port}" | read -r url
       echo "##vso[task.setvariable variable=SERVICE_URL]$url"
     displayName: Get Service URL
 
   - bash: |
       curl -fv $SERVICE_URL
     displayName: Smoke test 2
-
 
   - task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
     displayName: 'Run Taurus'
@@ -427,6 +426,10 @@ jobs:
        - module: junit-xml
          filename: taurus-output/TEST-Taurus.xml
 
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    inputs:
+      testRunTitle: Integration tests
 
 - job: Cleanup
   displayName: Delete build-specific infrastructure
