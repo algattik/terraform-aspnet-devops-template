@@ -357,15 +357,17 @@ jobs:
   displayName: Destroy infrastructure
   dependsOn:
   - integration_tests
+  - Terraform
   - Terraform_shared_outputs
   pool: $(AGENT_POOL_NAME)
+  variables:
+    KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
+    KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
+    TERRAFORM_DIRECTORY: infrastructure/terraform-destroy
   # Do not delete AKS namespace:
   # - if deploying on master branch
   # - if namespace was manually set with RUN_SET_NAMEBASE
   condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMEBASE']))
-  variables:
-    KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    TERRAFORM_DIRECTORY: infrastructure/terraform-destroy
   steps:
 
   - template: terraform-template.yml
