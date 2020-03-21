@@ -204,6 +204,9 @@ jobs:
     parameters:
       TerraformAction: none
       TerraformStateKey: cd
+      TerraformVariables:
+        ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
 
 - job: Terraform
   displayName: Deploy infrastructure
