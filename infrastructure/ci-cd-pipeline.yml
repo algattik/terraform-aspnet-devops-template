@@ -403,8 +403,11 @@ jobs:
 
   - bash: |
       set -eux  # fail on error
-      read -d, url < <(kubectl -n "$KUBERNETES_NAMESPACE" get svc "$(CHART_NAME)" -o jsonpath="{.spec.ports[0].name}://{.spec.clusterIP}:{.spec.ports[0].port},")
+      read -d, firstNodeIP < <(kubectl -n "$KUBERNETES_NAMESPACE" get nodes -o jsonpath="{.items[0].status.addresses[?(@.type=='InternalIP')].address},")
+      read -d, nodePort < <(kubectl -n "$KUBERNETES_NAMESPACE" get svc "$(CHART_NAME)" -o jsonpath="{.spec.ports[0].nodePort},")
+      url="http://$firstNodeIP:$nodePort"
       echo "##vso[task.setvariable variable=SERVICE_URL]$url"
+      echo "$url"
     displayName: Get Service URL
 
   - bash: |
