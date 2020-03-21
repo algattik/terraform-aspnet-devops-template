@@ -23,6 +23,12 @@ jobs:
       TerraformStateKey: cd
 
   - bash: |
+      set -euo pipefail
+      curl -fu ":$AGENT_POOL_MANAGEMENT_TOKEN" '$(System.CollectionUri)_apis/distributedtask/pools?poolName=$AGENT_POOL_NAME&actionFilter=manage&api-version=5.1' \
+        | jq -e '.count>0' 
+    displayName: Verify agent pool token
+
+  - bash: |
       set -eu
       terraform apply -input=false -auto-approve \
         -var environment=cd \
