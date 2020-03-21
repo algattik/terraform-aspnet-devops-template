@@ -2,6 +2,10 @@ output "subscription_id" {
   value = data.azurerm_client_config.current.subscription_id
 }
 
+output "vnet_name" {
+  value = module.vnet.name
+}
+
 output "vnet_id" {
   value = module.vnet.id
 }

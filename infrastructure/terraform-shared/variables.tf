@@ -21,11 +21,6 @@ variable "resource_group" {
   description = "Resource group to deploy in."
 }
 
-variable "vnet_name" {
-  type = string
-  description = "Name of the generated VNET."
-}
-
 variable "az_devops_url" {
   type = string
   description = "Specify the Azure DevOps url e.g. https://dev.azure.com/myorg"

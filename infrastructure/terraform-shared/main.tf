@@ -11,7 +11,8 @@ module "acr" {
 
 module "vnet" {
   source = "./vnet"
-  vnet_name = var.vnet_name
+  appname = var.appname
+  environment = var.environment
   resource_group_name = var.resource_group
   location = var.location
 }

@@ -43,8 +43,6 @@ variables:
   value: Terraform
 - name: TERRAFORM_STORAGE_ACCOUNT
   value: tttemplate01terraform
-- name: VNET_NAME
-  value: tttemplate01
 - name: AGENT_POOL_NAME
   value: tttemplate01
 - name: JMETER_VERSION

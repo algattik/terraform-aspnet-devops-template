@@ -177,7 +177,6 @@ jobs:
         ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
         TF_VAR_environment: cd
         TF_VAR_resource_group: $(RESOURCE_GROUP)
-        TF_VAR_vnet_name: $(VNET_NAME)
         TF_VAR_acr_name: $(ACR_NAME)
         TF_VAR_aks_version: $(AKS_VERSION)
         TF_VAR_aks_sp_client_id: $(AKS_SP_CLIENT_ID)
