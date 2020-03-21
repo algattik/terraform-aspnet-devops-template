@@ -10,148 +10,6 @@
 #   temporary AKS namespace that is deleted at the end of the build.
 
 jobs:
-- job: Terraform_shared
-  displayName: Deploy shared infrastructure
-  # Avoid concurrent Terraform runs on PRs, which would result in failures due to exclusive lock on remote state file.
-  condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), variables['RUN_FLAG_TERRAFORM']))
-  variables:
-    TERRAFORM_DIRECTORY: infrastructure/terraform-shared
-  steps:
-
-  - template: terraform-init-template.yml
-    parameters:
-      TerraformStateKey: cd
-
-  - bash: |
-      set -euo pipefail
-      curl -sfu ":$(AGENT_POOL_MANAGEMENT_TOKEN)" '$(System.CollectionUri)_apis/distributedtask/pools?poolName=$(AGENT_POOL_NAME)&actionFilter=manage&api-version=5.1' \
-        | jq -e '.count>0'
-    displayName: Verify agent pool token
-
-  - bash: |
-      set -eu
-      terraform plan -out=tfplan -input=false \
-        -var environment=cd \
-        -var resource_group=$(RESOURCE_GROUP) \
-        -var vnet_name=$(VNET_NAME) \
-        -var acr_name=$(ACR_NAME) \
-        -var aks_name=$(AKS_NAME) \
-        -var aks_version=$(AKS_VERSION) \
-        -var aks_sp_client_id=$(AKS_SP_CLIENT_ID) \
-        -var aks_sp_object_id=$(AKS_SP_OBJECT_ID) \
-        -var kusto_name=$(KUSTO_NAME) \
-        -var kusto_admin_sp_object_id=$(AKS_SP_OBJECT_ID) \
-        -var az_devops_agent_pool=$(AGENT_POOL_NAME) \
-        -var az_devops_url=$(System.CollectionUri) \
-        -var az_devops_pat=$(AGENT_POOL_MANAGEMENT_TOKEN) \
-        ;
-        terraform apply -input=false -auto-approve tfplan
-    displayName: Terraform apply
-    workingDirectory: $(TERRAFORM_DIRECTORY)
-    # For additional security, pass secret through environment instead of command line.
-    # Terraform recognizes the TF_VAR prefixed environment variables.
-    env:
-      TF_VAR_aks_sp_client_secret: $(AKS_SP_CLIENT_SECRET)
-      ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
-      ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
-
-
-- job: Terraform_shared_outputs
-  displayName: Read shared infrastructure
-  dependsOn:
-  - Terraform_shared
-  condition: |
-    in(dependencies.Terraform_shared.result, 'Succeeded', 'SucceededWithIssues', 'Skipped')
-  variables:
-    TERRAFORM_DIRECTORY: infrastructure/terraform-shared
-  steps:
-
-  - template: terraform-init-template.yml
-    parameters:
-      TerraformStateKey: cd
-
-  - template: terraform-outputs-template.yml
-
-- job: Start_agents
-  displayName: Start agents
-  dependsOn:
-  - Terraform_shared_outputs
-  variables:
-    AGENT_VMSS_ID: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.agent_vmss_id'] ]
-    TERRAFORM_DIRECTORY: infrastructure/terraform-shared
-  steps:
-
-  - task: AzureCLI@1
-    displayName: Start agents
-    inputs:
-      azureSubscription: Terraform
-      scriptLocation: inlineScript
-      inlineScript: |
-        set -eux  # fail on error
-        az vmss scale --id $AGENT_VMSS_ID --new-capacity 2 -o table
-
-- job: Terraform
-  displayName: Deploy infrastructure
-  pool: $(AGENT_POOL_NAME)
-  dependsOn:
-  - Terraform_shared_outputs
-  variables:
-    KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
-    TERRAFORM_DIRECTORY: infrastructure/terraform
-  steps:
-
-  - bash: |
-      set -eu  # fail on error
-      base64 -d <<< $KUBE_CONFIG_BASE64 > kube_config
-      echo "##vso[task.setvariable variable=KUBECONFIG]$PWD/kube_config"
-    displayName: Save kubeconfig
-    env:
-      KUBE_CONFIG_BASE64: $(KUBE_CONFIG_BASE64)
-
-  - bash: |
-      set -eu  # fail on error
-
-      KUBERNETES_NAMESPACE="build$(Build.BuildId)"
-      if [ "$(Build.SourceBranch)" = "refs/heads/master" ]; then
-        KUBERNETES_NAMESPACE="master"
-      fi
-      if [ "${RUN_SET_NAMEBASE:-}" != "" ]; then
-        KUBERNETES_NAMESPACE="$RUN_SET_NAMEBASE"
-      fi
-
-      echo "Namespace: $KUBERNETES_NAMESPACE"
-
-      echo "##vso[task.setvariable variable=KUBERNETES_NAMESPACE]$KUBERNETES_NAMESPACE"
-
-    displayName: Define AKS namespace
-
-  - template: terraform-init-template.yml
-    parameters:
-      TerraformStateKey: cd-$(Build.BuildId)
-
-  - bash: |
-      set -eu
-      terraform plan -out=tfplan -input=false \
-        -var resource_group=$(RESOURCE_GROUP) \
-        -var kusto_cluster_name=$(KUSTO_NAME) \
-        -var kusto_database_name=$(KUSTO_DB) \
-        -var kubernetes_namespace=$(KUBERNETES_NAMESPACE) \
-        -var release_name="$(HELM_RELEASE_NAME)" \
-        -var image_repository="$(ACR_NAME).azurecr.io/contoso" \
-        -var image_tag="$(SEMANTIC_VERSION)" \
-        -var client_id="$(AKS_SP_CLIENT_ID)" \
-        -var tenant_id="$(ARM_TENANT_ID)" \
-        ;
-        terraform apply -input=false -auto-approve tfplan
-    displayName: Terraform apply
-    workingDirectory: $(TERRAFORM_DIRECTORY)
-    env:
-      ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
-      ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
-      TF_VAR_client_secret: $(AKS_SP_CLIENT_SECRET)
-
-  - template: terraform-outputs-template.yml
 
 - job: security_analysis
   displayName: Security analysis
@@ -296,25 +154,151 @@ jobs:
         # Push Docker image to ACR
         docker push "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION"
 
-- job: integration_tests
-  displayName: Integration tests
+
+- job: Terraform_shared
+  displayName: Deploy shared infrastructure
+  # Avoid concurrent Terraform runs on PRs, which would result in failures due to exclusive lock on remote state file.
+  condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), variables['RUN_FLAG_TERRAFORM']))
+  variables:
+    TERRAFORM_DIRECTORY: infrastructure/terraform-shared
+  steps:
+
+  - bash: |
+      set -euo pipefail
+      curl -sfu ":$(AGENT_POOL_MANAGEMENT_TOKEN)" '$(System.CollectionUri)_apis/distributedtask/pools?poolName=$(AGENT_POOL_NAME)&actionFilter=manage&api-version=5.1' \
+        | jq -e '.count>0'
+    displayName: Verify agent pool token
+
+  - template: terraform-apply-template.yml
+    parameters:
+      TerraformStateKey: cd
+      TerraformVariables:
+        ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+        TF_VAR_environment: cd
+        TF_VAR_resource_group: $(RESOURCE_GROUP)
+        TF_VAR_vnet_name: $(VNET_NAME)
+        TF_VAR_acr_name: $(ACR_NAME)
+        TF_VAR_aks_name: $(AKS_NAME)
+        TF_VAR_aks_version: $(AKS_VERSION)
+        TF_VAR_aks_sp_client_id: $(AKS_SP_CLIENT_ID)
+        TF_VAR_aks_sp_client_secret: $(AKS_SP_CLIENT_SECRET)
+        TF_VAR_aks_sp_object_id: $(AKS_SP_OBJECT_ID)
+        TF_VAR_kusto_name: $(KUSTO_NAME)
+        TF_VAR_kusto_admin_sp_object_id: $(AKS_SP_OBJECT_ID)
+        TF_VAR_az_devops_agent_pool: $(AGENT_POOL_NAME)
+        TF_VAR_az_devops_url: $(System.CollectionUri)
+        TF_VAR_az_devops_pat: $(AGENT_POOL_MANAGEMENT_TOKEN)
+
+- job: Terraform_shared_outputs
+  displayName: Read shared infrastructure
+  dependsOn:
+  - Terraform_shared
+  condition: |
+    in(dependencies.Terraform_shared.result, 'Succeeded', 'SucceededWithIssues', 'Skipped')
+  variables:
+    TERRAFORM_DIRECTORY: infrastructure/terraform-shared
+  steps:
+
+  - template: terraform-apply-template.yml
+    parameters:
+      TerraformAction: none
+      TerraformStateKey: cd
+
+- job: Terraform
+  displayName: Deploy infrastructure
   pool: $(AGENT_POOL_NAME)
   dependsOn:
-  - build
-  - Terraform
   - Terraform_shared_outputs
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
+    KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
+    TERRAFORM_DIRECTORY: infrastructure/terraform
   steps:
 
   - bash: |
       set -eu  # fail on error
-      base64 -d <<< $KUBE_CONFIG_BASE64 > kube_config
-      echo "##vso[task.setvariable variable=KUBECONFIG]$PWD/kube_config"
-    displayName: Save kubeconfig
-    env:
-      KUBE_CONFIG_BASE64: $(KUBE_CONFIG_BASE64)
+
+      KUBERNETES_NAMESPACE="build$(Build.BuildId)"
+      if [ "$(Build.SourceBranch)" = "refs/heads/master" ]; then
+        KUBERNETES_NAMESPACE="master"
+      fi
+      if [ "${RUN_SET_NAMEBASE:-}" != "" ]; then
+        KUBERNETES_NAMESPACE="$RUN_SET_NAMEBASE"
+      fi
+
+      echo "Namespace: $KUBERNETES_NAMESPACE"
+
+      echo "##vso[task.setvariable variable=KUBERNETES_NAMESPACE]$KUBERNETES_NAMESPACE"
+
+    displayName: Define AKS namespace
+
+  - template: terraform-apply-template.yml
+    parameters:
+      TerraformStateKey: cd-$(Build.BuildId)
+      TerraformVariables:
+        ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+        TF_VAR_resource_group: $(RESOURCE_GROUP)
+        TF_VAR_kusto_cluster_name: $(KUSTO_NAME)
+        TF_VAR_kusto_database_name: $(KUSTO_DB)
+        TF_VAR_kubernetes_namespace: $(KUBERNETES_NAMESPACE)
+
+- job: Terraform_app
+  displayName: Deploy application
+  pool: $(AGENT_POOL_NAME)
+  dependsOn:
+  - build
+  - Terraform
+  variables:
+    KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
+    KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
+    TERRAFORM_DIRECTORY: infrastructure/terraform-app
+  steps:
+
+  - template: terraform-apply-template.yml
+    parameters:
+      TerraformStateKey: cd-app-$(Build.BuildId)
+      TerraformVariables:
+        ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+        TF_VAR_kubernetes_namespace: $(KUBERNETES_NAMESPACE)
+        TF_VAR_release_name: $(HELM_RELEASE_NAME)
+        TF_VAR_image_repository: $(ACR_NAME).azurecr.io/contoso
+        TF_VAR_image_tag: $(SEMANTIC_VERSION)
+        TF_VAR_client_id: $(AKS_SP_CLIENT_ID)
+        TF_VAR_tenant_id: $(ARM_TENANT_ID)
+        TF_VAR_client_secret: $(AKS_SP_CLIENT_SECRET)
+
+- job: Start_agents
+  displayName: Start agents
+  dependsOn:
+  - Terraform_shared_outputs
+  variables:
+    AGENT_VMSS_ID: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.agent_vmss_id'] ]
+    TERRAFORM_DIRECTORY: infrastructure/terraform-shared
+  steps:
+
+  - task: AzureCLI@1
+    displayName: Start agents
+    inputs:
+      azureSubscription: Terraform
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -eux  # fail on error
+        az vmss scale --id $AGENT_VMSS_ID --new-capacity 2 -o table
+
+- job: integration_tests
+  displayName: Integration tests
+  pool: $(AGENT_POOL_NAME)
+  dependsOn:
+  - Terraform
+  - Terraform_shared_outputs
+  - Terraform_app
+  variables:
+    KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
+    KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
+  steps:
 
   - task: KubectlInstaller@0
     displayName: Install kubectl
@@ -397,26 +381,13 @@ jobs:
     TERRAFORM_DIRECTORY: infrastructure/terraform-destroy
   steps:
 
-  - bash: |
-      set -eu  # fail on error
-      base64 -d <<< $KUBE_CONFIG_BASE64 > kube_config
-      echo "##vso[task.setvariable variable=KUBECONFIG]$PWD/kube_config"
-    displayName: Save kubeconfig
-    env:
-      KUBE_CONFIG_BASE64: $(KUBE_CONFIG_BASE64)
-
-  - template: terraform-init-template.yml
+  - template: terraform-apply-template.yml
     parameters:
+      TerraformAction: destroy
       TerraformStateKey: cd-$(Build.BuildId)
-
-  - bash: |
-      set -eu
-      terraform destroy -input=false -auto-approve
-    displayName: Terraform destroy
-    workingDirectory: $(TERRAFORM_DIRECTORY)
-    env:
-      ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
-      ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+      TerraformVariables:
+        ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
 
 - job: Promote
   displayName: Promote latest image

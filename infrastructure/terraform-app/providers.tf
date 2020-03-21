@@ -13,5 +13,5 @@ provider "azurerm" {
   features {}
 }
 
-provider "kubernetes" {
+provider "helm" {
 }
