@@ -62,6 +62,8 @@ jobs:
   - Terraform_shared
   condition: |
     in(dependencies.Terraform_shared.result, 'Succeeded', 'SucceededWithIssues', 'Skipped')
+  variables:
+    TERRAFORM_DIRECTORY: infrastructure/terraform-shared
   steps:
 
   - template: terraform-init-template.yml
