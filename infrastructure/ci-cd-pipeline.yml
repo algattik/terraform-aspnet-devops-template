@@ -30,7 +30,6 @@ jobs:
 
   - bash: |
       set -eu
-      terraform init -input=false to initialize the working directory.
       terraform plan -out=tfplan -input=false \
         -var environment=cd \
         -var resource_group=$(RESOURCE_GROUP) \
@@ -56,7 +55,29 @@ jobs:
       ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
       ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
 
+
+- job: Terraform_shared_outputs
+  displayName: Terraform_shared_outputs
+  dependsOn:
+  - Terraform_shared
+  condition: |
+    in(dependencies.Terraform_shared.result, 'Succeeded', 'SucceededWithIssues', 'Skipped')
+  steps:
+
+  - template: terraform-init-template.yml
+    parameters:
+      TerraformStateKey: cd
+
   - template: terraform-outputs-template.yml
+
+- job: Start_agents
+  displayName: Start agents
+  dependsOn:
+  - Terraform_shared_outputs
+  variables:
+    KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
+    TERRAFORM_DIRECTORY: infrastructure/terraform-exclusive
+  steps:
 
   - task: AzureCLI@1
     displayName: Start agents
@@ -65,25 +86,20 @@ jobs:
       scriptLocation: inlineScript
       inlineScript: |
         set -eux  # fail on error
-        env
         az vmss scale --id $AGENT_VMSS_ID --new-capacity 2 -o table
 
 - job: Terraform_exclusive
   displayName: Terraform exclusive
   dependsOn:
-  - Terraform_shared
-  condition: |
-    in(dependencies.Terraform_shared.result, 'Succeeded', 'SucceededWithIssues', 'Skipped')
+  - Terraform_shared_outputs
   variables:
-    KUSTO_NAME: $[ dependencies.Terraform_shared.outputs['Outputs.kusto_name'] ]
+    KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-exclusive
   steps:
 
   - template: terraform-init-template.yml
     parameters:
       TerraformStateKey: cd-$(Build.BuildId)
-
-  - bash: env
 
   - bash: |
       set -eu
@@ -93,6 +109,9 @@ jobs:
         ;
     displayName: Terraform apply
     workingDirectory: $(TERRAFORM_DIRECTORY)
+    env:
+      ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
+      ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
 
 - job: security_analysis
   displayName: Security analysis
@@ -198,7 +217,6 @@ jobs:
       testRunTitle: 'Unit Tests'
 
   #FIXME
-  - bash: sudo apt install -y unzip
   - bash: echo "##vso[task.setvariable variable=HOME]."
 
   - task: UseDotNet@2
@@ -252,7 +270,7 @@ jobs:
   dependsOn:
   - build
   - Terraform_exclusive
-  - Terraform_shared
+  - Terraform_shared_outputs
   steps:
 
   - template: setup-k8s-clients-template.yml
