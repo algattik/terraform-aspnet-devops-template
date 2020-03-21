@@ -105,10 +105,11 @@ jobs:
 
   - bash: |
       set -eu
-      terraform apply -input=false -auto-approve \
+      terraform plan -out=tfplan -input=false \
         -var resource_group=$(RESOURCE_GROUP) \
         -var kusto_name=$(KUSTO_NAME) \
         ;
+        terraform apply -input=false -auto-approve tfplan
     displayName: Terraform apply
     workingDirectory: $(TERRAFORM_DIRECTORY)
     env:
