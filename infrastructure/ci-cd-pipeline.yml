@@ -429,7 +429,7 @@ jobs:
           concurrency: 10
           ramp-up: 15s
           hold-for: 2m
-          iterations: 1000
+          iterations: 10000
         reporting:
         - module: junit-xml
           filename: taurus-output/TEST-Taurus.xml
