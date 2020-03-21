@@ -145,6 +145,8 @@ jobs:
       ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
       ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
 
+  - template: terraform-outputs-template.yml
+
 - job: security_analysis
   displayName: Security analysis
   condition: false
@@ -306,7 +308,7 @@ jobs:
   - Terraform_shared_outputs
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    KUBERNETES_NAMESPACE: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kubernetes_namespace'] ]
+    KUBERNETES_NAMESPACE: $[ dependencies.Terraform_specific.outputs['Outputs.kubernetes_namespace'] ]
   steps:
 
   - bash: |
