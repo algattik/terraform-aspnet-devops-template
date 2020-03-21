@@ -270,11 +270,6 @@ jobs:
       pathToSources: '$(Build.SourcesDirectory)/Src'
       failIfCoverageEmpty: true
 
-  - task: HelmInstaller@1
-    displayName: Helm installer
-    inputs:
-      helmVersionToInstall: $(HELM_VERSION)
-
   - task: AzureCLI@1
     displayName: Build images and charts
     inputs:
@@ -294,10 +289,6 @@ jobs:
 
         # Push Docker image to ACR
         docker push "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION"
-
-        # Push Helm chart to ACR
-        helm package --version "$SEMANTIC_VERSION" charts/contoso -d charts_out
-        az acr helm push --force "$(ls charts_out/*)" -o table
 
 - job: integration_tests
   displayName: Integration tests
@@ -319,26 +310,10 @@ jobs:
     env:
       KUBE_CONFIG_BASE64: $(KUBE_CONFIG_BASE64)
 
-  - task: HelmInstaller@1
-    displayName: Install helm
-    inputs:
-      helmVersionToInstall: $(HELM_VERSION)
-
   - task: KubectlInstaller@0
     displayName: Install kubectl
     inputs:
       kubectlVersion: $(AKS_VERSION)
-
-  - task: AzureCLI@1
-    displayName: Log into ACR Helm repo
-    inputs:
-      azureSubscription: $(ACR_PULL_SERVICE_CONNECTION)
-      scriptLocation: inlineScript
-      inlineScript: |
-        set -eu  # fail on error
-        az acr helm repo add -n "$(ACR_NAME)"
-        KUSTO_URI=$(az kusto cluster show -g $(RESOURCE_GROUP) -n $(KUSTO_NAME) --query uri -o tsv)
-        echo "##vso[task.setvariable variable=KUSTO_URI]$KUSTO_URI"
 
   - bash: |
       set -eux  # fail on error
@@ -353,7 +328,6 @@ jobs:
         --set image.tag=$SEMANTIC_VERSION \
         --set replicaCount=2 \
         --set service.type=NodePort \
-        --set settings.adxClusterUrl="$KUSTO_URI" \
         --set settings.adxDefaultDatabaseName="$(KUSTO_DB)" \
         --set settings.aadClientId="$(AKS_SP_CLIENT_ID)" \
         --set settings.aadClientSecret="$secret" \
