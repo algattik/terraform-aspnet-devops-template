@@ -40,7 +40,7 @@ variables:
 #  value: ENTER
 - name: AKS_VERSION
   value: 1.15.7
-- name: CHART_NAME
+- name: HELM_RELEASE_NAME
   value: contoso
 - name: KUSTO_NAME
   value: tttemplate01

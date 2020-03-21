@@ -137,7 +137,7 @@ jobs:
         -var kusto_cluster_name=$(KUSTO_NAME) \
         -var kusto_database_name=$(KUSTO_DB) \
         -var kubernetes_namespace=$(KUBERNETES_NAMESPACE) \
-        -var release_name="$(CHART_NAME)" \
+        -var release_name="$(HELM_RELEASE_NAME)" \
         -var image_repository="$(ACR_NAME).azurecr.io/contoso" \
         -var image_tag="$(SEMANTIC_VERSION)" \
         -var client_id="$(AKS_SP_CLIENT_ID)" \
@@ -346,20 +346,20 @@ jobs:
       taurusVersion: 1.14.1
       pythonCommand: python3.6
 
-  - bash: kubectl -n "$KUBERNETES_NAMESPACE" rollout status deployment "$(CHART_NAME)" --timeout 5m
+  - bash: kubectl -n "$KUBERNETES_NAMESPACE" rollout status deployment "$(HELM_RELEASE_NAME)" --timeout 5m
     displayName: Await K2 deployment
 
   - bash: |
       set -eux  # fail on error
-      kubectl -n "$KUBERNETES_NAMESPACE" run --attach --rm --restart=Never --image=busybox smoke-test-$(CHART_NAME) -- \
+      kubectl -n "$KUBERNETES_NAMESPACE" run --attach --rm --restart=Never --image=busybox smoke-test-$(HELM_RELEASE_NAME) -- \
         wget -O- \
-        'http://$(CHART_NAME)'
+        'http://$(HELM_RELEASE_NAME)'
     displayName: Smoke test
 
   - bash: |
       set -eux  # fail on error
       read -d, firstNodeIP < <(kubectl -n "$KUBERNETES_NAMESPACE" get nodes -o jsonpath="{.items[0].status.addresses[?(@.type=='InternalIP')].address},")
-      read -d, nodePort < <(kubectl -n "$KUBERNETES_NAMESPACE" get svc "$(CHART_NAME)" -o jsonpath="{.spec.ports[0].nodePort},")
+      read -d, nodePort < <(kubectl -n "$KUBERNETES_NAMESPACE" get svc "$(HELM_RELEASE_NAME)" -o jsonpath="{.spec.ports[0].nodePort},")
       url="http://$firstNodeIP:$nodePort"
       echo "##vso[task.setvariable variable=SERVICE_URL]$url"
       echo "$url"
