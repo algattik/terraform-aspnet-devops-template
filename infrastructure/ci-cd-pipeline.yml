@@ -169,7 +169,7 @@ jobs:
         | jq -e '.count>0'
     displayName: Verify agent pool token
 
-  - template: terraform-apply-template.yml
+  - template: terraform-template.yml
     parameters:
       TerraformStateKey: cd
       TerraformVariables:
@@ -200,7 +200,7 @@ jobs:
     TERRAFORM_DIRECTORY: infrastructure/terraform-shared
   steps:
 
-  - template: terraform-apply-template.yml
+  - template: terraform-template.yml
     parameters:
       TerraformAction: none
       TerraformStateKey: cd
@@ -236,7 +236,7 @@ jobs:
 
     displayName: Define AKS namespace
 
-  - template: terraform-apply-template.yml
+  - template: terraform-template.yml
     parameters:
       TerraformStateKey: cd-$(Build.BuildId)
       TerraformVariables:
@@ -259,7 +259,7 @@ jobs:
     TERRAFORM_DIRECTORY: infrastructure/terraform-app
   steps:
 
-  - template: terraform-apply-template.yml
+  - template: terraform-template.yml
     parameters:
       TerraformStateKey: cd-app-$(Build.BuildId)
       TerraformVariables:
@@ -384,7 +384,7 @@ jobs:
     TERRAFORM_DIRECTORY: infrastructure/terraform-destroy
   steps:
 
-  - template: terraform-apply-template.yml
+  - template: terraform-template.yml
     parameters:
       TerraformAction: destroy
       TerraformStateKey: cd-$(Build.BuildId)
