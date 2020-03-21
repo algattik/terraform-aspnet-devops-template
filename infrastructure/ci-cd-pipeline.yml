@@ -418,16 +418,22 @@ jobs:
     displayName: 'Run Taurus'
     inputs:
       taurusConfig: |
-       execution:
-       - scenario:
-           requests:
-           - $(SERVICE_URL)
-         concurrency: 5
-         iterations: 10
-         ramp-up: 2s
-       reporting:
-       - module: junit-xml
-         filename: taurus-output/TEST-Taurus.xml
+        modules:
+          jmeter:
+            properties:
+              jmeter.reportgenerator.overall_granularity: 5000
+        execution:
+        - scenario:
+            requests:
+            - $(SERVICE_URL)
+          concurrency: 10
+          ramp-up: 15s
+          hold-for: 2m
+          iterations: 1000
+        reporting:
+        - module: junit-xml
+          filename: taurus-output/TEST-Taurus.xml
+
 
   - task: PublishTestResults@2
     displayName: Publish test results
