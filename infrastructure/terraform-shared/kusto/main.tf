@@ -1,5 +1,5 @@
 resource "azurerm_kusto_cluster" "kusto" {
-  name                = "adx-${var.appname}-${var.environment}"
+  name                = "adx${var.appname}${var.environment}"
   location            = var.location
   resource_group_name = var.resource_group_name
 
