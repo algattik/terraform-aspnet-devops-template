@@ -107,10 +107,17 @@ jobs:
       perl -pe 's/\\n/\n/g' > kube_config <<< $KUBE_CONFIG_RAW
       #FIXME
       cat kube_config
+      cat kube_config | perl -pe 's/\n/§/g' 
       echo "##vso[task.setvariable variable=KUBECONFIG]$PWD/kube_config"
     displayName: Save kubeconfig
     env:
       KUBE_CONFIG_RAW: $(KUBE_CONFIG_RAW)
+
+
+  #FIXME
+  - template: setup-k8s-clients-template.yml
+  - bash: kubectl get ns
+
 
   - bash: |
       set -eu  # fail on error
