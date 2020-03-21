@@ -346,16 +346,6 @@ jobs:
       taurusVersion: 1.14.1
       pythonCommand: python3.6
 
-  - bash: kubectl -n "$KUBERNETES_NAMESPACE" rollout status deployment "$(HELM_RELEASE_NAME)" --timeout 5m
-    displayName: Await K2 deployment
-
-  - bash: |
-      set -eux  # fail on error
-      kubectl -n "$KUBERNETES_NAMESPACE" run --attach --rm --restart=Never --image=busybox smoke-test-$(HELM_RELEASE_NAME) -- \
-        wget -O- \
-        'http://$(HELM_RELEASE_NAME)'
-    displayName: Smoke test
-
   - bash: |
       set -eux  # fail on error
       read -d, firstNodeIP < <(kubectl -n "$KUBERNETES_NAMESPACE" get nodes -o jsonpath="{.items[0].status.addresses[?(@.type=='InternalIP')].address},")
@@ -364,10 +354,6 @@ jobs:
       echo "##vso[task.setvariable variable=SERVICE_URL]$url"
       echo "$url"
     displayName: Get Service URL
-
-  - bash: |
-      curl -fv $SERVICE_URL
-    displayName: Smoke test 2
 
   - task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
     displayName: 'Run Taurus'
