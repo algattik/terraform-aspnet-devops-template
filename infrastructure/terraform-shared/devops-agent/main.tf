@@ -68,6 +68,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "devops" {
     ip_configuration {
       name                          = "AzureDevOpsNicConfiguration"
       subnet_id                     = var.subnet_id
+      primary                       = true
     }
   }
   sku                   = var.az_devops_agent_vm_size
