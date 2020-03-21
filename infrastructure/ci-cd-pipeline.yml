@@ -365,7 +365,7 @@ jobs:
 
       kubectl run --namespace "$KUBERNETES_NAMESPACE" --attach --rm --restart=Never --image=busybox smoke-test-$(CHART_NAME) -- \
         wget -O- \
-        'http://$(CHART_NAME):5000'
+        'http://$(CHART_NAME)'
 
     displayName: Smoke test
 
@@ -387,7 +387,6 @@ jobs:
 
   - bash: |
       set -eu
-      terraform plan -destroy -input=false
       terraform destroy -input=false -auto-approve
     displayName: Terraform destroy
     workingDirectory: $(TERRAFORM_DIRECTORY)
