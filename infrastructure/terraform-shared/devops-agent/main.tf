@@ -23,7 +23,7 @@ resource "azurerm_storage_blob" "devops_agent_init" {
   storage_account_name   = azurerm_storage_account.devops.name
   storage_container_name = azurerm_storage_container.devops.name
   type                   = "Block"
-  source                 = join("\n\n", ["${path.module}/devops_agent_init.sh", "${path.module}/install_software.sh"])
+  source_content         = join("\n\n", [file("${path.module}/devops_agent_init.sh"), file("${path.module}/install_software.sh")])
 }
 
 data "azurerm_storage_account_blob_container_sas" "devops_agent_init" {
