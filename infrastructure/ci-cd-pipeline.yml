@@ -365,6 +365,12 @@ jobs:
     env:
       secret: $(AKS_SP_CLIENT_SECRET)
 
+  - task: AlexandreGattiker.jmeter-tasks.custom-jmeter-installer-task.JMeterInstaller@0
+    displayName: 'Install JMeter'
+    inputs:
+      jmeterVersion: $(JMETER_VERSION)
+      plugins: jpgc-casutg,jpgc-dummy,jpgc-ffw,jpgc-fifo,jpgc-functions,jpgc-json,jpgc-perfmon,jpgc-prmctl,jpgc-tst,jmeter.backendlistener.azure
+
   - bash: kubectl rollout status deployment "$(CHART_NAME)" --timeout 5m --namespace "$KUBERNETES_NAMESPACE"
     displayName: Await K2 deployment
 
