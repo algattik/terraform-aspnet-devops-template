@@ -131,7 +131,7 @@ jobs:
       TerraformStateKey: cd-$(Build.BuildId)
 
   - bash: |
-      set -eu
+      set -eux
       terraform plan -out=tfplan -input=false \
         -var resource_group=$(RESOURCE_GROUP) \
         -var kusto_cluster_name=$(KUSTO_NAME) \
@@ -397,7 +397,7 @@ jobs:
       failTaskOnFailedTests: true
 
 - job: Cleanup
-  displayName: Delete infrastructure
+  displayName: Destroy infrastructure
   dependsOn:
   - integration_tests
   - Terraform_shared_outputs
