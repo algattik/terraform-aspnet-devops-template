@@ -19,6 +19,9 @@ resource "helm_release" "example" {
   chart      = "../../charts/contoso"
   namespace  = var.kubernetes_namespace
 
+  wait       = true
+  timeout    = 300
+
   set {
     name  = "image.repository"
     value = var.image_repository
