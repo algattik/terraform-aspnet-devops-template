@@ -21,8 +21,3 @@
     http://127.0.0.1:8080. This is an internal address in the cluster and you should run this to access it locally:
     kubectl port-forward service/{{ include "contoso.fullname" .}} 8080 --namespace {{ .Release.Namespace }}
 {{- end }}
-
-3. Optionally deploy Kibana by running these commands:
-    helm install kibana elastic/kibana --namespace {{ .Release.Namespace }} --set image=docker.elastic.co/kibana/kibana-oss --set imageTag={{ .Values.elasticsearch.imageTag }} --set elasticsearchHosts=http://{{ include "contoso.fullname" . }}:{{ .Values.service.port }}
-    kubectl port-forward service/kibana-kibana 5601 --namespace {{ .Release.Namespace }}
-    Use http://127.0.0.1:5601 to connect to Kibana
