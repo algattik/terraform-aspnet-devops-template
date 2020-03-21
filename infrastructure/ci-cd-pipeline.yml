@@ -104,7 +104,7 @@ jobs:
   - bash: |
       set -eux  # fail on error
       echo "$KUBE_CONFIG_RAW"
-      perl -pe 's/\\n/\n/g' > kube_config <<< $KUBE_CONFIG_RAW
+      echo "$KUBE_CONFIG_RAW" | perl -pe 's/\\n/\n/g' > kube_config
       #FIXME
       cat kube_config
       cat kube_config | perl -pe 's/\n/§/g' 
