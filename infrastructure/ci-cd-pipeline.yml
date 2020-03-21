@@ -336,6 +336,7 @@ jobs:
       helm list
       # Deploy chart
       helm upgrade --install "$(CHART_NAME)" $(ACR_NAME)/contoso \
+        --namespace "$KUBERNETES_NAMESPACE" \
         --version "$SEMANTIC_VERSION" \
         --set image.repository=$(ACR_NAME).azurecr.io/contoso \
         --set image.tag=$SEMANTIC_VERSION \
@@ -352,16 +353,6 @@ jobs:
     displayName: Install Contoso
     env:
       secret: $(AKS_SP_CLIENT_SECRET)
-
-  # Deploy a new Kusto db
-  - task: AzureCLI@1
-    displayName: Provision Kusto database
-    inputs:
-      azureSubscription: $(ACR_PULL_SERVICE_CONNECTION)
-      scriptLocation: inlineScript
-      inlineScript: |
-        set -eux  # fail on error
-        az kusto database create -g "$(RESOURCE_GROUP)" --cluster-name "$(KUSTO_NAME)" -n "$(KUSTO_DB)"
 
   - bash: kubectl rollout status deployment "$(CHART_NAME)" --timeout 5m
     displayName: Await K2 deployment

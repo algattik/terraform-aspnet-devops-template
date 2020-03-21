@@ -5,3 +5,9 @@ resource "azurerm_container_registry" "acr" {
   sku                      = "Standard"
   admin_enabled            = false
 }
+
+resource "azurerm_role_assignment" "aks_sp_container_registry" {
+  scope                = azurerm_container_registry.acr.id
+  role_definition_name = "AcrPull"
+  principal_id         = var.aks_sp_object_id
+}

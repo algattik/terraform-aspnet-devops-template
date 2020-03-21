@@ -9,3 +9,7 @@ variable "resource_group_name" {
 variable "location" {
   type    = string
 }
+
+variable "aks_sp_object_id" {
+  type    = string
+}
