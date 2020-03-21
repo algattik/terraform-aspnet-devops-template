@@ -15,7 +15,7 @@ resource "kubernetes_namespace" "build" {
 }
 
 resource "helm_release" "example" {
-  name       = var.release_name
+  name       = "contoso"
   chart      = "../../charts/contoso"
   namespace  = var.kubernetes_namespace
 
