@@ -131,17 +131,17 @@ jobs:
       TerraformStateKey: cd-$(Build.BuildId)
 
   - bash: |
-      set -eux
+      set -eu
       terraform plan -out=tfplan -input=false \
         -var resource_group=$(RESOURCE_GROUP) \
         -var kusto_cluster_name=$(KUSTO_NAME) \
         -var kusto_database_name=$(KUSTO_DB) \
         -var kubernetes_namespace=$(KUBERNETES_NAMESPACE) \
-        -var release_name="$(HELM_RELEASE_NAME)" \
-        -var image_repository="$(ACR_NAME).azurecr.io/contoso" \
-        -var image_tag="$(SEMANTIC_VERSION)" \
-        -var client_id="$(AKS_SP_CLIENT_ID)" \
-        -var tenant_id="$(ARM_TENANT_ID)" \
+        -var release_name="$(HELM_RELEASE_NAME)" \
+        -var image_repository="$(ACR_NAME).azurecr.io/contoso" \
+        -var image_tag="$(SEMANTIC_VERSION)" \
+        -var client_id="$(AKS_SP_CLIENT_ID)" \
+        -var tenant_id="$(ARM_TENANT_ID)" \
         ;
         terraform apply -input=false -auto-approve tfplan
     displayName: Terraform apply
