@@ -21,7 +21,6 @@ steps:
     set -eu  # fail on error
     base64 -d <<< $KUBE_CONFIG_BASE64 > kube_config
     echo "##vso[task.setvariable variable=KUBECONFIG]$PWD/kube_config"
-    fi
   displayName: Save kubeconfig
   condition: ne(variables.KUBE_CONFIG_BASE64, '')
   env:
