@@ -107,7 +107,8 @@ jobs:
       set -eu
       terraform plan -out=tfplan -input=false \
         -var resource_group=$(RESOURCE_GROUP) \
-        -var kusto_name=$(KUSTO_NAME) \
+        -var kusto_cluster_name=$(KUSTO_NAME) \
+        -var kusto_database_name=$(KUSTO_DB) \
         ;
         terraform apply -input=false -auto-approve tfplan
     displayName: Terraform apply
