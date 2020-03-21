@@ -252,6 +252,7 @@ jobs:
   pool: $(AGENT_POOL_NAME)
   dependsOn:
   - build
+  - Terraform_shared_outputs
   - Terraform
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
