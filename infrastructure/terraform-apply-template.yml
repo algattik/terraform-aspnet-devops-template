@@ -1,8 +1,8 @@
 parameters:
 - name: TerraformVersion
-  value: 0.12.24
+  default: 0.12.24
 - name: TerraformDirectory
-  value: $(TERRAFORM_DIRECTORY)
+  default: $(TERRAFORM_DIRECTORY)
 - name: TerraformAction
   type: string
   default: apply
