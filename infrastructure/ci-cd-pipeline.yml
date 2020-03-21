@@ -4,7 +4,7 @@
 #   `terraform apply` only runs on the master branch.
 # - RUN_FLAG_PROMOTE: Set to 1 to promote the Docker image to `latest` tag if
 #   tests are successful. By default this is only done on the master branch.
-# - RUN_SET_NAMESPACE: Set to a string to deploy to the given AKS namespace,
+# - RUN_SET_NAMEBASE: Set to a string to deploy to the given AKS namespace,
 #   and not delete the namespace after the build. By default the build deploys to
 #   the `master` AKS namespace if run on the master branch, and otherwise to a
 #   temporary AKS namespace that is deleted at the end of the build.
@@ -25,7 +25,7 @@ jobs:
   - bash: |
       set -euo pipefail
       curl -sfu ":$(AGENT_POOL_MANAGEMENT_TOKEN)" '$(System.CollectionUri)_apis/distributedtask/pools?poolName=$(AGENT_POOL_NAME)&actionFilter=manage&api-version=5.1' \
-        | jq -e '.count>0' 
+        | jq -e '.count>0'
     displayName: Verify agent pool token
 
   - bash: |
@@ -116,8 +116,8 @@ jobs:
       if [ "$(Build.SourceBranch)" = "refs/heads/master" ]; then
         KUBERNETES_NAMESPACE="master"
       fi
-      if [ "${RUN_SET_NAMESPACE:-}" != "" ]; then
-        KUBERNETES_NAMESPACE="$RUN_SET_NAMESPACE"
+      if [ "${RUN_SET_NAMEBASE:-}" != "" ]; then
+        KUBERNETES_NAMESPACE="$RUN_SET_NAMEBASE"
       fi
 
       echo "Namespace: $KUBERNETES_NAMESPACE"
@@ -352,6 +352,7 @@ jobs:
         --set image.repository=$(ACR_NAME).azurecr.io/contoso \
         --set image.tag=$SEMANTIC_VERSION \
         --set replicaCount=2 \
+        --set service.type=NodePort \
         --set settings.adxClusterUrl="$KUSTO_URI" \
         --set settings.adxDefaultDatabaseName="$(KUSTO_DB)" \
         --set settings.aadClientId="$(AKS_SP_CLIENT_ID)" \
@@ -365,17 +366,80 @@ jobs:
     env:
       secret: $(AKS_SP_CLIENT_SECRET)
 
-  - bash: kubectl rollout status deployment "$(CHART_NAME)" --timeout 5m --namespace "$KUBERNETES_NAMESPACE"
+  #FIXME
+  - bash: |
+     sudo apt-get install openjdk-8-jdk
+    displayName: FIXME Install Java
+
+  - task: AlexandreGattiker.jmeter-tasks.custom-jmeter-installer-task.JMeterInstaller@0
+    displayName: 'Install JMeter'
+    inputs:
+      jmeterVersion: $(JMETER_VERSION)
+      plugins: jpgc-casutg,jpgc-dummy,jpgc-ffw,jpgc-fifo,jpgc-functions,jpgc-json,jpgc-perfmon,jpgc-prmctl,jpgc-tst,jmeter.backendlistener.azure
+
+  #FIXME
+  - bash: |
+     sudo add-apt-repository ppa:deadsnakes/ppa
+     sudo apt update
+     sudo apt install python3.6 python3-pip python3.6-dev
+     python3.6 -mpip install --upgrade urllib3
+    displayName: FIXME Install Python 3.6 (for Ubuntu 16)
+
+  - task: AlexandreGattiker.jmeter-tasks.custom-taurus-installer-task.TaurusInstaller@0
+    displayName: 'Install Taurus'
+    inputs:
+      taurusVersion: 1.14.1
+      pythonCommand: python3.6
+
+  - bash: kubectl -n "$KUBERNETES_NAMESPACE" rollout status deployment "$(CHART_NAME)" --timeout 5m
     displayName: Await K2 deployment
 
   - bash: |
       set -eux  # fail on error
-
-      kubectl run --namespace "$KUBERNETES_NAMESPACE" --attach --rm --restart=Never --image=busybox smoke-test-$(CHART_NAME) -- \
+      kubectl -n "$KUBERNETES_NAMESPACE" run --attach --rm --restart=Never --image=busybox smoke-test-$(CHART_NAME) -- \
         wget -O- \
         'http://$(CHART_NAME)'
-
     displayName: Smoke test
+
+  - bash: |
+      set -eux  # fail on error
+      read -d, firstNodeIP < <(kubectl -n "$KUBERNETES_NAMESPACE" get nodes -o jsonpath="{.items[0].status.addresses[?(@.type=='InternalIP')].address},")
+      read -d, nodePort < <(kubectl -n "$KUBERNETES_NAMESPACE" get svc "$(CHART_NAME)" -o jsonpath="{.spec.ports[0].nodePort},")
+      url="http://$firstNodeIP:$nodePort"
+      echo "##vso[task.setvariable variable=SERVICE_URL]$url"
+      echo "$url"
+    displayName: Get Service URL
+
+  - bash: |
+      curl -fv $SERVICE_URL
+    displayName: Smoke test 2
+
+  - task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
+    displayName: 'Run Taurus'
+    inputs:
+      taurusConfig: |
+        modules:
+          jmeter:
+            properties:
+              jmeter.reportgenerator.overall_granularity: 5000
+        execution:
+        - scenario:
+            requests:
+            - $(SERVICE_URL)
+          concurrency: 10
+          ramp-up: 15s
+          hold-for: 2m
+          iterations: 10000
+        reporting:
+        - module: junit-xml
+          filename: taurus-output/TEST-Taurus.xml
+
+
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    inputs:
+      testRunTitle: Integration tests
+      failTaskOnFailedTests: true
 
 - job: Cleanup
   displayName: Delete build-specific infrastructure
@@ -385,8 +449,8 @@ jobs:
   pool: $(AGENT_POOL_NAME)
   # Do not delete AKS namespace:
   # - if deploying on master branch
-  # - if namespace was manually set with RUN_SET_NAMESPACE
-  condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMESPACE']))
+  # - if namespace was manually set with RUN_SET_NAMEBASE
+  condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMEBASE']))
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-specific-destroy
