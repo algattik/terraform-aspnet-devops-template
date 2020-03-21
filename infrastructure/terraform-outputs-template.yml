@@ -3,7 +3,7 @@ parameters:
 
 steps:
 - bash: |
-    set -eu
+    set -euo pipefail
 
     echo "Setting job variables from Terraform outputs:"
     terraform output -json | jq -r '
