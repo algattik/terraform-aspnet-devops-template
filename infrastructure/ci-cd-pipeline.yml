@@ -404,6 +404,9 @@ jobs:
   - bash: |
       set -euxo pipefail  # fail on error
       kubectl -n "$KUBERNETES_NAMESPACE" get svc "$(CHART_NAME)" -o jsonpath="{.spec.ports[0].name}://{.spec.clusterIP}:{.spec.ports[0].port};" | read -r -d ";" url
+      echo //
+      printenv
+      echo //
       echo "##vso[task.setvariable variable=SERVICE_URL]$url"
     displayName: Get Service URL
 
