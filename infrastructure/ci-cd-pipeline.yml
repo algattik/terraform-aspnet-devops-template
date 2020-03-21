@@ -25,7 +25,7 @@ jobs:
   - bash: |
       set -euo pipefail
       curl -sfu ":$(AGENT_POOL_MANAGEMENT_TOKEN)" '$(System.CollectionUri)_apis/distributedtask/pools?poolName=$(AGENT_POOL_NAME)&actionFilter=manage&api-version=5.1' \
-        | jq -e '.count>0' 
+        | jq -e '.count>0'
     displayName: Verify agent pool token
 
   - bash: |
@@ -390,25 +390,24 @@ jobs:
       taurusVersion: 1.14.1
       pythonCommand: python3.6
 
-steps:
-- task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
-  displayName: 'Run Taurus'
-  inputs:
-    taurusConfig: |
-     
-     execution:
-     - scenario:
-         requests:
-         - https://www.bing.com
-         # You can also reference a JMeter test plan (recommended)
-         # script: website-test.jmx
-       concurrency: 5
-       iterations: 10
-       ramp-up: 2s
-     
-     reporting:
-     - module: junit-xml
-       filename: taurus-output/TEST-Taurus.xml
+  - task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
+    displayName: 'Run Taurus'
+    inputs:
+      taurusConfig: |
+
+       execution:
+       - scenario:
+           requests:
+           - https://www.bing.com
+           # You can also reference a JMeter test plan (recommended)
+           # script: website-test.jmx
+         concurrency: 5
+         iterations: 10
+         ramp-up: 2s
+
+       reporting:
+       - module: junit-xml
+         filename: taurus-output/TEST-Taurus.xml
 
 
   - bash: kubectl rollout status deployment "$(CHART_NAME)" --timeout 5m --namespace "$KUBERNETES_NAMESPACE"
