@@ -14,7 +14,6 @@ parameters:
   type: string
 - name: TerraformVariables
   type: object
-  default: {}
 
 steps:
 
@@ -51,7 +50,7 @@ steps:
     terraform plan -out=tfplan -input=false
     terraform apply -input=false -auto-approve tfplan
   displayName: Terraform apply
-  condition: eq('${{ parameters.TerraformAction }}, 'apply')
+  condition: eq('${{ parameters.TerraformAction }}', 'apply')
   workingDirectory: $(TERRAFORM_DIRECTORY)
   env:
     ${{ parameters.TerraformVariables }}
@@ -60,7 +59,7 @@ steps:
     set -eu
     terraform destroy -input=false -auto-approve
   displayName: Terraform destroy
-  condition: eq('${{ parameters.TerraformAction }}, 'destroy')
+  condition: eq('${{ parameters.TerraformAction }}', 'destroy')
   workingDirectory: $(TERRAFORM_DIRECTORY)
   env:
     ${{ parameters.TerraformVariables }}
