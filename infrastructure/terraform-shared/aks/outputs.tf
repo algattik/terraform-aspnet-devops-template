@@ -6,6 +6,10 @@ output "kubernetes_version" {
   value = azurerm_kubernetes_cluster.aks.kubernetes_version
 }
 
+output "name" {
+  value = azurerm_kubernetes_cluster.aks.name
+}
+
 output "id" {
   value = azurerm_kubernetes_cluster.aks.id
 }

@@ -1,4 +1,8 @@
-variable "aks_name" {
+variable "appname" {
+  type = string
+}
+
+variable "environment" {
   type = string
 }
 

@@ -23,8 +23,6 @@ variables:
   value: "build$(Build.BuildId)"
 - name: ACR_NAME
   value: tttemplate01
-- name: AKS_NAME
-  value: tttemplate01
 - name: TERRAFORM_SP_CLIENT_ID
   value: df9df564-e889-4852-9bb2-aa912d990c93
 #- name: TERRAFORM_SP_CLIENT_SECRET

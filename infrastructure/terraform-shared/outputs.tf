@@ -14,9 +14,14 @@ output "agent_vmss_id" {
   value = module.devops-agent.agent_vmss_id
 }
 
-output "aks_id" {
+output "aks_name" {
+  value = module.aks.name
+}
+
+output "aks_name" {
   value = module.aks.id
 }
+
 
 output "kube_config_base64" {
   value     = base64encode(module.aks.kube_config_raw)

@@ -65,11 +65,6 @@ variable "acr_name" {
   description = "Name of the generated Azure Container Registry instance."
 }
 
-variable "aks_name" {
-  type = string
-  description = "Name of the generated Azure Kubernetes Service cluster."
-}
-
 variable "aks_version" {
   type = string
   description = "Kubernetes version of the AKS cluster."
