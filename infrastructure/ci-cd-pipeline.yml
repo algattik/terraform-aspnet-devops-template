@@ -371,15 +371,26 @@ jobs:
 
 - job: Cleanup
   displayName: Delete build-specific infrastructure
-  dependsOn: integration_tests
+  dependsOn:
+  - integration_tests
+  - Terraform_shared_outputs
   pool: $(AGENT_POOL_NAME)
   # Do not delete AKS namespace:
   # - if deploying on master branch
   # - if namespace was manually set with RUN_SET_NAMESPACE
   condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMESPACE']))
   variables:
+    KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-specific-destroy
   steps:
+
+  - bash: |
+      set -eu  # fail on error
+      base64 -d <<< $KUBE_CONFIG_BASE64 > kube_config
+      echo "##vso[task.setvariable variable=KUBECONFIG]$PWD/kube_config"
+    displayName: Save kubeconfig
+    env:
+      KUBE_CONFIG_BASE64: $(KUBE_CONFIG_BASE64)
 
   - template: terraform-init-template.yml
     parameters:
