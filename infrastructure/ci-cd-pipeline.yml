@@ -323,17 +323,25 @@ jobs:
 
   #FIXME
   - bash: |
-     sudo add-apt-repository ppa:deadsnakes/ppa
+  #   sudo add-apt-repository ppa:deadsnakes/ppa
      sudo apt update
-     sudo apt install python3.6 python3-pip python3.6-dev
-     python3.6 -mpip install --upgrade urllib3
+     sudo apt install python3-pip
+  #   python3.6 -mpip install --upgrade urllib3
     displayName: FIXME Install Python 3.6 (for Ubuntu 16)
 
   - task: AlexandreGattiker.jmeter-tasks.custom-taurus-installer-task.TaurusInstaller@0
     displayName: 'Install Taurus'
     inputs:
       taurusVersion: 1.14.1
-      pythonCommand: python3.6
+      pythonCommand: python3
+
+  - bash: |
+      set -eu  # fail on error
+      base64 -d <<< $KUBE_CONFIG_BASE64 > kube_config
+      echo "##vso[task.setvariable variable=KUBECONFIG]$PWD/kube_config"
+    displayName: Save kubeconfig
+    env:
+      KUBE_CONFIG_BASE64: $(KUBE_CONFIG_BASE64)
 
   - bash: |
       set -eux  # fail on error
