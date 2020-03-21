@@ -255,6 +255,7 @@ jobs:
   - Terraform_shared_outputs
   - Terraform
   variables:
+    KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
     KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-app
