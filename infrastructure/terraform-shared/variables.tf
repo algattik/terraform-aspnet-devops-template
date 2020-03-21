@@ -6,7 +6,7 @@ variable "appname" {
 
 variable "environment" {
   type    = string
-  description = "Environment name, e.g. 'dev' or 'stage'"
+  description = "Environment name, e.g. 'dev' or 'cd'"
   default = "dev"
 }
 
@@ -19,11 +19,6 @@ variable "location" {
 variable "resource_group" {
   type    = string
   description = "Resource group to deploy in."
-}
-
-variable "vnet_name" {
-  type = string
-  description = "Name of the generated VNET."
 }
 
 variable "az_devops_url" {
@@ -65,11 +60,6 @@ variable "acr_name" {
   description = "Name of the generated Azure Container Registry instance."
 }
 
-variable "aks_name" {
-  type = string
-  description = "Name of the generated Azure Kubernetes Service cluster."
-}
-
 variable "aks_version" {
   type = string
   description = "Kubernetes version of the AKS cluster."
@@ -88,11 +78,6 @@ variable "aks_sp_object_id" {
 variable "aks_sp_client_secret" {
   type = string
   description = "Service principal client secret for the Azure Kubernetes Service cluster identity."
-}
-
-variable "kusto_name" {
-  type = string
-  description = "Name of the generated Kusto cluster."
 }
 
 variable "kusto_admin_sp_object_id" {

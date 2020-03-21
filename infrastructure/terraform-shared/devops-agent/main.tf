@@ -18,12 +18,12 @@ resource "azurerm_storage_container" "devops" {
   container_access_type = "private"
 }
 
-resource "azurerm_storage_blob" "devops" {
-  name                   = "devops_agent_init-${md5(file("${path.module}/devops_agent_init.sh"))}.sh"
+resource "azurerm_storage_blob" "devops_agent_init" {
+  name                   = "provision_agent-${md5(file("${path.module}/devops_agent_init.sh"))}-${md5(file("${path.module}/install_software.sh"))}.sh"
   storage_account_name   = azurerm_storage_account.devops.name
   storage_container_name = azurerm_storage_container.devops.name
   type                   = "Block"
-  source                 = "${path.module}/devops_agent_init.sh"
+  source_content         = join("\n\n", [file("${path.module}/devops_agent_init.sh"), file("${path.module}/install_software.sh")])
 }
 
 data "azurerm_storage_account_blob_container_sas" "devops_agent_init" {
@@ -81,7 +81,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "devops" {
   source_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
-    sku       = "16.04.0-LTS"
+    sku       = "18.04-LTS"
     version   = "latest"
   }
 
@@ -131,8 +131,8 @@ resource "azurerm_virtual_machine_scale_set_extension" "devops" {
     "timestamp" : 1
   })
   protected_settings = jsonencode({
-  "fileUris": ["${azurerm_storage_blob.devops.url}${data.azurerm_storage_account_blob_container_sas.devops_agent_init.sas}"],
-  "commandToExecute": "bash ${azurerm_storage_blob.devops.name} '${var.az_devops_url}' '${var.az_devops_pat}' '${var.az_devops_agent_pool}' '${var.az_devops_agents_per_vm}'"
+  "fileUris": ["${azurerm_storage_blob.devops_agent_init.url}${data.azurerm_storage_account_blob_container_sas.devops_agent_init.sas}"],
+  "commandToExecute": "bash ${azurerm_storage_blob.devops_agent_init.name} '${var.az_devops_url}' '${var.az_devops_pat}' '${var.az_devops_agent_pool}' '${var.az_devops_agents_per_vm}'"
   })
   #output goes to /var/lib/waagent/custom-script
 }

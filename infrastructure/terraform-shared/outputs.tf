@@ -2,6 +2,10 @@ output "subscription_id" {
   value = data.azurerm_client_config.current.subscription_id
 }
 
+output "vnet_name" {
+  value = module.vnet.name
+}
+
 output "vnet_id" {
   value = module.vnet.id
 }
@@ -14,8 +18,12 @@ output "agent_vmss_id" {
   value = module.devops-agent.agent_vmss_id
 }
 
-output "aks_id" {
-  value = module.aks.id
+output "aks_name" {
+  value = module.aks.name
+}
+
+output "kusto_name" {
+  value = module.kusto.name
 }
 
 output "kube_config_base64" {
@@ -25,10 +33,6 @@ output "kube_config_base64" {
 
 output "kubernetes_version" {
   value = module.aks.kubernetes_version
-}
-
-output "kusto_name" {
-  value = module.kusto.name
 }
 
 output "kusto_uri" {

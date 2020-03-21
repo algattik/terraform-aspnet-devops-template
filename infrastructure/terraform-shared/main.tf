@@ -11,7 +11,8 @@ module "acr" {
 
 module "vnet" {
   source = "./vnet"
-  vnet_name = var.vnet_name
+  appname = var.appname
+  environment = var.environment
   resource_group_name = var.resource_group
   location = var.location
 }
@@ -33,7 +34,8 @@ module "devops-agent" {
 
 module "aks" {
   source = "./aks"
-  aks_name = var.aks_name
+  appname = var.appname
+  environment = var.environment
   aks_version = var.aks_version
   resource_group_name = var.resource_group
   location = var.location
@@ -45,7 +47,8 @@ module "aks" {
 
 module "kusto" {
   source = "./kusto"
-  kusto_name = var.kusto_name
+  appname = var.appname
+  environment = var.environment
   resource_group_name = var.resource_group
   location = var.location
   kusto_admin_sp_object_id = var.kusto_admin_sp_object_id

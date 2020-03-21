@@ -40,10 +40,10 @@ resource "azurerm_role_assignment" "aks_subnet" {
 # Kubernetes Service
 
 resource "azurerm_kubernetes_cluster" "aks" {
-  name                = var.aks_name
+  name                = "aks-${var.appname}-${var.environment}"
   location            = var.location
   resource_group_name = var.resource_group_name
-  dns_prefix          = var.aks_name
+  dns_prefix          = "aks-${var.appname}-${var.environment}"
   kubernetes_version  = var.aks_version
 
   default_node_pool {

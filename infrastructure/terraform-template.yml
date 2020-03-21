@@ -1,0 +1,87 @@
+parameters:
+- name: TerraformVersion
+  default: 0.12.24
+- name: TerraformDirectory
+  default: $(TERRAFORM_DIRECTORY)
+- name: TerraformAction
+  type: string
+  default: apply
+  values:
+  - apply
+  - destroy
+  - none
+- name: TerraformStateKey
+  type: string
+- name: TerraformVariables
+  type: object
+
+steps:
+
+- bash: |
+    set -eu  # fail on error
+    base64 -d <<< $KUBE_CONFIG_BASE64 > kube_config
+    echo "##vso[task.setvariable variable=KUBECONFIG]$PWD/kube_config"
+  displayName: Save kubeconfig
+  condition: ne(variables.KUBE_CONFIG_BASE64, '')
+  env:
+    KUBE_CONFIG_BASE64: $(KUBE_CONFIG_BASE64)
+
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+  displayName: Install Terraform
+  inputs:
+    terraformVersion: ${{ parameters.TerraformVersion }}
+
+- bash: |
+    set -eux  # fail on error
+    terraform init \
+      -input=false \
+      -backend-config=storage_account_name=$(TERRAFORM_STORAGE_ACCOUNT) \
+      -backend-config=container_name=terraformstate \
+      -backend-config=key=${{ parameters.TerraformStateKey }}.tfstate \
+      -backend-config=resource_group_name=$(RESOURCE_GROUP) \
+  workingDirectory: $(TERRAFORM_DIRECTORY)
+  displayName: Terraform init
+  env:
+    ${{ parameters.TerraformVariables }}
+
+- bash: |
+    set -eu
+    terraform plan -out=tfplan -input=false
+    terraform apply -input=false -auto-approve tfplan
+  displayName: Terraform apply
+  condition: eq('${{ parameters.TerraformAction }}', 'apply')
+  workingDirectory: $(TERRAFORM_DIRECTORY)
+  env:
+    ${{ parameters.TerraformVariables }}
+
+- bash: |
+    set -eu
+    terraform destroy -input=false -auto-approve
+  displayName: Terraform destroy
+  condition: eq('${{ parameters.TerraformAction }}', 'destroy')
+  workingDirectory: $(TERRAFORM_DIRECTORY)
+  env:
+    ${{ parameters.TerraformVariables }}
+
+- bash: |
+    set -euo pipefail
+
+    echo "Setting job variables from Terraform outputs:"
+
+    terraform output -json | jq -r '
+      . as $in
+      | keys[]
+      | ($in[.].value | tostring | gsub("\\\\"; "\\\\") | gsub("\n"; "\\n")) as $value
+      | ($in[.].sensitive | tostring) as $sensitive
+      | [
+        "- " + . + ": " + if $in[.].sensitive then "(sensitive)" else $value end,  # output name to console
+        "##vso[task.setvariable variable=" + . + ";isSecret=" + $sensitive + "]" + $value,  # set as ADO task variable
+        "##vso[task.setvariable variable=" + . + ";isOutput=true;isSecret=" + $sensitive + "]" + $value  # also set as ADO job variable
+        ]
+      | .[]'
+
+  name: Outputs
+  displayName: Read Terraform outputs
+  workingDirectory: ${{ parameters.TerraformDirectory }}
+  env:
+    ${{ parameters.TerraformVariables }}
