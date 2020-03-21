@@ -381,7 +381,7 @@ jobs:
   - bash: |
      sudo add-apt-repository ppa:deadsnakes/ppa
      sudo apt update
-     sudo apt install python3.6 python3.6-pip python3.6-dev
+     sudo apt install python3.6 python3-pip python3.6-dev
      python3.6 -mpip install --upgrade urllib3
     displayName: FIXME Install Python 3.6 (for Ubuntu 16)
 
@@ -404,7 +404,11 @@ jobs:
   - bash: |
       set -euxo pipefail  # fail on error
       k get svc "$(CHART_NAME)" -o jsonpath="{.spec.ports[0].name}://{.spec.clusterIP}:{.spec.ports[0].port}" | read -r url
-      curl -fv $url
+      echo "##vso[task.setvariable variable=SERVICE_URL]$url"
+    displayName: Get Service URL
+
+  - bash: |
+      curl -fv $SERVICE_URL
     displayName: Smoke test 2
 
 
@@ -415,7 +419,7 @@ jobs:
        execution:
        - scenario:
            requests:
-           - http://$(CHART_NAME)
+           - $(SERVICE_URL)
          concurrency: 5
          iterations: 10
          ramp-up: 2s
