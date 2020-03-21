@@ -45,12 +45,6 @@ variable "az_devops_agent_vm_size" {
   default = "Standard_D2s_v3"
 }
 
-variable "az_devops_agent_vm_count" {
-  type    = number
-  description = "Number of Azure DevOps agent VMs"
-  default = 1
-}
-
 variable "az_devops_agents_per_vm" {
   type = number
   description = "Number of Azure DevOps agents spawned per VM. Agents will be named with a random prefix."

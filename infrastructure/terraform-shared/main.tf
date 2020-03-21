@@ -28,7 +28,6 @@ module "devops-agent" {
   az_devops_agents_per_vm = var.az_devops_agents_per_vm
   az_devops_agent_sshkeys = var.az_devops_agent_sshkeys
   az_devops_agent_vm_size = var.az_devops_agent_vm_size
-  az_devops_agent_vm_count = var.az_devops_agent_vm_count
 }
 
 module "aks" {

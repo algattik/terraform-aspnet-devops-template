@@ -57,6 +57,7 @@ jobs:
       scriptLocation: inlineScript
       inlineScript: |
         set -eux  # fail on error
+        env
         az vmss scale --id $AGENT_VMSS_ID --new-capacity 2 -o table
 
 - job: Terraform_exclusive

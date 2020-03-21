@@ -106,7 +106,9 @@ resource "azurerm_linux_virtual_machine_scale_set" "devops" {
     identity_ids = [azurerm_user_assigned_identity.devops.id]
   }
 
-  instances = var.az_devops_agent_vm_count
+  # must scale up instances after azurerm_virtual_machine_scale_set_extension has been applied
+  instances = 0
+  scale_in_policy = "NewestVM"
 
   lifecycle {
     ignore_changes = [
