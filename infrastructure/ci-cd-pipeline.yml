@@ -370,27 +370,31 @@ jobs:
     displayName: Smoke test
 
 - job: Cleanup
+  displayName: Deploy build-specific infrastructure
   dependsOn: integration_tests
   pool: $(AGENT_POOL_NAME)
   # Do not delete AKS namespace:
   # - if deploying on master branch
   # - if namespace was manually set with RUN_SET_NAMESPACE
-  # condition: and(always(), not(variables['RUN_SET_NAMESPACE']))
+  # condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMESPACE']))
   condition: false
+  variables:
+    TERRAFORM_DIRECTORY: infrastructure/terraform-specific
   steps:
 
-  - template: setup-k8s-clients-template.yml
+  - template: terraform-init-template.yml
+    parameters:
+      TerraformStateKey: cd-$(Build.BuildId)
 
-  - task: AzureCLI@1
-    displayName: Delete AKS namespace and Kusto database
-    condition: and(succeeded(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')))
-    inputs:
-      azureSubscription: $(ACR_PULL_SERVICE_CONNECTION)
-      scriptLocation: inlineScript
-      inlineScript: |
-        set -eux  # fail on error
-        kubectl delete namespace "$KUBERNETES_NAMESPACE"
-        az kusto database delete -g "$(RESOURCE_GROUP)" --cluster-name "$(KUSTO_NAME)" -n "$(KUSTO_DB)" -y
+  - bash: |
+      set -eu
+      terraform plan -destroy -input=false
+      terraform destroy -input=false -auto-approve
+    displayName: Terraform destroy
+    workingDirectory: $(TERRAFORM_DIRECTORY)
+    env:
+      ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
+      ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
 
 - job: Promote
   displayName: Promote latest image
