@@ -103,7 +103,7 @@ jobs:
 
   - bash: |
       set -eux  # fail on error
-      cat > kube_config <<< $KUBE_CONFIG_RAW
+      sed 's/\\n/\n/g' > kube_config <<< $KUBE_CONFIG_RAW
       #FIXME
       cat kube_config
       echo "##vso[task.setvariable variable=KUBE_CONFIG]$PWD/kube_config"
