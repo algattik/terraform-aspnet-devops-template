@@ -114,15 +114,6 @@ jobs:
       failTaskOnFailedTests: true
       testRunTitle: 'Unit Tests'
 
-  #FIXME
-  - bash: echo "##vso[task.setvariable variable=HOME]."
-
-  - task: UseDotNet@2
-    displayName: Use .NET Core for coverage report generation
-    inputs:
-      packageType: sdk
-      version: 3.1.200
-
   # Publish the code coverage result (summary and web site)
   # The summary allows to view the coverage percentage in the summary tab
   # The web site allows to view which lines are covered directly in Azure Pipeline
@@ -306,22 +297,11 @@ jobs:
     inputs:
       kubectlVersion: $(AKS_VERSION)
 
-  #FIXME
-  - bash: |
-     sudo apt-get install openjdk-8-jdk
-    displayName: FIXME Install Java
-
   - task: AlexandreGattiker.jmeter-tasks.custom-jmeter-installer-task.JMeterInstaller@0
     displayName: 'Install JMeter'
     inputs:
       jmeterVersion: $(JMETER_VERSION)
       plugins: jpgc-casutg,jpgc-dummy,jpgc-ffw,jpgc-fifo,jpgc-functions,jpgc-json,jpgc-perfmon,jpgc-prmctl,jpgc-tst,jmeter.backendlistener.azure
-
-  #FIXME
-  - bash: |
-     sudo apt update
-     sudo apt install python3-pip
-    displayName: FIXME Install Python 3.6 (for Ubuntu 16)
 
   - task: AlexandreGattiker.jmeter-tasks.custom-taurus-installer-task.TaurusInstaller@0
     displayName: 'Install Taurus'
