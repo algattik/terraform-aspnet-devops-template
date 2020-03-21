@@ -99,6 +99,23 @@ jobs:
     TERRAFORM_DIRECTORY: infrastructure/terraform-specific
   steps:
 
+  - bash: |
+      set -eu  # fail on error
+
+      KUBERNETES_NAMESPACE="build$(Build.BuildId)"
+      if [ "$(Build.SourceBranch)" = "refs/heads/master" ]; then
+        KUBERNETES_NAMESPACE="master"
+      fi
+      if [ "${RUN_SET_NAMESPACE:-}" != "" ]; then
+        KUBERNETES_NAMESPACE="$RUN_SET_NAMESPACE"
+      fi
+
+      echo "Namespace: $KUBERNETES_NAMESPACE"
+
+      echo "##vso[task.setvariable variable=KUBERNETES_NAMESPACE]$KUBERNETES_NAMESPACE"
+
+    displayName: Define AKS namespace
+
   - template: terraform-init-template.yml
     parameters:
       TerraformStateKey: cd-$(Build.BuildId)
@@ -109,6 +126,7 @@ jobs:
         -var resource_group=$(RESOURCE_GROUP) \
         -var kusto_cluster_name=$(KUSTO_NAME) \
         -var kusto_database_name=$(KUSTO_DB) \
+        -var kubernetes_namespace=$(KUBERNETES_NAMESPACE) \
         ;
         terraform apply -input=false -auto-approve tfplan
     displayName: Terraform apply

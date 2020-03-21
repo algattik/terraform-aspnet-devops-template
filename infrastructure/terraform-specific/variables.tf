@@ -11,10 +11,15 @@ variable "resource_group" {
 
 variable "kusto_cluster_name" {
   type = string
-  description = "Name of the Kusto cluster."
+  description = "Name of the existing Kusto cluster."
 }
 
 variable "kusto_database_name" {
   type = string
-  description = "Name of the Kusto database."
+  description = "Name of the Kusto database to create."
+}
+
+variable "kubernetes_namespace" {
+  type = string
+  description = "Kubernetes namespace to create."
 }
