@@ -265,7 +265,7 @@ jobs:
 
         # Push Helm chart to ACR
         helm package --version "$SEMANTIC_VERSION" charts/contoso -d charts_out
-        az acr helm push --force "$(ls charts_out/*)"
+        az acr helm push --force "$(ls charts_out/*)" -o table
 
 - job: integration_tests
   displayName: Integration tests
