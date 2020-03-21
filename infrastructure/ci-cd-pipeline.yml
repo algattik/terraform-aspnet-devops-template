@@ -90,13 +90,13 @@ jobs:
         set -eux  # fail on error
         az vmss scale --id $AGENT_VMSS_ID --new-capacity 2 -o table
 
-- job: Terraform_exclusive
-  displayName: Terraform exclusive
+- job: Terraform_specific
+  displayName: Terraform specific
   dependsOn:
   - Terraform_shared_outputs
   variables:
     KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
-    TERRAFORM_DIRECTORY: infrastructure/terraform-exclusive
+    TERRAFORM_DIRECTORY: infrastructure/terraform-specific
   steps:
 
   - template: terraform-init-template.yml
@@ -272,7 +272,7 @@ jobs:
   displayName: Integration tests
   dependsOn:
   - build
-  - Terraform_exclusive
+  - Terraform_specific
   - Terraform_shared_outputs
   steps:
 
