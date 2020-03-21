@@ -24,7 +24,7 @@ jobs:
 
   - bash: |
       set -euo pipefail
-      curl -fu ":$(AGENT_POOL_MANAGEMENT_TOKEN)" '$(System.CollectionUri)_apis/distributedtask/pools?poolName=$(AGENT_POOL_NAME)&actionFilter=manage&api-version=5.1' \
+      curl -sfu ":$(AGENT_POOL_MANAGEMENT_TOKEN)" '$(System.CollectionUri)_apis/distributedtask/pools?poolName=$(AGENT_POOL_NAME)&actionFilter=manage&api-version=5.1' \
         | jq -e '.count>0' 
     displayName: Verify agent pool token
 
@@ -77,8 +77,8 @@ jobs:
   dependsOn:
   - Terraform_shared_outputs
   variables:
-    KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
-    TERRAFORM_DIRECTORY: infrastructure/terraform-exclusive
+    AGENT_VMSS_ID: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.agent_vmss_id'] ]
+    TERRAFORM_DIRECTORY: infrastructure/terraform-shared
   steps:
 
   - task: AzureCLI@1
