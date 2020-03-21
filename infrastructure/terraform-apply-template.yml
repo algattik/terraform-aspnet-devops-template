@@ -18,6 +18,7 @@ parameters:
 steps:
 
 - bash: |
+    printenv|sort
     if [ "$KUBE_CONFIG_BASE64" != "" ]; then
       set -eu  # fail on error
       base64 -d <<< $KUBE_CONFIG_BASE64 > kube_config

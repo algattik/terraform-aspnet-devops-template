@@ -23,10 +23,6 @@ variables:
   value: "build$(Build.BuildId)"
 - name: ACR_NAME
   value: tttemplate01
-- name: ACR_PULL_SERVICE_CONNECTION
-  value: Terraform
-- name: ACR_PUSH_SERVICE_CONNECTION
-  value: Terraform
 - name: AKS_NAME
   value: tttemplate01
 - name: TERRAFORM_SP_CLIENT_ID
