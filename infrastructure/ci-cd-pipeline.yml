@@ -96,9 +96,18 @@ jobs:
   dependsOn:
   - Terraform_shared_outputs
   variables:
+    KUBE_CONFIG_RAW: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_raw'] ]
     KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-specific
   steps:
+
+  - bash: |
+      set -eux  # fail on error
+      cat > kube_config <<< $KUBE_CONFIG_RAW
+      #FIXME
+      cat kube_config
+      echo "##vso[task.setvariable variable=KUBE_CONFIG]$PWD/kube_config"
+    displayName: Save kubeconfig
 
   - bash: |
       set -eu  # fail on error

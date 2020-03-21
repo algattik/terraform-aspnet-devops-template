@@ -18,8 +18,8 @@ output "aks_id" {
   value = module.aks.id
 }
 
-output "kube_config" {
-  value     = module.aks.kube_config
+output "kube_config_raw" {
+  value     = module.aks.kube_config_raw
   sensitive = true
 }
 
