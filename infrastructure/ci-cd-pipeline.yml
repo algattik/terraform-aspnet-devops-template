@@ -365,11 +365,51 @@ jobs:
     env:
       secret: $(AKS_SP_CLIENT_SECRET)
 
+  #FIXME
+  - bash: |
+     sudo apt-get install openjdk-8-jdk
+    displayName: FIXME Install Java
+
   - task: AlexandreGattiker.jmeter-tasks.custom-jmeter-installer-task.JMeterInstaller@0
     displayName: 'Install JMeter'
     inputs:
       jmeterVersion: $(JMETER_VERSION)
       plugins: jpgc-casutg,jpgc-dummy,jpgc-ffw,jpgc-fifo,jpgc-functions,jpgc-json,jpgc-perfmon,jpgc-prmctl,jpgc-tst,jmeter.backendlistener.azure
+
+  #FIXME
+  - bash: |
+     sudo add-apt-repository ppa:deadsnakes/ppa
+     sudo apt update
+     sudo apt install python3.6 python3.6-dev
+     python3.6 -mpip install --upgrade urllib3
+    displayName: FIXME Install Python 3.6 (for Ubuntu 16)
+
+  - task: AlexandreGattiker.jmeter-tasks.custom-taurus-installer-task.TaurusInstaller@0
+    displayName: 'Install Taurus'
+    inputs:
+      taurusVersion: 1.14.1
+      pythonCommand: python3.6
+
+steps:
+- task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
+  displayName: 'Run Taurus'
+  inputs:
+    taurusConfig: |
+     
+     execution:
+     - scenario:
+         requests:
+         - https://www.bing.com
+         # You can also reference a JMeter test plan (recommended)
+         # script: website-test.jmx
+       concurrency: 5
+       iterations: 10
+       ramp-up: 2s
+     
+     reporting:
+     - module: junit-xml
+       filename: taurus-output/TEST-Taurus.xml
+
 
   - bash: kubectl rollout status deployment "$(CHART_NAME)" --timeout 5m --namespace "$KUBERNETES_NAMESPACE"
     displayName: Await K2 deployment
