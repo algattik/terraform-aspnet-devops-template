@@ -306,6 +306,7 @@ jobs:
   - Terraform_shared_outputs
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
+    KUBERNETES_NAMESPACE: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kubernetes_namespace'] ]
   steps:
 
   - bash: |
