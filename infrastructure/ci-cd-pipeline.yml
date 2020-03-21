@@ -396,12 +396,17 @@ jobs:
 
   - bash: |
       set -eux  # fail on error
-
       kubectl run --namespace "$KUBERNETES_NAMESPACE" --attach --rm --restart=Never --image=busybox smoke-test-$(CHART_NAME) -- \
         wget -O- \
         'http://$(CHART_NAME)'
-
     displayName: Smoke test
+
+  - bash: |
+      set -euxo pipefail  # fail on error
+      k get svc "$(CHART_NAME)" -o jsonpath="{.spec.ports[0].name}://{.spec.clusterIP}:{.spec.ports[0].port}" | read -r url
+      curl -fv $url
+    displayName: Smoke test 2
+
 
   - task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
     displayName: 'Run Taurus'
