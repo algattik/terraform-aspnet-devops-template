@@ -57,7 +57,7 @@ jobs:
 
 
 - job: Terraform_shared_outputs
-  displayName: Terraform_shared_outputs
+  displayName: Read Terraform shared outputs
   dependsOn:
   - Terraform_shared
   condition: |
