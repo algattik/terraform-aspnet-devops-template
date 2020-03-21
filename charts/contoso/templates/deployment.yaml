@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "contoso.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "contoso.name" . }}
+    helm.sh/chart: {{ include "contoso.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "contoso.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "contoso.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 20
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "500m"
+            limits:
+              memory: "2000Mi"
+              cpu: "2"
+          envFrom:
+          - configMapRef:
+              name: {{ include "contoso.fullname" . }}
+          env:
+            - name: bridgeListenerAddress
+              value: "{{ .Values.settings.bridgeListenerAddress }}"
+            - name: metadataElasticAddress
+              value: "{{ .Values.settings.metadataElasticAddress }}"
+            - name: outputBackendQuery
+              value: "{{ .Values.settings.outputBackendQuery }}"
+            - name: adxClusterUrl
+              value: "{{ .Values.settings.adxClusterUrl }}"
+            - name: adxDefaultDatabaseName
+              value: "{{ .Values.settings.adxDefaultDatabaseName }}"
+            - name: aadClientId
+              value: "{{ .Values.settings.aadClientId }}"
+            - name: aadClientSecret
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "contoso.fullname" . }}-kusto-credentials
+                  key: aadClientSecret
+            - name: aadTenantId
+              value: "{{ .Values.settings.aadTenantId }}"
+            - name: instrumentationKey
+              value: "{{ .Values.settings.instrumentationKey }}"
+            - name: collectTelemetry
+              value: "{{ .Values.settings.collectTelemetry }}"
+            - name: enableQueryLogging
+              value: "{{ .Values.settings.enableQueryLogging }}"
+          volumeMounts:
+            - name: appsettings-volume
+              mountPath: /app/settings
+      volumes:
+        - name: appsettings-volume
+          configMap:
+            # Provide the name of the ConfigMap containing the files you want
+            # to add to the container
+            name: {{ include "contoso.fullname" . }}-appsettings

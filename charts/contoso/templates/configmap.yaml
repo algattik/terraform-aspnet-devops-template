@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "contoso.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "contoso.name" . }}
+    helm.sh/chart: {{ include "contoso.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  bridgeListenerAddress: "{{ .Values.settings.bridgeListenerAddress }}"
+  metadataElasticAddress: "{{ .Values.settings.metadataElasticAddress }}"
+  adxClusterUrl: "{{ .Values.settings.adxClusterUrl }}"
+  adxDefaultDatabaseName: "{{ .Values.settings.adxDefaultDatabaseName }}"
+  aadClientId: "{{ .Values.settings.aadClientId }}"
+  aadTenantId: "{{ .Values.settings.aadTenantId }}"
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "contoso.fullname" . }}-appsettings
+  labels:
+    app.kubernetes.io/name: {{ include "contoso.name" . }}
+    helm.sh/chart: {{ include "contoso.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  appsettings.json: |
+    {
+      "Serilog": {
+        "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.ApplicationInsights" ],
+        "MinimumLevel": {
+          "Default": "Debug",
+          "Override": {
+            "Microsoft": "Warning",
+            "Microsoft.AspNetCore": "Warning",
+            "Serilog.AspNetCore.RequestLoggingMiddleware": "Warning",
+            "System": "Warning"
+          }
+        },
+        "WriteTo": [
+          {
+            "Name": "Console",
+            "Args": {
+              "formatter": "Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact"
+            }
+          },
+          {
+            "Name": "ApplicationInsights",
+            "Args": {
+              "restrictedToMinimumLevel": "Debug",
+              "telemetryConverter": "Serilog.Sinks.ApplicationInsights.Sinks.ApplicationInsights.TelemetryConverters.TraceTelemetryConverter, Serilog.Sinks.ApplicationInsights"
+            }
+          }
+        ],
+        "Enrich": [ "FromLogContext", "WithCorrelationId", "WithCorrelationIdHeader" ]
+      }
+    }

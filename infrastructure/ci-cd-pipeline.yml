@@ -1,0 +1,435 @@
+# CI/CD Azure DevOps deployment pipeline.
+# The following variables can be optionally set for each pipeline run:
+# - RUN_FLAG_TERRAFORM: Set to 1 to have `terraform apply`. By default
+#   `terraform apply` only runs on the master branch.
+# - RUN_FLAG_PROMOTE: Set to 1 to promote the Docker image to `latest` tag if
+#   tests are successful. By default this is only done on the master branch.
+# - RUN_SET_NAMESPACE: Set to a string to deploy to the given AKS namespace,
+#   and not delete the namespace after the build. By default the build deploys to
+#   the `master` AKS namespace if run on the master branch, and otherwise to a
+#   temporary AKS namespace that is deleted at the end of the build.
+
+jobs:
+- job: Terraform_shared
+  displayName: Deploy shared infrastructure
+  # Avoid concurrent Terraform runs on PRs, which would result in failures due to exclusive lock on remote state file.
+  condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), variables['RUN_FLAG_TERRAFORM']))
+  variables:
+    TERRAFORM_DIRECTORY: infrastructure/terraform-shared
+  steps:
+
+  - template: terraform-init-template.yml
+    parameters:
+      TerraformStateKey: cd
+
+  - bash: |
+      set -euo pipefail
+      curl -sfu ":$(AGENT_POOL_MANAGEMENT_TOKEN)" '$(System.CollectionUri)_apis/distributedtask/pools?poolName=$(AGENT_POOL_NAME)&actionFilter=manage&api-version=5.1' \
+        | jq -e '.count>0' 
+    displayName: Verify agent pool token
+
+  - bash: |
+      set -eu
+      terraform plan -out=tfplan -input=false \
+        -var environment=cd \
+        -var resource_group=$(RESOURCE_GROUP) \
+        -var vnet_name=$(VNET_NAME) \
+        -var acr_name=$(ACR_NAME) \
+        -var aks_name=$(AKS_NAME) \
+        -var aks_version=$(AKS_VERSION) \
+        -var aks_sp_client_id=$(AKS_SP_CLIENT_ID) \
+        -var aks_sp_object_id=$(AKS_SP_OBJECT_ID) \
+        -var kusto_name=$(KUSTO_NAME) \
+        -var kusto_admin_sp_object_id=$(AKS_SP_OBJECT_ID) \
+        -var az_devops_agent_pool=$(AGENT_POOL_NAME) \
+        -var az_devops_url=$(System.CollectionUri) \
+        -var az_devops_pat=$(AGENT_POOL_MANAGEMENT_TOKEN) \
+        ;
+        terraform apply -input=false -auto-approve tfplan
+    displayName: Terraform apply
+    workingDirectory: $(TERRAFORM_DIRECTORY)
+    # For additional security, pass secret through environment instead of command line.
+    # Terraform recognizes the TF_VAR prefixed environment variables.
+    env:
+      TF_VAR_aks_sp_client_secret: $(AKS_SP_CLIENT_SECRET)
+      ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
+      ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+
+
+- job: Terraform_shared_outputs
+  displayName: Read Terraform shared outputs
+  dependsOn:
+  - Terraform_shared
+  condition: |
+    in(dependencies.Terraform_shared.result, 'Succeeded', 'SucceededWithIssues', 'Skipped')
+  variables:
+    TERRAFORM_DIRECTORY: infrastructure/terraform-shared
+  steps:
+
+  - template: terraform-init-template.yml
+    parameters:
+      TerraformStateKey: cd
+
+  - template: terraform-outputs-template.yml
+
+- job: Start_agents
+  displayName: Start agents
+  dependsOn:
+  - Terraform_shared_outputs
+  variables:
+    AGENT_VMSS_ID: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.agent_vmss_id'] ]
+    TERRAFORM_DIRECTORY: infrastructure/terraform-shared
+  steps:
+
+  - task: AzureCLI@1
+    displayName: Start agents
+    inputs:
+      azureSubscription: Terraform
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -eux  # fail on error
+        az vmss scale --id $AGENT_VMSS_ID --new-capacity 2 -o table
+
+- job: Terraform_specific
+  displayName: Deploy build-specific infrastructure
+  pool: $(AGENT_POOL_NAME)
+  dependsOn:
+  - Terraform_shared_outputs
+  variables:
+    KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
+    KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
+    TERRAFORM_DIRECTORY: infrastructure/terraform-specific
+  steps:
+
+  - bash: |
+      set -eu  # fail on error
+      base64 -d <<< $KUBE_CONFIG_BASE64 > kube_config
+      echo "##vso[task.setvariable variable=KUBECONFIG]$PWD/kube_config"
+    displayName: Save kubeconfig
+    env:
+      KUBE_CONFIG_BASE64: $(KUBE_CONFIG_BASE64)
+
+  - bash: |
+      set -eu  # fail on error
+
+      KUBERNETES_NAMESPACE="build$(Build.BuildId)"
+      if [ "$(Build.SourceBranch)" = "refs/heads/master" ]; then
+        KUBERNETES_NAMESPACE="master"
+      fi
+      if [ "${RUN_SET_NAMESPACE:-}" != "" ]; then
+        KUBERNETES_NAMESPACE="$RUN_SET_NAMESPACE"
+      fi
+
+      echo "Namespace: $KUBERNETES_NAMESPACE"
+
+      echo "##vso[task.setvariable variable=KUBERNETES_NAMESPACE]$KUBERNETES_NAMESPACE"
+
+    displayName: Define AKS namespace
+
+  - template: terraform-init-template.yml
+    parameters:
+      TerraformStateKey: cd-$(Build.BuildId)
+
+  - bash: |
+      set -eu
+      terraform plan -out=tfplan -input=false \
+        -var resource_group=$(RESOURCE_GROUP) \
+        -var kusto_cluster_name=$(KUSTO_NAME) \
+        -var kusto_database_name=$(KUSTO_DB) \
+        -var kubernetes_namespace=$(KUBERNETES_NAMESPACE) \
+        ;
+        terraform apply -input=false -auto-approve tfplan
+    displayName: Terraform apply
+    workingDirectory: $(TERRAFORM_DIRECTORY)
+    env:
+      ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
+      ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+
+  - template: terraform-outputs-template.yml
+
+- job: security_analysis
+  displayName: Security analysis
+  condition: false
+
+  pool:
+    # CredScan only runs on Windows
+    vmImage: 'windows-latest'
+
+  steps:
+  - task: CredScan@2
+    displayName: 'Find credentials in source code'
+    inputs:
+      toolMajorVersion: 'V2'
+
+# - task: SdtReport@1
+#   displayName: 'Security analysis report'
+#   inputs:
+#     AllTools: false
+#     APIScan: false
+#     BinSkim: false
+#     CodesignValidation: false
+#     CredScan: true
+#     FortifySCA: false
+#     FxCop: false
+#     ModernCop: false
+#     MSRD: false
+#     PoliCheck: false
+#     RoslynAnalyzers: false
+#     SDLNativeRules: false
+#     Semmle: false
+#     TSLint: false
+#     ToolLogsNotFoundAction: 'Standard'
+
+  - task: PublishSecurityAnalysisLogs@2
+    displayName: 'Publish security analysis logs'
+    inputs:
+      ArtifactName: 'CodeAnalysisLogs'
+      ArtifactType: 'Container'
+      AllTools: false
+      AntiMalware: false
+      APIScan: false
+      BinSkim: false
+      CodesignValidation: false
+      CredScan: true
+      FortifySCA: false
+      FxCop: false
+      ModernCop: false
+      MSRD: false
+      PoliCheck: false
+      RoslynAnalyzers: false
+      SDLNativeRules: false
+      Semmle: false
+      TSLint: false
+      WebScout: false
+      ToolLogsNotFoundAction: 'Standard'
+
+  - task: PostAnalysis@1
+    displayName: 'Post security analysis'
+    inputs:
+      AllTools: false
+      APIScan: false
+      BinSkim: false
+      CodesignValidation: false
+      CredScan: true
+      FortifySCA: false
+      FxCop: false
+      ModernCop: false
+      PoliCheck: false
+      RoslynAnalyzers: false
+      SDLNativeRules: false
+      Semmle: false
+      TSLint: false
+      VstsConsole: false
+      ToolLogsNotFoundAction: 'Standard'
+
+  - task: ComponentGovernanceComponentDetection@0
+    inputs:
+      scanType: 'Register'
+      verbosity: 'Verbose'
+      alertWarningLevel: 'Medium'
+      failOnAlert: true
+
+- job: build
+  displayName: Build and unit tests
+  pool: $(AGENT_POOL_NAME)
+  steps:
+
+  - bash: |
+      set -eux  # fail on error
+      # Only build first stage of Dockerfile (build and unit test)
+      docker build --pull --target testrunner --build-arg VersionPrefix="$(SEMANTIC_VERSION)" -t contoso-build-$(Build.BuildId):test .
+      docker run --rm -v $PWD/TestResults:/app/Contoso.UnitTests/TestResults contoso-build-$(Build.BuildId):test
+    displayName: Docker build & test
+
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    condition: succeededOrFailed()
+    inputs:
+      testRunner: VSTest
+      testResultsFiles: '**/*.trx'
+      failTaskOnFailedTests: true
+      testRunTitle: 'Unit Tests'
+
+  #FIXME
+  - bash: echo "##vso[task.setvariable variable=HOME]."
+
+  - task: UseDotNet@2
+    displayName: Use .NET Core for coverage report generation
+    inputs:
+      packageType: sdk
+      version: 3.1.200
+
+  # Publish the code coverage result (summary and web site)
+  # The summary allows to view the coverage percentage in the summary tab
+  # The web site allows to view which lines are covered directly in Azure Pipeline
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish code coverage'
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: '**/coverage.cobertura.xml'
+      pathToSources: '$(Build.SourcesDirectory)/Src'
+      failIfCoverageEmpty: true
+
+  - task: HelmInstaller@1
+    displayName: Helm installer
+    inputs:
+      helmVersionToInstall: $(HELM_VERSION)
+
+  - task: AzureCLI@1
+    displayName: Build images and charts
+    inputs:
+      azureSubscription: $(ACR_PUSH_SERVICE_CONNECTION)
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -eux  # fail on error
+
+        az configure --defaults acr="$ACR_NAME"
+        az acr login
+
+        # Build runtime Docker image
+        # Reuses the cached build stage from the previous docker build task
+        docker build --build-arg VersionPrefix="$(SEMANTIC_VERSION)" \
+          -t "$ACR_NAME.azurecr.io/contoso:$(SEMANTIC_VERSION)" \
+          .
+
+        # Push Docker image to ACR
+        docker push "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION"
+
+        # Push Helm chart to ACR
+        helm package --version "$SEMANTIC_VERSION" charts/contoso -d charts_out
+        az acr helm push --force "$(ls charts_out/*)" -o table
+
+- job: integration_tests
+  displayName: Integration tests
+  pool: $(AGENT_POOL_NAME)
+  dependsOn:
+  - build
+  - Terraform_specific
+  - Terraform_shared_outputs
+  variables:
+    KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
+    KUBERNETES_NAMESPACE: $[ dependencies.Terraform_specific.outputs['Outputs.kubernetes_namespace'] ]
+  steps:
+
+  - bash: |
+      set -eu  # fail on error
+      base64 -d <<< $KUBE_CONFIG_BASE64 > kube_config
+      echo "##vso[task.setvariable variable=KUBECONFIG]$PWD/kube_config"
+    displayName: Save kubeconfig
+    env:
+      KUBE_CONFIG_BASE64: $(KUBE_CONFIG_BASE64)
+
+  - task: HelmInstaller@1
+    displayName: Install helm
+    inputs:
+      helmVersionToInstall: $(HELM_VERSION)
+
+  - task: KubectlInstaller@0
+    displayName: Install kubectl
+    inputs:
+      kubectlVersion: $(AKS_VERSION)
+
+  - task: AzureCLI@1
+    displayName: Log into ACR Helm repo
+    inputs:
+      azureSubscription: $(ACR_PULL_SERVICE_CONNECTION)
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -eu  # fail on error
+        az acr helm repo add -n "$(ACR_NAME)"
+        KUSTO_URI=$(az kusto cluster show -g $(RESOURCE_GROUP) -n $(KUSTO_NAME) --query uri -o tsv)
+        echo "##vso[task.setvariable variable=KUSTO_URI]$KUSTO_URI"
+
+  - bash: |
+      set -eux  # fail on error
+      helm show chart $(ACR_NAME)/contoso
+      # List charts before deploying (for job log, useful if rerunning job)
+      helm list
+      # Deploy chart
+      helm upgrade --install "$(CHART_NAME)" $(ACR_NAME)/contoso \
+        --namespace "$KUBERNETES_NAMESPACE" \
+        --version "$SEMANTIC_VERSION" \
+        --set image.repository=$(ACR_NAME).azurecr.io/contoso \
+        --set image.tag=$SEMANTIC_VERSION \
+        --set replicaCount=2 \
+        --set settings.adxClusterUrl="$KUSTO_URI" \
+        --set settings.adxDefaultDatabaseName="$(KUSTO_DB)" \
+        --set settings.aadClientId="$(AKS_SP_CLIENT_ID)" \
+        --set settings.aadClientSecret="$secret" \
+        --set settings.aadTenantId="$ARM_TENANT_ID" \
+        --set settings.enableQueryLogging=true \
+        ${NOT_MASTER_ES_CONFIG:-} #defaults to an empty string
+      # List charts after deploying (for job log)
+      helm list
+    displayName: Install Contoso
+    env:
+      secret: $(AKS_SP_CLIENT_SECRET)
+
+  - bash: kubectl rollout status deployment "$(CHART_NAME)" --timeout 5m --namespace "$KUBERNETES_NAMESPACE"
+    displayName: Await K2 deployment
+
+  - bash: |
+      set -eux  # fail on error
+
+      kubectl run --namespace "$KUBERNETES_NAMESPACE" --attach --rm --restart=Never --image=busybox smoke-test-$(CHART_NAME) -- \
+        wget -O- \
+        'http://$(CHART_NAME)'
+
+    displayName: Smoke test
+
+- job: Cleanup
+  displayName: Delete build-specific infrastructure
+  dependsOn:
+  - integration_tests
+  - Terraform_shared_outputs
+  pool: $(AGENT_POOL_NAME)
+  # Do not delete AKS namespace:
+  # - if deploying on master branch
+  # - if namespace was manually set with RUN_SET_NAMESPACE
+  condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMESPACE']))
+  variables:
+    KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
+    TERRAFORM_DIRECTORY: infrastructure/terraform-specific-destroy
+  steps:
+
+  - bash: |
+      set -eu  # fail on error
+      base64 -d <<< $KUBE_CONFIG_BASE64 > kube_config
+      echo "##vso[task.setvariable variable=KUBECONFIG]$PWD/kube_config"
+    displayName: Save kubeconfig
+    env:
+      KUBE_CONFIG_BASE64: $(KUBE_CONFIG_BASE64)
+
+  - template: terraform-init-template.yml
+    parameters:
+      TerraformStateKey: cd-$(Build.BuildId)
+
+  - bash: |
+      set -eu
+      terraform destroy -input=false -auto-approve
+    displayName: Terraform destroy
+    workingDirectory: $(TERRAFORM_DIRECTORY)
+    env:
+      ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
+      ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+
+- job: Promote
+  displayName: Promote latest image
+  dependsOn: integration_tests
+  condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), variables['RUN_FLAG_PROMOTE']))
+  steps:
+
+  - task: AzureCLI@1
+    displayName: Tag Docker image as latest
+    inputs:
+      azureSubscription: $(ACR_PUSH_SERVICE_CONNECTION)
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -eux  # fail on error
+        az configure --defaults acr="$ACR_NAME"
+        az acr login
+        docker pull "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION"
+        docker tag \
+          "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION" \
+          "$ACR_NAME.azurecr.io/contoso:latest"
+        docker push "$ACR_NAME.azurecr.io/contoso:latest"

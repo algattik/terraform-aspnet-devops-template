@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "contoso.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "contoso.name" . }}
+    helm.sh/chart: {{ include "contoso.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "contoso.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
