@@ -92,6 +92,7 @@ jobs:
 
 - job: Terraform_specific
   displayName: Deploy build-specific infrastructure
+  pool: $(AGENT_POOL_NAME)
   dependsOn:
   - Terraform_shared_outputs
   variables:
@@ -289,6 +290,7 @@ jobs:
 
 - job: integration_tests
   displayName: Integration tests
+  pool: $(AGENT_POOL_NAME)
   dependsOn:
   - build
   - Terraform_specific
@@ -356,6 +358,7 @@ jobs:
 
 - job: Cleanup
   dependsOn: integration_tests
+  pool: $(AGENT_POOL_NAME)
   # Do not delete AKS namespace:
   # - if deploying on master branch
   # - if namespace was manually set with RUN_SET_NAMESPACE
