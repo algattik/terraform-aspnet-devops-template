@@ -439,6 +439,7 @@ jobs:
     displayName: Publish test results
     inputs:
       testRunTitle: Integration tests
+      failTaskOnFailedTests: true
 
 - job: Cleanup
   displayName: Delete build-specific infrastructure
