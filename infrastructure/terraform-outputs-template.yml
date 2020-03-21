@@ -6,16 +6,11 @@ steps:
     set -euo pipefail
 
     echo "Setting job variables from Terraform outputs:"
-    terraform output -json | jq -r '
-      . as $in
-      | keys[]
-      | ["- " + .]
-      | @tsv'
 
     terraform output -json | jq -r '
       . as $in
       | keys[]
-      | ($in[.].value | tostring) as $value
+      | ($in[.].value | tostring | gsub("\\\\"; "\\\\") | gsub("\n"; "\\n")) as $value
       | ($in[.].sensitive | tostring) as $sensitive
       | [
         "- " + . + ": " + if $in[.].sensitive then "(sensitive)" else $value end,  # output name to console
