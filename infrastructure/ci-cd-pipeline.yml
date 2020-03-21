@@ -117,7 +117,10 @@ jobs:
       perl -pe 's/\n/§/g' <<< $KUBE_CONFIG_RAW
       echo ""
       echo "//"
-      kubectl get ns -f $PWD/kube_config
+      kubectl --kubeconfig=$PWD/kube_config get ns
+      echo "//"
+      export KUBECONFIG=$PWD/kube_config
+      kubectl get ns
 
     displayName: Save kubeconfig
     env:
