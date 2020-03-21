@@ -57,7 +57,7 @@ jobs:
 
 
 - job: Terraform_shared_outputs
-  displayName: Read Terraform shared outputs
+  displayName: Read shared infrastructure
   dependsOn:
   - Terraform_shared
   condition: |
@@ -90,15 +90,15 @@ jobs:
         set -eux  # fail on error
         az vmss scale --id $AGENT_VMSS_ID --new-capacity 2 -o table
 
-- job: Terraform_specific
-  displayName: Deploy build-specific infrastructure
+- job: Terraform
+  displayName: Deploy infrastructure
   pool: $(AGENT_POOL_NAME)
   dependsOn:
   - Terraform_shared_outputs
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
     KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
-    TERRAFORM_DIRECTORY: infrastructure/terraform-specific
+    TERRAFORM_DIRECTORY: infrastructure/terraform
   steps:
 
   - bash: |
@@ -301,11 +301,11 @@ jobs:
   pool: $(AGENT_POOL_NAME)
   dependsOn:
   - build
-  - Terraform_specific
+  - Terraform
   - Terraform_shared_outputs
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    KUBERNETES_NAMESPACE: $[ dependencies.Terraform_specific.outputs['Outputs.kubernetes_namespace'] ]
+    KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
   steps:
 
   - bash: |
@@ -397,7 +397,7 @@ jobs:
       failTaskOnFailedTests: true
 
 - job: Cleanup
-  displayName: Delete build-specific infrastructure
+  displayName: Delete infrastructure
   dependsOn:
   - integration_tests
   - Terraform_shared_outputs
@@ -408,7 +408,7 @@ jobs:
   condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMEBASE']))
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    TERRAFORM_DIRECTORY: infrastructure/terraform-specific-destroy
+    TERRAFORM_DIRECTORY: infrastructure/terraform-destroy
   steps:
 
   - bash: |
