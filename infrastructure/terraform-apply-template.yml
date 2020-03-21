@@ -14,6 +14,7 @@ parameters:
   type: string
 - name: TerraformVariables
   type: object
+  default: {}
 
 steps:
 
