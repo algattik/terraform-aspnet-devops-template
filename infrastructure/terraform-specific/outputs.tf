@@ -1,3 +1,3 @@
-output "kusto_database_name" {
-  value = azurerm_kusto_database.build.name
+output "kubernetes_namespace" {
+  value = kubernetes_namespace.build.name
 }
