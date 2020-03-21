@@ -378,7 +378,7 @@ jobs:
   # - if namespace was manually set with RUN_SET_NAMESPACE
   condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMESPACE']))
   variables:
-    TERRAFORM_DIRECTORY: infrastructure/terraform-specific
+    TERRAFORM_DIRECTORY: infrastructure/terraform-specific-destroy
   steps:
 
   - template: terraform-init-template.yml
