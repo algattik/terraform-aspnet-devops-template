@@ -137,6 +137,11 @@ jobs:
         -var kusto_cluster_name=$(KUSTO_NAME) \
         -var kusto_database_name=$(KUSTO_DB) \
         -var kubernetes_namespace=$(KUBERNETES_NAMESPACE) \
+        -var release_name="$(CHART_NAME)" \
+        -var image_repository="$(ACR_NAME).azurecr.io/contoso" \
+        -var image_tag="$(SEMANTIC_VERSION)" \
+        -var client_id="$(AKS_SP_CLIENT_ID)" \
+        -var tenant_id="$(ARM_TENANT_ID)" \
         ;
         terraform apply -input=false -auto-approve tfplan
     displayName: Terraform apply
@@ -144,6 +149,7 @@ jobs:
     env:
       ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
       ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+      TF_VAR_client_secret: $(AKS_SP_CLIENT_SECRET)
 
   - template: terraform-outputs-template.yml
 
@@ -314,31 +320,6 @@ jobs:
     displayName: Install kubectl
     inputs:
       kubectlVersion: $(AKS_VERSION)
-
-  - bash: |
-      set -eux  # fail on error
-      helm show chart $(ACR_NAME)/contoso
-      # List charts before deploying (for job log, useful if rerunning job)
-      helm list
-      # Deploy chart
-      helm upgrade --install "$(CHART_NAME)" $(ACR_NAME)/contoso \
-        --namespace "$KUBERNETES_NAMESPACE" \
-        --version "$SEMANTIC_VERSION" \
-        --set image.repository=$(ACR_NAME).azurecr.io/contoso \
-        --set image.tag=$SEMANTIC_VERSION \
-        --set replicaCount=2 \
-        --set service.type=NodePort \
-        --set settings.adxDefaultDatabaseName="$(KUSTO_DB)" \
-        --set settings.aadClientId="$(AKS_SP_CLIENT_ID)" \
-        --set settings.aadClientSecret="$secret" \
-        --set settings.aadTenantId="$ARM_TENANT_ID" \
-        --set settings.enableQueryLogging=true \
-        ${NOT_MASTER_ES_CONFIG:-} #defaults to an empty string
-      # List charts after deploying (for job log)
-      helm list
-    displayName: Install Contoso
-    env:
-      secret: $(AKS_SP_CLIENT_SECRET)
 
   #FIXME
   - bash: |
