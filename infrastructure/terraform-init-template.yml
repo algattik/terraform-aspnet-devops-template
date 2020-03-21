@@ -12,6 +12,7 @@ steps:
 - bash: |
     set -eux  # fail on error
     terraform init \
+      -input=false \
       -backend-config=storage_account_name=$(TERRAFORM_STORAGE_ACCOUNT) \
       -backend-config=container_name=terraformstate \
       -backend-config=key=${{ parameters.TerraformStateKey }}.tfstate \

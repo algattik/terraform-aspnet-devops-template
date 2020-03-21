@@ -30,7 +30,8 @@ jobs:
 
   - bash: |
       set -eu
-      terraform apply -input=false -auto-approve \
+      terraform init -input=false to initialize the working directory.
+      terraform plan -out=tfplan -input=false \
         -var environment=cd \
         -var resource_group=$(RESOURCE_GROUP) \
         -var vnet_name=$(VNET_NAME) \
@@ -45,6 +46,7 @@ jobs:
         -var az_devops_url=$(System.CollectionUri) \
         -var az_devops_pat=$(AGENT_POOL_MANAGEMENT_TOKEN) \
         ;
+        terraform apply -input=false -auto-approve tfplan
     displayName: Terraform apply
     workingDirectory: $(TERRAFORM_DIRECTORY)
     # For additional security, pass secret through environment instead of command line.
