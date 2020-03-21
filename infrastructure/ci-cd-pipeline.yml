@@ -57,7 +57,7 @@ jobs:
 
 
 - job: Terraform_shared_outputs
-  displayName: Read Terraform shared outputs
+  displayName: Read shared infrastructure
   dependsOn:
   - Terraform_shared
   condition: |
@@ -90,15 +90,15 @@ jobs:
         set -eux  # fail on error
         az vmss scale --id $AGENT_VMSS_ID --new-capacity 2 -o table
 
-- job: Terraform_specific
-  displayName: Deploy build-specific infrastructure
+- job: Terraform
+  displayName: Deploy infrastructure
   pool: $(AGENT_POOL_NAME)
   dependsOn:
   - Terraform_shared_outputs
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
     KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
-    TERRAFORM_DIRECTORY: infrastructure/terraform-specific
+    TERRAFORM_DIRECTORY: infrastructure/terraform
   steps:
 
   - bash: |
@@ -137,6 +137,11 @@ jobs:
         -var kusto_cluster_name=$(KUSTO_NAME) \
         -var kusto_database_name=$(KUSTO_DB) \
         -var kubernetes_namespace=$(KUBERNETES_NAMESPACE) \
+        -var release_name="$(HELM_RELEASE_NAME)" \
+        -var image_repository="$(ACR_NAME).azurecr.io/contoso" \
+        -var image_tag="$(SEMANTIC_VERSION)" \
+        -var client_id="$(AKS_SP_CLIENT_ID)" \
+        -var tenant_id="$(ARM_TENANT_ID)" \
         ;
         terraform apply -input=false -auto-approve tfplan
     displayName: Terraform apply
@@ -144,6 +149,7 @@ jobs:
     env:
       ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
       ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+      TF_VAR_client_secret: $(AKS_SP_CLIENT_SECRET)
 
   - template: terraform-outputs-template.yml
 
@@ -270,11 +276,6 @@ jobs:
       pathToSources: '$(Build.SourcesDirectory)/Src'
       failIfCoverageEmpty: true
 
-  - task: HelmInstaller@1
-    displayName: Helm installer
-    inputs:
-      helmVersionToInstall: $(HELM_VERSION)
-
   - task: AzureCLI@1
     displayName: Build images and charts
     inputs:
@@ -295,20 +296,16 @@ jobs:
         # Push Docker image to ACR
         docker push "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION"
 
-        # Push Helm chart to ACR
-        helm package --version "$SEMANTIC_VERSION" charts/contoso -d charts_out
-        az acr helm push --force "$(ls charts_out/*)" -o table
-
 - job: integration_tests
   displayName: Integration tests
   pool: $(AGENT_POOL_NAME)
   dependsOn:
   - build
-  - Terraform_specific
+  - Terraform
   - Terraform_shared_outputs
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    KUBERNETES_NAMESPACE: $[ dependencies.Terraform_specific.outputs['Outputs.kubernetes_namespace'] ]
+    KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
   steps:
 
   - bash: |
@@ -319,52 +316,10 @@ jobs:
     env:
       KUBE_CONFIG_BASE64: $(KUBE_CONFIG_BASE64)
 
-  - task: HelmInstaller@1
-    displayName: Install helm
-    inputs:
-      helmVersionToInstall: $(HELM_VERSION)
-
   - task: KubectlInstaller@0
     displayName: Install kubectl
     inputs:
       kubectlVersion: $(AKS_VERSION)
-
-  - task: AzureCLI@1
-    displayName: Log into ACR Helm repo
-    inputs:
-      azureSubscription: $(ACR_PULL_SERVICE_CONNECTION)
-      scriptLocation: inlineScript
-      inlineScript: |
-        set -eu  # fail on error
-        az acr helm repo add -n "$(ACR_NAME)"
-        KUSTO_URI=$(az kusto cluster show -g $(RESOURCE_GROUP) -n $(KUSTO_NAME) --query uri -o tsv)
-        echo "##vso[task.setvariable variable=KUSTO_URI]$KUSTO_URI"
-
-  - bash: |
-      set -eux  # fail on error
-      helm show chart $(ACR_NAME)/contoso
-      # List charts before deploying (for job log, useful if rerunning job)
-      helm list
-      # Deploy chart
-      helm upgrade --install "$(CHART_NAME)" $(ACR_NAME)/contoso \
-        --namespace "$KUBERNETES_NAMESPACE" \
-        --version "$SEMANTIC_VERSION" \
-        --set image.repository=$(ACR_NAME).azurecr.io/contoso \
-        --set image.tag=$SEMANTIC_VERSION \
-        --set replicaCount=2 \
-        --set service.type=NodePort \
-        --set settings.adxClusterUrl="$KUSTO_URI" \
-        --set settings.adxDefaultDatabaseName="$(KUSTO_DB)" \
-        --set settings.aadClientId="$(AKS_SP_CLIENT_ID)" \
-        --set settings.aadClientSecret="$secret" \
-        --set settings.aadTenantId="$ARM_TENANT_ID" \
-        --set settings.enableQueryLogging=true \
-        ${NOT_MASTER_ES_CONFIG:-} #defaults to an empty string
-      # List charts after deploying (for job log)
-      helm list
-    displayName: Install Contoso
-    env:
-      secret: $(AKS_SP_CLIENT_SECRET)
 
   #FIXME
   - bash: |
@@ -391,20 +346,20 @@ jobs:
       taurusVersion: 1.14.1
       pythonCommand: python3.6
 
-  - bash: kubectl -n "$KUBERNETES_NAMESPACE" rollout status deployment "$(CHART_NAME)" --timeout 5m
+  - bash: kubectl -n "$KUBERNETES_NAMESPACE" rollout status deployment "$(HELM_RELEASE_NAME)" --timeout 5m
     displayName: Await K2 deployment
 
   - bash: |
       set -eux  # fail on error
-      kubectl -n "$KUBERNETES_NAMESPACE" run --attach --rm --restart=Never --image=busybox smoke-test-$(CHART_NAME) -- \
+      kubectl -n "$KUBERNETES_NAMESPACE" run --attach --rm --restart=Never --image=busybox smoke-test-$(HELM_RELEASE_NAME) -- \
         wget -O- \
-        'http://$(CHART_NAME)'
+        'http://$(HELM_RELEASE_NAME)'
     displayName: Smoke test
 
   - bash: |
       set -eux  # fail on error
       read -d, firstNodeIP < <(kubectl -n "$KUBERNETES_NAMESPACE" get nodes -o jsonpath="{.items[0].status.addresses[?(@.type=='InternalIP')].address},")
-      read -d, nodePort < <(kubectl -n "$KUBERNETES_NAMESPACE" get svc "$(CHART_NAME)" -o jsonpath="{.spec.ports[0].nodePort},")
+      read -d, nodePort < <(kubectl -n "$KUBERNETES_NAMESPACE" get svc "$(HELM_RELEASE_NAME)" -o jsonpath="{.spec.ports[0].nodePort},")
       url="http://$firstNodeIP:$nodePort"
       echo "##vso[task.setvariable variable=SERVICE_URL]$url"
       echo "$url"
@@ -442,7 +397,7 @@ jobs:
       failTaskOnFailedTests: true
 
 - job: Cleanup
-  displayName: Delete build-specific infrastructure
+  displayName: Destroy infrastructure
   dependsOn:
   - integration_tests
   - Terraform_shared_outputs
@@ -453,7 +408,7 @@ jobs:
   condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMEBASE']))
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    TERRAFORM_DIRECTORY: infrastructure/terraform-specific-destroy
+    TERRAFORM_DIRECTORY: infrastructure/terraform-destroy
   steps:
 
   - bash: |

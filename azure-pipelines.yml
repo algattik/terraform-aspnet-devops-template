@@ -37,13 +37,10 @@ variables:
 - name: AKS_SP_OBJECT_ID
   value: ddf63018-48fb-4738-a3f5-0062fb16dbb0
 #- name: AKS_SP_CLIENT_SECRET
-#  value: ENTER
 - name: AKS_VERSION
   value: 1.15.7
-- name: CHART_NAME
+- name: HELM_RELEASE_NAME
   value: contoso
-- name: HELM_VERSION
-  value: 3.1.2
 - name: KUSTO_NAME
   value: tttemplate01
 - name: RESOURCE_GROUP
