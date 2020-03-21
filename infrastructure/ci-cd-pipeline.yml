@@ -370,14 +370,13 @@ jobs:
     displayName: Smoke test
 
 - job: Cleanup
-  displayName: Deploy build-specific infrastructure
+  displayName: Delete build-specific infrastructure
   dependsOn: integration_tests
   pool: $(AGENT_POOL_NAME)
   # Do not delete AKS namespace:
   # - if deploying on master branch
   # - if namespace was manually set with RUN_SET_NAMESPACE
-  # condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMESPACE']))
-  condition: false
+  condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMESPACE']))
   variables:
     TERRAFORM_DIRECTORY: infrastructure/terraform-specific
   steps:
