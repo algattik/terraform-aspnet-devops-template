@@ -27,3 +27,6 @@ steps:
   name: Outputs
   displayName: Read Terraform outputs
   workingDirectory: ${{ parameters.TerraformDirectory }}
+  env:
+    ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
+    ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
