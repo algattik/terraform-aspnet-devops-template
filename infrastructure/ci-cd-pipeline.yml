@@ -352,7 +352,7 @@ jobs:
         --set image.repository=$(ACR_NAME).azurecr.io/contoso \
         --set image.tag=$SEMANTIC_VERSION \
         --set replicaCount=2 \
-        --set ingress.enabled=true \
+        --set service.type=NodePort \
         --set settings.adxClusterUrl="$KUSTO_URI" \
         --set settings.adxDefaultDatabaseName="$(KUSTO_DB)" \
         --set settings.aadClientId="$(AKS_SP_CLIENT_ID)" \
