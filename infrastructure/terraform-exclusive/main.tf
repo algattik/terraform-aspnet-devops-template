@@ -5,7 +5,8 @@
 
 module "kusto" {
   source = "./kusto"
-  kusto_name = var.kusto_name
+  kusto_cluster_name = var.kusto_cluster_name
+  kusto_database_name = var.kusto_database_name
   resource_group_name = var.resource_group
   location = var.location
 }

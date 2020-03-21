@@ -9,7 +9,12 @@ variable "resource_group" {
   description = "Resource group to deploy in."
 }
 
-variable "kusto_name" {
+variable "kusto_cluster_name" {
   type = string
   description = "Name of the Kusto cluster."
+}
+
+variable "kusto_database_name" {
+  type = string
+  description = "Name of the Kusto database."
 }

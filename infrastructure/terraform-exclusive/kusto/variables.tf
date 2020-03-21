@@ -1,4 +1,8 @@
-variable "kusto_name" {
+variable "kusto_cluster_name" {
+  type = string
+}
+
+variable "kusto_database_name" {
   type = string
 }
 
