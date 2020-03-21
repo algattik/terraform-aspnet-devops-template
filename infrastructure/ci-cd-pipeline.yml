@@ -357,13 +357,13 @@ jobs:
     env:
       secret: $(AKS_SP_CLIENT_SECRET)
 
-  - bash: kubectl rollout status deployment "$(CHART_NAME)" --timeout 5m
+  - bash: kubectl rollout status deployment "$(CHART_NAME)" --timeout 5m --namespace "$KUBERNETES_NAMESPACE"
     displayName: Await K2 deployment
 
   - bash: |
       set -eux  # fail on error
 
-      kubectl run --attach --rm --restart=Never --image=busybox smoke-test-$(CHART_NAME) -- \
+      kubectl run --namespace "$KUBERNETES_NAMESPACE" --attach --rm --restart=Never --image=busybox smoke-test-$(CHART_NAME) -- \
         wget -O- \
         'http://$(CHART_NAME):5000'
 
