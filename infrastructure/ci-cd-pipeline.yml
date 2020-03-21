@@ -11,7 +11,7 @@
 
 jobs:
 - job: Terraform_shared
-  displayName: Terraform shared
+  displayName: Deploy shared infrastructure
   # Avoid concurrent Terraform runs on PRs, which would result in failures due to exclusive lock on remote state file.
   condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), variables['RUN_FLAG_TERRAFORM']))
   variables:
@@ -91,7 +91,7 @@ jobs:
         az vmss scale --id $AGENT_VMSS_ID --new-capacity 2 -o table
 
 - job: Terraform_specific
-  displayName: Terraform specific
+  displayName: Deploy build-specific infrastructure
   dependsOn:
   - Terraform_shared_outputs
   variables:
