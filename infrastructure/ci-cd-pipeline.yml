@@ -106,7 +106,7 @@ jobs:
       sed 's/\\n/\n/g' > kube_config <<< $KUBE_CONFIG_RAW
       #FIXME
       cat kube_config
-      echo "##vso[task.setvariable variable=KUBE_CONFIG]$PWD/kube_config"
+      echo "##vso[task.setvariable variable=KUBECONFIG]$PWD/kube_config"
     displayName: Save kubeconfig
     env:
       KUBE_CONFIG_RAW: $(KUBE_CONFIG_RAW)
