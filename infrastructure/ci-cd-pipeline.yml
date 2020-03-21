@@ -4,7 +4,7 @@
 #   `terraform apply` only runs on the master branch.
 # - RUN_FLAG_PROMOTE: Set to 1 to promote the Docker image to `latest` tag if
 #   tests are successful. By default this is only done on the master branch.
-# - RUN_SET_NAMESPACE: Set to a string to deploy to the given AKS namespace,
+# - RUN_SET_NAMEBASE: Set to a string to deploy to the given AKS namespace,
 #   and not delete the namespace after the build. By default the build deploys to
 #   the `master` AKS namespace if run on the master branch, and otherwise to a
 #   temporary AKS namespace that is deleted at the end of the build.
@@ -116,8 +116,8 @@ jobs:
       if [ "$(Build.SourceBranch)" = "refs/heads/master" ]; then
         KUBERNETES_NAMESPACE="master"
       fi
-      if [ "${RUN_SET_NAMESPACE:-}" != "" ]; then
-        KUBERNETES_NAMESPACE="$RUN_SET_NAMESPACE"
+      if [ "${RUN_SET_NAMEBASE:-}" != "" ]; then
+        KUBERNETES_NAMESPACE="$RUN_SET_NAMEBASE"
       fi
 
       echo "Namespace: $KUBERNETES_NAMESPACE"
@@ -403,7 +403,7 @@ jobs:
 
   - bash: |
       set -euxo pipefail  # fail on error
-      kubectl -n "$KUBERNETES_NAMESPACE" get svc "$(CHART_NAME)" -o jsonpath="{.spec.ports[0].name}://{.spec.clusterIP}:{.spec.ports[0].port}" | read -r url
+      kubectl -n "$KUBERNETES_NAMESPACE" get svc "$(CHART_NAME)" -o jsonpath="{.spec.ports[0].name}://{.spec.clusterIP}:{.spec.ports[0].port};" | read -r -d ";" url
       echo "##vso[task.setvariable variable=SERVICE_URL]$url"
     displayName: Get Service URL
 
@@ -439,8 +439,8 @@ jobs:
   pool: $(AGENT_POOL_NAME)
   # Do not delete AKS namespace:
   # - if deploying on master branch
-  # - if namespace was manually set with RUN_SET_NAMESPACE
-  condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMESPACE']))
+  # - if namespace was manually set with RUN_SET_NAMEBASE
+  condition: and(always(), not(eq(variables['KUBERNETES_NAMESPACE'], 'master')), not(variables['RUN_SET_NAMEBASE']))
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-specific-destroy
