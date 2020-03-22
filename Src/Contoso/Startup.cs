@@ -125,19 +125,6 @@ namespace Contoso
         /// </summary>
         private void ConfigureApplicationInsights(IServiceCollection services)
         {
-            // Only if explicitly declared we are collecting telemetry
-            var hasCollectBool =
-                bool.TryParse(
-                    this.Configuration["collectTelemetry"],
-                    out bool isCollect);
-
-            if (!hasCollectBool || !isCollect)
-            {
-                return;
-            }
-
-            var adxUrl = this.Configuration["adxClusterUrl"];
-
             // verify we got a valid instrumentation key, if we didn't, we just skip AppInsights
             // we do not log this, as at this point we still don't have a logger
             var hasGuid = Guid.TryParse(this.Configuration["instrumentationKey"], out Guid instrumentationKey);

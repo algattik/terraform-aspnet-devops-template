@@ -50,31 +50,11 @@ spec:
           - configMapRef:
               name: {{ include "contoso.fullname" . }}
           env:
-            - name: bridgeListenerAddress
-              value: "{{ .Values.settings.bridgeListenerAddress }}"
-            - name: metadataElasticAddress
-              value: "{{ .Values.settings.metadataElasticAddress }}"
-            - name: outputBackendQuery
-              value: "{{ .Values.settings.outputBackendQuery }}"
-            - name: adxClusterUrl
-              value: "{{ .Values.settings.adxClusterUrl }}"
-            - name: adxDefaultDatabaseName
-              value: "{{ .Values.settings.adxDefaultDatabaseName }}"
-            - name: aadClientId
-              value: "{{ .Values.settings.aadClientId }}"
             - name: aadClientSecret
               valueFrom:
                 secretKeyRef:
                   name: {{ include "contoso.fullname" . }}-kusto-credentials
                   key: aadClientSecret
-            - name: aadTenantId
-              value: "{{ .Values.settings.aadTenantId }}"
-            - name: instrumentationKey
-              value: "{{ .Values.settings.instrumentationKey }}"
-            - name: collectTelemetry
-              value: "{{ .Values.settings.collectTelemetry }}"
-            - name: enableQueryLogging
-              value: "{{ .Values.settings.enableQueryLogging }}"
           volumeMounts:
             - name: appsettings-volume
               mountPath: /app/settings
