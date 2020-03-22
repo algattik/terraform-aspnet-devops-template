@@ -1,4 +1,8 @@
-﻿namespace Contoso
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+// See LICENSE file in the project root for full license information.
+
+namespace Contoso
 {
     using Microsoft.ApplicationInsights;
     using Prometheus;
@@ -9,14 +13,7 @@
     public class Histogram
     {
         private readonly IHistogram histogram;
-        private readonly Metric appInsightsMetric;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Histogram"/> class.
-        /// </summary>
-        public Histogram()
-        {
-        }
+        private readonly Metric? appInsightsMetric;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Histogram"/> class.
@@ -25,11 +22,11 @@
         /// <param name="name">A name.</param>
         /// <param name="help">Help text.</param>
         /// <param name="appInsightsMetric">The ApplicationInsights <see cref="Metric"/> object.</param>
-        public Histogram(IHistogram histogram, string name, string help, Metric appInsightsMetric)
+        public Histogram(IHistogram histogram, string name, string help, Metric? appInsightsMetric)
         {
             this.histogram = histogram;
-            Name = name;
-            Help = help;
+            this.Name = name;
+            this.Help = help;
             this.appInsightsMetric = appInsightsMetric;
         }
 
@@ -49,10 +46,10 @@
         /// <param name="val">The Value.</param>
         public void Observe(double val)
         {
-            histogram.Observe(val);
+            this.histogram.Observe(val);
 
             // AppInsights might not be on and the metric could be null
-            appInsightsMetric?.TrackValue(val);
+            this.appInsightsMetric?.TrackValue(val);
         }
     }
 }

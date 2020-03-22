@@ -1,3 +1,7 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+// See LICENSE file in the project root for full license information.
+
 namespace Contoso
 {
     using System.IO;
@@ -51,7 +55,7 @@ namespace Contoso
 
             var typeName = logEvent.Exception.GetType().Name;
             using var sourceContext = new StringWriter();
-            if (logEvent.Properties.TryGetValue("SourceContext", out LogEventPropertyValue prop))
+            if (logEvent.Properties.TryGetValue("SourceContext", out LogEventPropertyValue? prop))
             {
                 prop.Render(sourceContext, SerilogRawFormat);
             }

@@ -1,4 +1,8 @@
-﻿namespace Contoso
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+// See LICENSE file in the project root for full license information.
+
+namespace Contoso
 {
     using System;
     using Microsoft.ApplicationInsights.AspNetCore.TelemetryInitializers;
@@ -40,16 +44,20 @@
         {
             if (telemetry is ISupportProperties itemProperties)
             {
-                itemProperties.Properties[K2IdentifierPropertyName] = identifier;
+                itemProperties.Properties[K2IdentifierPropertyName] = this.identifier;
             }
 
             if (platformContext != null && string.IsNullOrEmpty(telemetry?.Context?.Operation?.SyntheticSource))
             {
                 var path = platformContext.Request.Path;
 
-                if (path.StartsWithSegments(healthCheckRoute, StringComparison.OrdinalIgnoreCase))
+                if (path.StartsWithSegments(this.healthCheckRoute, StringComparison.OrdinalIgnoreCase))
                 {
-                    telemetry.Context.Operation.SyntheticSource = SyntheticSourceHeaderValue;
+                    var operation = telemetry?.Context?.Operation;
+                    if (operation != null)
+                    {
+                        operation.SyntheticSource = SyntheticSourceHeaderValue;
+                    }
                 }
             }
         }

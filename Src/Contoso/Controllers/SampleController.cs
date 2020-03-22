@@ -1,15 +1,22 @@
-﻿namespace Contoso
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+// See LICENSE file in the project root for full license information.
+
+namespace Contoso
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
 
+    /// <summary>
+    /// Sample controller.
+    /// </summary>
     [Route("[controller]/[action]")]
     public class SampleController : ControllerBase
     {
         public SampleController(SampleService sampleService, ILogger<SampleController> logger)
         {
-            Logger = logger;
-            SampleService = sampleService;
+            this.Logger = logger;
+            this.SampleService = sampleService;
         }
 
         private SampleService SampleService { get; set; }
@@ -19,9 +26,9 @@
         [HttpGet]
         public IActionResult Process()
         {
-            var response = SampleService.DoSomething("Hello");
+            var response = this.SampleService.DoSomething("Hello");
 
-            return Ok(response);
+            return this.Ok(response);
         }
     }
 }
