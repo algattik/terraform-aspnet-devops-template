@@ -61,7 +61,7 @@ for agent_num in $(seq 1 $az_devops_agents_per_vm); do
   agent_dir="agent-$agent_num"
   mkdir -p "$agent_dir"
   pushd "$agent_dir"
-    agent_id="${HOSTNAME}-${agent_num}"
+    agent_id="${HOSTNAME}_${agent_num}"
     echo "installing agent $agent_id"
     tar zxf ../agent_package.tar.gz
     chmod -R 777 .
