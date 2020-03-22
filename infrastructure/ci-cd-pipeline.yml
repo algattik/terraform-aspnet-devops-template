@@ -126,7 +126,7 @@ jobs:
       failIfCoverageEmpty: true
 
   - task: AzureCLI@1
-    displayName: Build images and charts
+    displayName: Build runtime image
     inputs:
       azureSubscription: $(TERRAFORM_SERVICE_CONNECTION)
       scriptLocation: inlineScript
@@ -267,7 +267,7 @@ jobs:
   dependsOn:
   - Terraform_shared_outputs
   variables:
-    AGENT_VMSS_ID: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.agent_vmss_id'] ]
+    AGENT_VMSS_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.agent_vmss_name'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-shared
   steps:
 
@@ -278,7 +278,9 @@ jobs:
       scriptLocation: inlineScript
       inlineScript: |
         set -eux  # fail on error
-        az vmss scale --id $AGENT_VMSS_ID --new-capacity 2 -o table
+        # Trigger rerun of provisioning script if it has changed (based on CustomScript timestamp attribute)
+        az vmss update-instances --instance-ids '*' --name $AGENT_VMSS_NAME --resource-group $RESOURCE_GROUP --no-wait
+        az vmss scale --new-capacity 2 -o table --name $AGENT_VMSS_NAME --resource-group $RESOURCE_GROUP
 
 - job: integration_tests
   displayName: Integration tests

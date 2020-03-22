@@ -33,6 +33,7 @@ apt-get install -y --no-install-recommends \
         jq \
         apt-transport-https \
         docker.io \
+        curl \
         unzip
 
 
@@ -56,19 +57,11 @@ echo "Release "${AGENTRELEASE}" appears to be latest"
 echo "Downloading..."
 wget -q -O agent_package.tar.gz ${AGENTURL} 
 
-# Generate random prefix for agent names
-if ! test -e "host_uuid.txt"; then
-  uuidgen > host_uuid.txt.tmp
-  mv host_uuid.txt.tmp host_uuid.txt
-fi
-host_id=$(cat host_uuid.txt)
-
-
 for agent_num in $(seq 1 $az_devops_agents_per_vm); do
   agent_dir="agent-$agent_num"
   mkdir -p "$agent_dir"
   pushd "$agent_dir"
-    agent_id="${agent_num}_${host_id}"
+    agent_id="${HOSTNAME}_${agent_num}"
     echo "installing agent $agent_id"
     tar zxf ../agent_package.tar.gz
     chmod -R 777 .

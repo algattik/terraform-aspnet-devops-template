@@ -14,8 +14,8 @@ output "agent_pool_name" {
   value = var.az_devops_agent_pool
 }
 
-output "agent_vmss_id" {
-  value = module.devops-agent.agent_vmss_id
+output "agent_vmss_name" {
+  value = module.devops-agent.agent_vmss_name
 }
 
 output "aks_name" {
