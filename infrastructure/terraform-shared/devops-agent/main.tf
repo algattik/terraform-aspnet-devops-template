@@ -135,7 +135,4 @@ resource "azurerm_virtual_machine_scale_set_extension" "devops" {
   "commandToExecute": "bash ${azurerm_storage_blob.devops_agent_init.name} '${var.az_devops_url}' '${var.az_devops_pat}' '${var.az_devops_agent_pool}' '${var.az_devops_agents_per_vm}'"
   })
   #output goes to /var/lib/waagent/custom-script
-
-
-  depends_on = [aws_s3_bucket.example]
 }
