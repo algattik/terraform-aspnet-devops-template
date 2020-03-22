@@ -126,7 +126,7 @@ jobs:
       failIfCoverageEmpty: true
 
   - task: AzureCLI@1
-    displayName: Build images and charts
+    displayName: Build runtime image
     inputs:
       azureSubscription: $(TERRAFORM_SERVICE_CONNECTION)
       scriptLocation: inlineScript
