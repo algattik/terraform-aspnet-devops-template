@@ -17,7 +17,7 @@ RUN dotnet restore
 # copy everything else and build app
 COPY Src/. .
 WORKDIR /app/Contoso
-RUN dotnet build -c Release /p:VersionPrefix=${VersionPrefix}
+RUN dotnet build -c Release /p:VersionPrefix=${VersionPrefix} /p:TreatWarningsAsErrors=true -warnaserror
 
 
 FROM build AS testrunner
