@@ -339,7 +339,7 @@ jobs:
         execution:
         - scenario:
             requests:
-            - $(SERVICE_URL)
+            - $(SERVICE_URL)/metrics
           concurrency: 10
           ramp-up: 15s
           hold-for: 2m
