@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
 
+    [Route("[controller]/[action]")]
     public class SampleController : ControllerBase
     {
         public SampleController(SampleService sampleService, ILogger<SampleController> logger)
@@ -16,9 +17,9 @@
         private ILogger Logger { get; set; }
 
         [HttpGet]
-        public IActionResult Process(string name)
+        public IActionResult Process()
         {
-            var response = SampleService.DoSomething(name);
+            var response = SampleService.DoSomething("Hello");
 
             return Ok(response);
         }
