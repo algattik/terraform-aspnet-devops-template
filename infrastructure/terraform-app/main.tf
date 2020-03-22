@@ -38,8 +38,4 @@ resource "helm_release" "build" {
     name  = "settings.aadTenantId"
     value = var.tenant_id
   }
-  set {
-    name  = "settings.enableQueryLogging"
-    value = true 
-  }
 }

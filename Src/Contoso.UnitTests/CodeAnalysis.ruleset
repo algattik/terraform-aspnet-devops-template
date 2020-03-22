@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Rules" Description="Code analysis rules" ToolsVersion="16.0">
+  <Include Path="AllRulesDefault.ruleset" Action="Default" />
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <Rule Id="CS1591" Action="None" />
+    <Rule Id="SA1600" Action="None" />
+  </Rules>
+</RuleSet>

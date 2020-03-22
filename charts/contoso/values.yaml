@@ -10,16 +10,13 @@ image:
   pullPolicy: Always
 
 settings:
-  bridgeListenerAddress: "http://contoso:80/"
-  outputBackendQuery: true
+  computeServiceAddress: "http://contoso:80/"
   adxClusterUrl: "https://myadxinstance.region.kusto.windows.net"
   adxDefaultDatabaseName: "myadxdatabase"
   aadClientId: "00000000-0000-0000-0000-000000000000"
   aadClientSecret: "secret/pa$$w0rd"
   aadTenantId: "00000000-0000-0000-0000-000000000000"
   instrumentationKey: "00000000-0000-0000-0000-000000000000"
-  collectTelemetry: false
-  enableQueryLogging: true
 
 service:
   type: ClusterIP

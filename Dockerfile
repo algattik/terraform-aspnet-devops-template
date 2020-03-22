@@ -2,8 +2,9 @@
 
 ARG ASPNET_VERSION=3.1
 
-
 FROM mcr.microsoft.com/dotnet/core/sdk:$ASPNET_VERSION AS build
+
+ARG VersionPrefix=0.0.0
 
 WORKDIR /app
 
@@ -16,7 +17,7 @@ RUN dotnet restore
 # copy everything else and build app
 COPY Src/. .
 WORKDIR /app/Contoso
-RUN dotnet build
+RUN dotnet build -c Release /p:VersionPrefix=${VersionPrefix} /p:TreatWarningsAsErrors=true -warnaserror
 
 
 FROM build AS testrunner
