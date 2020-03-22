@@ -33,6 +33,7 @@ apt-get install -y --no-install-recommends \
         jq \
         apt-transport-https \
         docker.io \
+        curl \
         unzip
 
 

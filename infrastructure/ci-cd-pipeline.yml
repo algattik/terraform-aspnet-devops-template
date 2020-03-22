@@ -278,6 +278,7 @@ jobs:
       scriptLocation: inlineScript
       inlineScript: |
         set -eux  # fail on error
+        # Trigger rerun of provisioning script if it has changed (based on CustomScript timestamp attribute)
         az vmss update-instances --instance-ids '*' --name $AGENT_VMSS_NAME --resource-group $RESOURCE_GROUP --no-wait
         az vmss scale --new-capacity 2 -o table --name $AGENT_VMSS_NAME --resource-group $RESOURCE_GROUP
 
