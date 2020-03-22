@@ -18,12 +18,17 @@ resource "azurerm_storage_container" "devops" {
   container_access_type = "private"
 }
 
+locals {
+  init_script = join("\n\n", [file("${path.module}/devops_agent_init.sh"), file("${path.module}/install_software.sh")])
+  max_int32_value = 2147483647
+}
+
 resource "azurerm_storage_blob" "devops_agent_init" {
-  name                   = "provision_agent-${md5(file("${path.module}/devops_agent_init.sh"))}-${md5(file("${path.module}/install_software.sh"))}.sh"
+  name                   = "provision_agent.sh"
   storage_account_name   = azurerm_storage_account.devops.name
   storage_container_name = azurerm_storage_container.devops.name
   type                   = "Block"
-  source_content         = join("\n\n", [file("${path.module}/devops_agent_init.sh"), file("${path.module}/install_software.sh")])
+  source_content         = local.init_script
 }
 
 data "azurerm_storage_account_blob_container_sas" "devops_agent_init" {
@@ -58,7 +63,8 @@ resource "random_password" "agent_vms" {
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "devops" {
-  name                  = "vm${var.appname}devops${var.environment}"
+  # limit name length to avoid conflict in truncated service names on the VMs
+  name                  = format("%.24s", "vm${var.appname}devops${var.environment}")
   location              = var.location
   resource_group_name   = var.resource_group_name
   network_interface {
@@ -126,9 +132,9 @@ resource "azurerm_virtual_machine_scale_set_extension" "devops" {
   type_handler_version = "2.0"
 
   #timestamp: use this field only to trigger a re-run of the script by changing value of this field.
-  #           Any integer value is acceptable; it must only be different than the previous value.
+  #           Any int32 value is acceptable; it must only be different than the previous value.
   settings = jsonencode({
-    "timestamp" : 1
+    "timestamp" : parseint(sha1(local.init_script), 16) % local.max_int32_value
   })
   protected_settings = jsonencode({
   "fileUris": ["${azurerm_storage_blob.devops_agent_init.url}${data.azurerm_storage_account_blob_container_sas.devops_agent_init.sas}"],
