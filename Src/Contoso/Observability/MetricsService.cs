@@ -13,7 +13,7 @@ namespace Contoso
     public class MetricsService
     {
         /// <summary>
-        /// Constructor.
+        /// Initializes a new instance of the <see cref="MetricsService"/> class.
         /// </summary>
         /// <param name="telemetryClient">The ApplicationInsights telemetry client (null if AppInsights is off).</param>
         public MetricsService(TelemetryClient? telemetryClient)

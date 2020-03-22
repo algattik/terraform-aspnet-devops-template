@@ -18,6 +18,9 @@ namespace Contoso
     using Prometheus;
     using Serilog;
 
+    /// <summary>
+    /// Startup ASP.NET Core class.
+    /// </summary>
     [ExcludeFromCodeCoverage]
     public class Startup
     {
@@ -32,9 +35,16 @@ namespace Contoso
             this.Configuration = configuration;
         }
 
+        /// <summary>
+        /// Gets application configuration.
+        /// </summary>
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app">Application builder.</param>
+        /// <param name="env">Host environment.</param>
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -66,8 +76,11 @@ namespace Contoso
             });
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940.
+        /// </summary>
+        /// <param name="services">Service collection to be configured.</param>
         public void ConfigureServices(IServiceCollection services)
         {
             this.ConfigureTelemetryServices(services);

@@ -13,6 +13,9 @@ namespace Contoso
     using Microsoft.Extensions.Hosting;
     using Serilog;
 
+    /// <summary>
+    /// ASP.NET Core entry point.
+    /// </summary>
     [ExcludeFromCodeCoverage]
     public static class Program
     {
@@ -21,7 +24,7 @@ namespace Contoso
         /// <summary>
         /// Gets the Configuration for the app.
         /// The config is stored in appsettings.json.
-        /// It can also be found on appsettings.Development.json (in local env)
+        /// It can also be found on appsettings.Development.json (in local env).
         /// </summary>
         public static IConfiguration Configuration { get; } = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
@@ -34,7 +37,7 @@ namespace Contoso
         /// Entry point.
         /// </summary>
         /// <param name="args">Program args.</param>
-        public static int Main(string[] args)
+        public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
@@ -47,8 +50,6 @@ namespace Contoso
                 Log.Information($"***** Starting Contoso {AssemblyVersion} *****");
 
                 CreateHostBuilder(args).Build().Run();
-
-                return 0;
             }
             catch (Exception ex)
             {

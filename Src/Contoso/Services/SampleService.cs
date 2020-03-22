@@ -7,8 +7,15 @@ namespace Contoso
     using System;
     using Microsoft.Extensions.Logging;
 
+    /// <summary>
+    /// Sample service.
+    /// </summary>
     public class SampleService
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SampleService"/> class.
+        /// </summary>
+        /// <param name="logger">Logger.</param>
         public SampleService(ILogger<SampleService> logger)
         {
             this.Logger = logger;
@@ -16,22 +23,16 @@ namespace Contoso
 
         private ILogger Logger { get; set; }
 
-        public static int AddTwoNumbers(int x, int y)
+        /// <summary>
+        /// Add two numbers and return their sum.
+        /// </summary>
+        /// <param name="x">First number to add.</param>
+        /// <param name="y">Second number to add.</param>
+        /// <returns>Sum of x and y.</returns>
+        public int AddTwoNumbers(int x, int y)
         {
+            this.Logger.LogInformation("Adding numbers");
             return x + y;
-        }
-
-        public string DoSomething(string indexName)
-        {
-            try
-            {
-                return indexName;
-            }
-            catch (Exception ex)
-            {
-                this.Logger.LogError(ex, "Error while executing DoSomething.");
-                throw;
-            }
         }
     }
 }
