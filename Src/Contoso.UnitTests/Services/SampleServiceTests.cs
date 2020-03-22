@@ -5,6 +5,7 @@
 namespace Contoso.UnitTests
 {
     using Contoso;
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using NSubstitute;
     using Xunit;
@@ -14,10 +15,13 @@ namespace Contoso.UnitTests
         [Fact]
         public void AddTwoNumbers()
         {
+            var controller = Substitute.For<ISampleController>();
+            controller.SumNumbersUpTo(2).Returns(3);
             var service = new SampleService(
+                controller,
                 Substitute.For<ILogger<SampleService>>());
-            var returnedString = service.AddTwoNumbers(2, 3);
-            Assert.Equal(5, returnedString);
+            var returnedString = service.SumNumbersUpTo(3);
+            Assert.Equal(6, returnedString);
         }
     }
 }

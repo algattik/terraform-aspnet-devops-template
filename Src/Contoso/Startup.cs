@@ -89,14 +89,17 @@ namespace Contoso
 
             services.AddTransient<SampleService>(
                 s => new SampleService(
+                    s.GetRequiredService<SampleController>(),
                     s.GetRequiredService<ILogger<SampleService>>()));
 
-            // use this http client factory to issue requests to the metadata elastic instance
-            services.AddHttpClient("ForwardingClient", (svcProvider, httpClient) =>
+            // use this http client factory to issue requests to the compute service
+            services.AddHttpClient("ComputeServiceClient", c =>
             {
                 var computeServiceURL = this.Configuration["computeServiceURL"];
-                httpClient.BaseAddress = new Uri(computeServiceURL);
-            }).AddHeaderPropagation();
+                c.BaseAddress = new Uri(computeServiceURL);
+            })
+            .AddHeaderPropagation()
+            .AddTypedClient(c => Refit.RestService.For<SampleController>(c));
 
             services.AddHeaderPropagation(options =>
             {

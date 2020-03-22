@@ -4,35 +4,42 @@
 
 namespace Contoso
 {
-    using System;
     using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Sample service.
     /// </summary>
-    public class SampleService
+    public class SampleService : ISampleService
     {
+        private readonly ISampleController client;
+        private readonly ILogger logger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SampleService"/> class.
         /// </summary>
+        /// <param name="client">Remote controller.</param>
         /// <param name="logger">Logger.</param>
-        public SampleService(ILogger<SampleService> logger)
+        public SampleService(ISampleController client, ILogger<SampleService> logger)
         {
-            this.Logger = logger;
+            this.client = client;
+            this.logger = logger;
         }
-
-        private ILogger Logger { get; set; }
 
         /// <summary>
         /// Add two numbers and return their sum.
         /// </summary>
-        /// <param name="x">First number to add.</param>
-        /// <param name="y">Second number to add.</param>
-        /// <returns>Sum of x and y.</returns>
-        public int AddTwoNumbers(int x, int y)
+        /// <param name="value">Number to add values up to.</param>
+        /// <returns>Sum of integer numbers from 0 to value.</returns>
+        public int SumNumbersUpTo(int value)
         {
-            this.Logger.LogInformation("Adding numbers");
-            return x + y;
+            if (value == 1)
+            {
+                return value;
+            }
+
+            var r1 = this.client.SumNumbersUpTo(value - 1);
+            var sum1 = r1;
+            return value + sum1;
         }
     }
 }

@@ -10,34 +10,35 @@ namespace Contoso
     /// <summary>
     /// Sample controller.
     /// </summary>
+    [ApiController]
     [Route("[controller]/[action]")]
-    public class SampleController : ControllerBase
+    public class SampleController : ControllerBase, ISampleController
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SampleController"/> class.
         /// </summary>
         /// <param name="sampleService">Service to add numbers.</param>
         /// <param name="logger">Logger.</param>
-        public SampleController(SampleService sampleService, ILogger<SampleController> logger)
+        public SampleController(ISampleService sampleService, ILogger<SampleController> logger)
         {
             this.Logger = logger;
             this.SampleService = sampleService;
         }
 
-        private SampleService SampleService { get; set; }
+        private ISampleService SampleService { get; set; }
 
         private ILogger Logger { get; set; }
 
         /// <summary>
-        /// Action for adding numbers.
+        /// Add two numbers and return their sum.
         /// </summary>
-        /// <returns>A dummy response.</returns>
-        [HttpGet]
-        public IActionResult Process()
+        /// <param name="value">Number to add values up to.</param>
+        /// <returns>Sum of integer numbers from 0 to value.</returns>
+        public int SumNumbersUpTo(int value)
         {
-            var response = this.SampleService.AddTwoNumbers(1, 2);
+            var response = this.SampleService.SumNumbersUpTo(value);
 
-            return this.Ok(response);
+            return response;
         }
     }
 }
