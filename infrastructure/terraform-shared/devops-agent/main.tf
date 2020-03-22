@@ -128,11 +128,14 @@ resource "azurerm_virtual_machine_scale_set_extension" "devops" {
   #timestamp: use this field only to trigger a re-run of the script by changing value of this field.
   #           Any integer value is acceptable; it must only be different than the previous value.
   settings = jsonencode({
-    "timestamp" : 1
+    "timestamp" : parseint("5eb63bbbe01eeed093cb22bb8f5acdc3", 16) % 2147483647
   })
   protected_settings = jsonencode({
   "fileUris": ["${azurerm_storage_blob.devops_agent_init.url}${data.azurerm_storage_account_blob_container_sas.devops_agent_init.sas}"],
   "commandToExecute": "bash ${azurerm_storage_blob.devops_agent_init.name} '${var.az_devops_url}' '${var.az_devops_pat}' '${var.az_devops_agent_pool}' '${var.az_devops_agents_per_vm}'"
   })
   #output goes to /var/lib/waagent/custom-script
+
+
+  depends_on = [aws_s3_bucket.example]
 }
