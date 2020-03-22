@@ -63,7 +63,8 @@ resource "random_password" "agent_vms" {
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "devops" {
-  name                  = "vm${var.appname}devops${var.environment}"
+  # limit name length to avoid conflict in truncated service names on the VMs
+  name                  = ${format("%.24s", "vm${var.appname}devops${var.environment}")}
   location              = var.location
   resource_group_name   = var.resource_group_name
   network_interface {
