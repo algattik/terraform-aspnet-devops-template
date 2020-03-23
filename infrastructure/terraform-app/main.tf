@@ -23,6 +23,10 @@ resource "helm_release" "build" {
     value = "NodePort"
   }
   set {
+    name  = "settings.adxClusterUrl"
+    value = var.kusto_cluster_url
+  }
+  set {
     name  = "settings.adxDefaultDatabaseName"
     value = var.kusto_database_name
   }

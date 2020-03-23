@@ -246,6 +246,7 @@ jobs:
   variables:
     KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
+    KUSTO_URI: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_uri'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-app
   steps:
 
@@ -263,6 +264,8 @@ jobs:
         TF_VAR_client_id: $(AKS_SP_CLIENT_ID)
         TF_VAR_tenant_id: $(ARM_TENANT_ID)
         TF_VAR_client_secret: $(AKS_SP_CLIENT_SECRET)
+        TF_VAR_kusto_cluster_url: $(KUSTO_URI)
+        TF_VAR_kusto_database_name: not_yet_implemented
 
 - job: Start_agents
   displayName: Start agents
