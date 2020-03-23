@@ -14,38 +14,24 @@ namespace Contoso
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MetricsService"/> class.
+        /// Constructor for mocking.
+        /// </summary>
+        public MetricsService()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MetricsService"/> class.
         /// </summary>
         /// <param name="telemetryClient">The ApplicationInsights telemetry client (null if AppInsights is off).</param>
         public MetricsService(TelemetryClient? telemetryClient)
         {
-            var name = "adx_query_total_seconds";
-            var help = "ADX query total execution time in seconds.";
-            this.AdxQueryDurationMetric = new Histogram(
+            var name = "sample_controller_call_duration_s";
+            var help = "Duration in seconds of calls to the SumComputationAPI.";
+            this.SumComputationAPICallDuration = new Histogram(
                 Prometheus.Metrics.CreateHistogram(name, help, new HistogramConfiguration
                 {
-                    Buckets = Prometheus.Histogram.LinearBuckets(start: 1, width: 1, count: 60),
-                }),
-                name,
-                help,
-                telemetryClient?.GetMetric(name));
-
-            name = "adx_query_net_seconds";
-            help = "ADX query net execution time in seconds.";
-            this.AdxNetQueryDurationMetric = new Histogram(
-                Prometheus.Metrics.CreateHistogram(name, help, new HistogramConfiguration
-                {
-                    Buckets = Prometheus.Histogram.LinearBuckets(start: 1, width: 1, count: 60),
-                }),
-                name,
-                help,
-                telemetryClient?.GetMetric(name));
-
-            name = "adx_query_result_bytes";
-            help = "ADX query result payload size in bytes.";
-            this.AdxQueryBytesMetric = new Histogram(
-                Prometheus.Metrics.CreateHistogram(name, help, new HistogramConfiguration
-                {
-                    Buckets = Prometheus.Histogram.LinearBuckets(start: 1, width: 250000, count: 40),
+                    Buckets = Prometheus.Histogram.ExponentialBuckets(start: 0.001, factor: 2, count: 15),
                 }),
                 name,
                 help,
@@ -53,18 +39,8 @@ namespace Contoso
         }
 
         /// <summary>
-        /// Gets or Sets AdxQueryDurationMetric.
+        /// Gets the metric for the duration in seconds of calls to the SumComputationAPI.
         /// </summary>
-        public Histogram AdxQueryDurationMetric { get; set; }
-
-        /// <summary>
-        /// Gets or Sets AdxNetQueryDurationMetric.
-        /// </summary>
-        public Histogram AdxNetQueryDurationMetric { get; set; }
-
-        /// <summary>
-        /// Gets or Sets AdxQueryBytesMetric.
-        /// </summary>
-        public Histogram AdxQueryBytesMetric { get; set; }
+        public Histogram? SumComputationAPICallDuration { get; }
     }
 }

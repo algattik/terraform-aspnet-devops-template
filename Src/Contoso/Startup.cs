@@ -91,8 +91,9 @@ namespace Contoso
 
             services.AddTransient<ISampleService>(
                 s => new SampleService(
-                    s.GetRequiredService<ISampleController>(),
-                    s.GetRequiredService<ILogger<SampleService>>()));
+                    s.GetRequiredService<ISumComputationAPI>(),
+                    s.GetRequiredService<ILogger<SampleService>>(),
+                    s.GetRequiredService<MetricsService>()));
 
             services.AddHeaderPropagation(options =>
             {
@@ -106,7 +107,7 @@ namespace Contoso
                 c.BaseAddress = new Uri(computeServiceAddress);
             })
             .AddHeaderPropagation()
-            .AddTypedClient(c => Refit.RestService.For<ISampleController>(c));
+            .AddTypedClient(c => Refit.RestService.For<ISumComputationAPI>(c));
 
             // Add a health/liveness service
             services.AddHealthChecks();

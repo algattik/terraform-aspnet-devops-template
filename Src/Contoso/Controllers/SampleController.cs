@@ -13,7 +13,7 @@ namespace Contoso
     /// </summary>
     [ApiController]
     [Route("[controller]/[action]")]
-    public class SampleController : ControllerBase, ISampleController
+    public class SampleController : ControllerBase, ISumComputationAPI
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SampleController"/> class.
@@ -35,6 +35,7 @@ namespace Contoso
         /// </summary>
         /// <param name="value">Number to add values up to.</param>
         /// <returns>Sum of integer numbers from 0 to value.</returns>
+        [HttpGet]
         public Task<int> SumNumbersUpTo(int value)
         {
             var response = this.SampleService.SumNumbersUpToAsync(value);
