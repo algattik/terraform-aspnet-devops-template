@@ -26,7 +26,7 @@ namespace Contoso
         /// <param name="telemetryClient">The ApplicationInsights telemetry client (null if AppInsights is off).</param>
         public MetricsService(TelemetryClient? telemetryClient)
         {
-            var name = "sample_controller_call_duration_s";
+            var name = "sum_computation_api_call_duration_s";
             var help = "Duration in seconds of calls to the SumComputationAPI.";
             this.SumComputationAPICallDuration = new Histogram(
                 Prometheus.Metrics.CreateHistogram(name, help, new HistogramConfiguration
