@@ -50,7 +50,7 @@ data "azurerm_storage_account_blob_container_sas" "devops_agent_init" {
 }
 
 
-# Create virtual machine
+# Create virtual machine scale set
 
 resource "random_password" "agent_vms" {
   length = 24

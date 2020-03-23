@@ -91,7 +91,6 @@ data "helm_repository" "stable" {
 resource "helm_release" "prometheus" {
   name       = "prometheus-operator"
   chart      = "stable/prometheus-operator"
-  namespace  = var.kubernetes_namespace
 
   wait       = true
   timeout    = 300
