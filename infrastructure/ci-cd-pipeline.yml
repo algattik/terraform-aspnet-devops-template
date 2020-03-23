@@ -226,7 +226,7 @@ jobs:
 
   - template: terraform-template.yml
     parameters:
-      TerraformDelete: true
+      TerraformDestroy: true
       TerraformApply: true
       TerraformStateKey: cd-$(Build.BuildId)
       TerraformVariables:
