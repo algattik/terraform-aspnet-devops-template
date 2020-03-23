@@ -26,3 +26,8 @@ variable "client_secret" {
 variable "tenant_id" {
   type = string
 }
+
+variable "kusto_database_name" {
+  type = string
+  description = "Name of the Kusto database to connect to."
+}

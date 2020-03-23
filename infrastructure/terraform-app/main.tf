@@ -24,7 +24,7 @@ resource "helm_release" "build" {
   }
   set {
     name  = "settings.adxDefaultDatabaseName"
-    value = "$(KUSTO_DB)" 
+    value = var.kusto_database_name
   }
   set {
     name  = "settings.aadClientId"
