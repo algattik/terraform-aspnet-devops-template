@@ -196,17 +196,6 @@ jobs:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
         ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
 
-- job: Terraform
-  displayName: Deploy infrastructure
-  pool: $(AGENT_POOL_NAME)
-  dependsOn:
-  - Terraform_shared_outputs
-  variables:
-    KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
-    TERRAFORM_DIRECTORY: infrastructure/terraform
-  steps:
-
   - bash: |
       set -eu  # fail on error
 
@@ -225,18 +214,30 @@ jobs:
     displayName: Define Deployment area
     name: area
 
+- job: Terraform
+  displayName: Deploy infrastructure
+  pool: $(AGENT_POOL_NAME)
+  dependsOn:
+  - Terraform_shared_outputs
+  variables:
+    AREA_NAME: $[ dependencies.Terraform_shared_outputs.outputs['area.AREA_NAME'] ]
+    KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
+    KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
+    TERRAFORM_DIRECTORY: infrastructure/terraform
+  steps:
+
   - template: terraform-template.yml
     parameters:
       TerraformDestroy: true
       TerraformApply: true
-      TerraformStateKey: infra/$(area.AREA_NAME)
+      TerraformStateKey: infra/$(AREA_NAME)
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
         ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
         TF_VAR_resource_group: $(RESOURCE_GROUP)
         TF_VAR_kusto_cluster_name: $(KUSTO_NAME)
         TF_VAR_kusto_database_name: build$(Build.BuildId)
-        TF_VAR_kubernetes_namespace: $(area.AREA_NAME)
+        TF_VAR_kubernetes_namespace: $(AREA_NAME)
 
 - job: Terraform_app
   displayName: Deploy application
@@ -371,7 +372,7 @@ jobs:
   - Terraform_shared_outputs
   pool: $(AGENT_POOL_NAME)
   variables:
-    AREA_NAME: $[ dependencies.Terraform.outputs['area.AREA_NAME'] ]
+    AREA_NAME: $[ dependencies.Terraform_shared_outputs.outputs['area.AREA_NAME'] ]
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-destroy
   # Destroy build-specific infrastructure unless either:

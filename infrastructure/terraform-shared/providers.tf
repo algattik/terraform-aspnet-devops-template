@@ -19,9 +19,6 @@ provider "random" {
   version = "~> 2.2"
 }
 
-provider "helm" {
-}
-
 # Data
 
 # Provides client_id, tenant_id, subscription_id and object_id variables
