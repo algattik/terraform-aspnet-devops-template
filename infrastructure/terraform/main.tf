@@ -31,7 +31,7 @@ resource "helm_release" "prometheus" {
   # Workaround for https://github.com/helm/charts/issues/19452
   set {
     name  = "prometheusOperator.enabled"
-    value = var.kubernetes_namespace == "master"
+    value = var.kubernetes_namespace == "promettmp"
   }
   set {
     name  = "prometheusOperator.createCustomResource"
