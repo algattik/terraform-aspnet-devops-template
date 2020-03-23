@@ -404,4 +404,5 @@ jobs:
         docker pull "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION"
         docker tag \
           "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION" \
-          "$ACR_NAME.azurecr.io/contoso:latest" docker push "$ACR_NAME.azurecr.io/contoso:latest"
+          "$ACR_NAME.azurecr.io/contoso:latest"
+        docker push "$ACR_NAME.azurecr.io/contoso:latest"
