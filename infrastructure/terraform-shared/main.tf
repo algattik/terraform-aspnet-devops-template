@@ -53,3 +53,11 @@ module "kusto" {
   location = var.location
   kusto_admin_sp_object_id = var.kusto_admin_sp_object_id
 }
+
+module "app-insights" {
+  source = "./app-insights"
+  appname = var.appname
+  environment = var.environment
+  resource_group_name = var.resource_group
+  location = var.location
+}

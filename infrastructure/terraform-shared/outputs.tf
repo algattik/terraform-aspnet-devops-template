@@ -38,3 +38,7 @@ output "kubernetes_version" {
 output "kusto_uri" {
   value = module.kusto.uri
 }
+
+output "instrumentation_key" {
+  value = module.app-insights.instrumentation_key
+}
