@@ -45,7 +45,7 @@ variables:
 - name: TERRAFORM_SERVICE_CONNECTION
   value: Terraform
 - name: TERRAFORM_STORAGE_ACCOUNT
-  value: aspnetmpltterraform
+  value: $(APP_NAME)terraform
 - name: AGENT_POOL_NAME
   value: aspnetmplt
 - name: JMETER_VERSION
