@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "contoso.name" . }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "contoso.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  namespaceSelector:
+    matchNames:
+    - {{.Release.Namespace}}
+  endpoints:
+  - port: web
+    interval: 30s
