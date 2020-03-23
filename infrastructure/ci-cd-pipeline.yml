@@ -210,32 +210,33 @@ jobs:
   - bash: |
       set -eu  # fail on error
 
-      KUBERNETES_NAMESPACE="build$(Build.BuildId)"
+      AREA_NAME="build$(Build.BuildId)"
       if [ "$(Build.SourceBranch)" = "refs/heads/master" ]; then
-        KUBERNETES_NAMESPACE="master"
+        AREA_NAME="master"
       fi
       if [ "${RUN_SET_NAMEBASE:-}" != "" ]; then
-        KUBERNETES_NAMESPACE="$RUN_SET_NAMEBASE"
+        AREA_NAME="$RUN_SET_NAMEBASE"
       fi
 
-      echo "Namespace: $KUBERNETES_NAMESPACE"
+      echo "Namespace: $AREA_NAME"
 
-      echo "##vso[task.setvariable variable=KUBERNETES_NAMESPACE]$KUBERNETES_NAMESPACE"
+      echo "##vso[task.setvariable variable=AREA_NAME;isOutput=true]$AREA_NAME"
 
-    displayName: Define AKS namespace
+    displayName: Define Deployment area
+    name: area
 
   - template: terraform-template.yml
     parameters:
       TerraformDestroy: true
       TerraformApply: true
-      TerraformStateKey: infra/$(KUBERNETES_NAMESPACE)
+      TerraformStateKey: infra/$(area.AREA_NAME)
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
         ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
         TF_VAR_resource_group: $(RESOURCE_GROUP)
         TF_VAR_kusto_cluster_name: $(KUSTO_NAME)
         TF_VAR_kusto_database_name: build$(Build.BuildId)
-        TF_VAR_kubernetes_namespace: $(KUBERNETES_NAMESPACE)
+        TF_VAR_kubernetes_namespace: $(AREA_NAME)
 
 - job: Terraform_app
   displayName: Deploy application
@@ -370,6 +371,7 @@ jobs:
   - Terraform_shared_outputs
   pool: $(AGENT_POOL_NAME)
   variables:
+    AREA_NAME: $[ dependencies.Terraform.outputs['area.AREA_NAME'] ]
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-destroy
   # Destroy build-specific infrastructure unless either:
@@ -381,7 +383,7 @@ jobs:
   - template: terraform-template.yml
     parameters:
       TerraformDestroy: true
-      TerraformStateKey: infra/$(KUBERNETES_NAMESPACE)
+      TerraformStateKey: infra/$(AREA_NAME)
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
         ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
