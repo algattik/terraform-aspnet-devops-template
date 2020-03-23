@@ -218,7 +218,7 @@ jobs:
         AREA_NAME="$RUN_SET_NAMEBASE"
       fi
 
-      echo "Namespace: $AREA_NAME"
+      echo "Area name: $AREA_NAME"
 
       echo "##vso[task.setvariable variable=AREA_NAME;isOutput=true]$AREA_NAME"
 
@@ -236,7 +236,7 @@ jobs:
         TF_VAR_resource_group: $(RESOURCE_GROUP)
         TF_VAR_kusto_cluster_name: $(KUSTO_NAME)
         TF_VAR_kusto_database_name: build$(Build.BuildId)
-        TF_VAR_kubernetes_namespace: $(AREA_NAME)
+        TF_VAR_kubernetes_namespace: $(area.AREA_NAME)
 
 - job: Terraform_app
   displayName: Deploy application
