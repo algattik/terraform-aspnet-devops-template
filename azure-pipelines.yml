@@ -50,6 +50,9 @@ variables:
   value: aspnetmplt
 - name: JMETER_VERSION
   value: 5.1.1
+# Enable buildkit to speed up multi-stage pipeline builds (avoid running unit tests twice)
+- name: DOCKER_BUILDKIT
+  value: 1
 
 pool:
   vmImage: ubuntu-latest
