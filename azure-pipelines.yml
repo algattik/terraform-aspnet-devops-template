@@ -15,6 +15,10 @@ name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
 variables:
 - group: tttemplate01
+# should contain variables
+# - AGENT_POOL_MANAGEMENT_TOKEN
+# - AKS_SP_CLIENT_SECRET
+# - TERRAFORM_SP_CLIENT_SECRET
 - name: MAJOR_MINOR_VERSION
   value: "0.1" # update between releases
 - name: SEMANTIC_VERSION
@@ -23,12 +27,10 @@ variables:
   value: tttemplate01
 - name: TERRAFORM_SP_CLIENT_ID
   value: df9df564-e889-4852-9bb2-aa912d990c93
-#- name: TERRAFORM_SP_CLIENT_SECRET
 - name: AKS_SP_CLIENT_ID
   value: cd0ad856-af8e-424e-b935-ce7ad6da5c9d
 - name: AKS_SP_OBJECT_ID
   value: ddf63018-48fb-4738-a3f5-0062fb16dbb0
-#- name: AKS_SP_CLIENT_SECRET
 - name: AKS_VERSION
   value: 1.15.7
 - name: HELM_RELEASE_NAME
