@@ -228,7 +228,7 @@ jobs:
     parameters:
       TerraformDestroy: true
       TerraformApply: true
-      TerraformStateKey: cd-$(Build.BuildId)
+      TerraformStateKey: infra/$(KUBERNETES_NAMESPACE)
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
         ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
@@ -255,7 +255,7 @@ jobs:
   - template: terraform-template.yml
     parameters:
       TerraformApply: true
-      TerraformStateKey: cd-app-$(Build.BuildId)
+      TerraformStateKey: app/build-$(Build.BuildId)
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
         ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
@@ -381,7 +381,7 @@ jobs:
   - template: terraform-template.yml
     parameters:
       TerraformDestroy: true
-      TerraformStateKey: cd-$(Build.BuildId)
+      TerraformStateKey: infra/$(KUBERNETES_NAMESPACE)
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
         ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
