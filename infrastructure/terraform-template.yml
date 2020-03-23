@@ -1,19 +1,18 @@
 parameters:
-- name: TerraformVersion
-  default: 0.12.24
-- name: TerraformDirectory
-  default: $(TERRAFORM_DIRECTORY)
-- name: TerraformAction
-  type: string
-  default: apply
-  values:
-  - apply
-  - destroy
-  - none
+- name: TerraformApply
+  type: boolean
+  default: false
+- name: TerraformDestroy
+  type: boolean
+  default: false
 - name: TerraformStateKey
   type: string
 - name: TerraformVariables
   type: object
+- name: TerraformDirectory
+  default: $(TERRAFORM_DIRECTORY)
+- name: TerraformVersion
+  default: 0.12.24
 
 steps:
 
@@ -46,19 +45,19 @@ steps:
 
 - bash: |
     set -eu
-    terraform plan -out=tfplan -input=false
-    terraform apply -input=false -auto-approve tfplan
-  displayName: Terraform apply
-  condition: eq('${{ parameters.TerraformAction }}', 'apply')
+    terraform destroy -input=false -auto-approve
+  displayName: Terraform destroy
+  condition: ${{ parameters.TerraformDestroy }}
   workingDirectory: $(TERRAFORM_DIRECTORY)
   env:
     ${{ parameters.TerraformVariables }}
 
 - bash: |
     set -eu
-    terraform destroy -input=false -auto-approve
-  displayName: Terraform destroy
-  condition: eq('${{ parameters.TerraformAction }}', 'destroy')
+    terraform plan -out=tfplan -input=false
+    terraform apply -input=false -auto-approve tfplan
+  displayName: Terraform apply
+  condition: ${{ parameters.TerraformApply }}
   workingDirectory: $(TERRAFORM_DIRECTORY)
   env:
     ${{ parameters.TerraformVariables }}

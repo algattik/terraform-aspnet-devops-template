@@ -162,6 +162,7 @@ jobs:
 
   - template: terraform-template.yml
     parameters:
+      TerraformApply: true
       TerraformStateKey: cd
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
@@ -190,7 +191,6 @@ jobs:
 
   - template: terraform-template.yml
     parameters:
-      TerraformAction: none
       TerraformStateKey: cd
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
@@ -226,6 +226,7 @@ jobs:
 
   - template: terraform-template.yml
     parameters:
+      TerraformApply: true
       TerraformStateKey: cd-$(Build.BuildId)
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
@@ -250,6 +251,7 @@ jobs:
 
   - template: terraform-template.yml
     parameters:
+      TerraformApply: true
       TerraformStateKey: cd-app-$(Build.BuildId)
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
@@ -372,7 +374,7 @@ jobs:
 
   - template: terraform-template.yml
     parameters:
-      TerraformAction: destroy
+      TerraformDestroy: true
       TerraformStateKey: cd-$(Build.BuildId)
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
