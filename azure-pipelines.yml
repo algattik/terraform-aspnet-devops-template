@@ -50,6 +50,9 @@ variables:
   value: tttemplate01
 - name: JMETER_VERSION
   value: 5.1.1
+# Enable buildkit
+- name: DOCKER_BUILDKIT
+  value: 1
 
 pool:
   vmImage: ubuntu-latest
