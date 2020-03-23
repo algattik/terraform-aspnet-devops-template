@@ -33,7 +33,7 @@ namespace Contoso
         /// <returns>Sum of integer numbers from 0 to value.</returns>
         public async Task<int> SumNumbersUpToAsync(int value)
         {
-            if (value == 1)
+            if (value <= 1)
             {
                 return value;
             }

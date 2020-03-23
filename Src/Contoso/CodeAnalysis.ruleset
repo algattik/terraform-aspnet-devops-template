@@ -3,5 +3,6 @@
   <Include Path="AllRulesEnabled.ruleset" Action="Default" />
   <Rules AnalyzerId="Microsoft.NetCore.Analyzers" RuleNamespace="Microsoft.NetCore.Analyzers">
     <Rule Id="CA1303" Action="None" />
+    <Rule Id="CA2007" Action="None" />
   </Rules>
 </RuleSet>
