@@ -48,7 +48,7 @@ spec:
               cpu: "2"
           envFrom:
           - configMapRef:
-              name: {{ include "contoso.fullname" . }}
+              name: {{ include "contoso.fullname" . }}-settings
           env:
             - name: aadClientSecret
               valueFrom:
