@@ -37,6 +37,11 @@ namespace Contoso
         /// <returns>Sum of integer numbers from 0 to value.</returns>
         public async Task<int> SumNumbersUpToAsync(int value)
         {
+            if (value < 0)
+            {
+                throw new SumComputationException("Can't sum numbers up to a negative value");
+            }
+
             if (value <= 1)
             {
                 return value;
