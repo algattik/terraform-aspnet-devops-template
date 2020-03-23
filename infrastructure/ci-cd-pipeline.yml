@@ -167,6 +167,7 @@ jobs:
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
         ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+        TF_VAR_appname: $(APP_NAME)
         TF_VAR_environment: cd
         TF_VAR_resource_group: $(RESOURCE_GROUP)
         TF_VAR_acr_name: $(ACR_NAME)

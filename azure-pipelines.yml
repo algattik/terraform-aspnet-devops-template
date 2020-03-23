@@ -16,6 +16,7 @@ name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 variables:
 - group: tttemplate01
 # should contain variables
+# - APP_NAME (short globally unique name, e.g. "starterterraform")
 # - AGENT_POOL_MANAGEMENT_TOKEN
 # - AKS_SP_CLIENT_SECRET
 # - TERRAFORM_SP_CLIENT_SECRET
