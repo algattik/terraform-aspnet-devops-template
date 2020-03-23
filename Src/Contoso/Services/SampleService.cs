@@ -4,6 +4,7 @@
 
 namespace Contoso
 {
+    using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
 
     /// <summary>
@@ -30,14 +31,14 @@ namespace Contoso
         /// </summary>
         /// <param name="value">Number to add values up to.</param>
         /// <returns>Sum of integer numbers from 0 to value.</returns>
-        public int SumNumbersUpTo(int value)
+        public async Task<int> SumNumbersUpToAsync(int value)
         {
             if (value == 1)
             {
                 return value;
             }
 
-            var r1 = this.client.SumNumbersUpTo(value - 1);
+            var r1 = await this.client.SumNumbersUpTo(value - 1);
             var sum1 = r1;
             return value + sum1;
         }

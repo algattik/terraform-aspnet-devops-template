@@ -4,6 +4,8 @@
 
 namespace Contoso
 {
+    using System.Threading.Tasks;
+
     /// <summary>
     /// Sample service.
     /// </summary>
@@ -14,6 +16,6 @@ namespace Contoso
         /// </summary>
         /// <param name="value">Number to add values up to.</param>
         /// <returns>Sum of integer numbers from 0 to value.</returns>
-        public int SumNumbersUpTo(int value);
+        Task<int> SumNumbersUpToAsync(int value);
     }
 }

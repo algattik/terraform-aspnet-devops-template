@@ -4,7 +4,9 @@
 
 namespace Contoso
 {
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
+    using Refit;
 
     /// <summary>
     /// Sample controller.
@@ -17,6 +19,7 @@ namespace Contoso
         /// <param name="value">Number to add values up to.</param>
         /// <returns>Sum of integer numbers from 0 to value.</returns>
         [HttpGet]
-        public int SumNumbersUpTo(int value);
+        [Get("/sample/sumNumbersUpTo")]
+        Task<int> SumNumbersUpTo(int value);
     }
 }

@@ -4,6 +4,7 @@
 
 namespace Contoso
 {
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
 
@@ -34,9 +35,9 @@ namespace Contoso
         /// </summary>
         /// <param name="value">Number to add values up to.</param>
         /// <returns>Sum of integer numbers from 0 to value.</returns>
-        public int SumNumbersUpTo(int value)
+        public Task<int> SumNumbersUpTo(int value)
         {
-            var response = this.SampleService.SumNumbersUpTo(value);
+            var response = this.SampleService.SumNumbersUpToAsync(value);
 
             return response;
         }
