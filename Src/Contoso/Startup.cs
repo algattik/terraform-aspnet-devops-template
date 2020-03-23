@@ -57,6 +57,8 @@ namespace Contoso
 
             app.UseRouting();
 
+            app.UseHeaderPropagation();
+
             // Expose HTTP Metrics to Prometheus:
             // Number of HTTP requests in progress.
             // Total number of received HTTP requests.
@@ -87,24 +89,24 @@ namespace Contoso
 
             services.AddControllers();
 
-            services.AddTransient<SampleService>(
+            services.AddTransient<ISampleService>(
                 s => new SampleService(
-                    s.GetRequiredService<SampleController>(),
+                    s.GetRequiredService<ISampleController>(),
                     s.GetRequiredService<ILogger<SampleService>>()));
-
-            // use this http client factory to issue requests to the compute service
-            services.AddHttpClient("ComputeServiceClient", c =>
-            {
-                var computeServiceURL = this.Configuration["computeServiceURL"];
-                c.BaseAddress = new Uri(computeServiceURL);
-            })
-            .AddHeaderPropagation()
-            .AddTypedClient(c => Refit.RestService.For<SampleController>(c));
 
             services.AddHeaderPropagation(options =>
             {
                 options.Headers.Add("X-TraceId");
             });
+
+            // use this http client factory to issue requests to the compute service
+            services.AddHttpClient("ComputeServiceClient", c =>
+            {
+                var computeServiceAddress = this.Configuration["computeServiceAddress"];
+                c.BaseAddress = new Uri(computeServiceAddress);
+            })
+            .AddHeaderPropagation()
+            .AddTypedClient(c => Refit.RestService.For<ISampleController>(c));
 
             // Add a health/liveness service
             services.AddHealthChecks();
