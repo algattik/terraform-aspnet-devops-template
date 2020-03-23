@@ -5,20 +5,18 @@
 namespace Contoso
 {
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Mvc;
     using Refit;
 
     /// <summary>
-    /// Sample controller.
+    /// API providing number summation services.
     /// </summary>
-    public interface ISampleController
+    public interface ISumComputationAPI
     {
         /// <summary>
         /// Add two numbers and return their sum.
         /// </summary>
         /// <param name="value">Number to add values up to.</param>
         /// <returns>Sum of integer numbers from 0 to value.</returns>
-        [HttpGet]
         [Get("/sample/sumNumbersUpTo")]
         Task<int> SumNumbersUpTo(int value);
     }

@@ -14,11 +14,12 @@ namespace Contoso.UnitTests
         [Fact]
         public async void AddTwoNumbers()
         {
-            var controller = Substitute.For<ISampleController>();
+            var controller = Substitute.For<ISumComputationAPI>();
             controller.SumNumbersUpTo(2).Returns(3);
             var service = new SampleService(
                 controller,
-                Substitute.For<ILogger<SampleService>>());
+                Substitute.For<ILogger<SampleService>>(),
+                Substitute.For<MetricsService>());
             var returnedString = await service.SumNumbersUpToAsync(3);
             Assert.Equal(6, returnedString);
         }
