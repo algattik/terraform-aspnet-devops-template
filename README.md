@@ -17,11 +17,11 @@ In Azure:
 
 In Azure DevOps:
   - Create an ADO agent pool named $(AGENT_POOL_NAME)
-  - Create an Azure DevOps Variable Group named terraform-aspnet-devops-template and create the variables
+  - Create an Azure DevOps Variable Group named `terraform-aspnet-devops-template` and create the variables
     - APP_NAME: short globally unique name, e.g. "aspnetmplt000010"
     - AGENT_POOL_MANAGEMENT_TOKEN: create an ADO PAT with Agent Manage permission
     - AKS_SP_CLIENT_SECRET: secret for AKS_SP_CLIENT_ID
-    - TERRAFORM_SP_CLIENT_SECRET: secret for TERRAFORM_SP_CLIENT_SECRET
+    - TERRAFORM_SP_CLIENT_SECRET: secret for TERRAFORM_SP_CLIENT_ID
   - Install ADO extensions:
     - Secure dev tools: https://marketplace.visualstudio.com/acquisition?itemName=securedevelopmentteam.vss-secure-development-tools
     - Terraform: https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
