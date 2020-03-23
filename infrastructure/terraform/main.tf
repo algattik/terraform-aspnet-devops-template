@@ -13,3 +13,25 @@ resource "kubernetes_namespace" "build" {
     name = var.kubernetes_namespace
   }
 }
+
+data "helm_repository" "stable" {
+  name = "stable"
+  url  = "https://kubernetes-charts.storage.googleapis.com"
+}
+
+resource "helm_release" "ingress" {
+  name       = "nginx"
+  chart      = "stable/nginx-ingress"
+  namespace  = var.kubernetes_namespace
+
+  wait       = true
+  timeout    = 300
+
+  set {
+    name  = "controller.replicaCount"
+    value = 2
+  }
+  values [
+    file("internal-ingress.yaml")
+  ]
+}
