@@ -58,7 +58,6 @@ module "app-insights" {
   source = "./app-insights"
   appname = var.appname
   environment = var.environment
-  aks_version = var.aks_version
   resource_group_name = var.resource_group
   location = var.location
 }
