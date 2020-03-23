@@ -14,7 +14,7 @@ pr:
 name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
 variables:
-- group: tttemplate01
+- group: terraform-aspnet-devops-template
 # should contain variables
 # - APP_NAME (short globally unique name, e.g. "starterterraform")
 # - AGENT_POOL_MANAGEMENT_TOKEN
@@ -25,7 +25,7 @@ variables:
 - name: SEMANTIC_VERSION
   value: "$(MAJOR_MINOR_VERSION).$(Build.BuildId)"
 - name: ACR_NAME
-  value: tttemplate01
+  value: aspnetmplt
 - name: TERRAFORM_SP_CLIENT_ID
   value: df9df564-e889-4852-9bb2-aa912d990c93
 - name: AKS_SP_CLIENT_ID
@@ -37,7 +37,7 @@ variables:
 - name: HELM_RELEASE_NAME
   value: contoso
 - name: RESOURCE_GROUP
-  value: tttemplate01
+  value: aspnetmplt
 - name: ARM_SUBSCRIPTION_ID
   value: a4ed7b9a-b128-49b4-a6ee-fd07ff6e296d
 - name: ARM_TENANT_ID
@@ -45,9 +45,9 @@ variables:
 - name: TERRAFORM_SERVICE_CONNECTION
   value: Terraform
 - name: TERRAFORM_STORAGE_ACCOUNT
-  value: tttemplate01terraform
+  value: $(APP_NAME)terraform
 - name: AGENT_POOL_NAME
-  value: tttemplate01
+  value: aspnetmplt
 - name: JMETER_VERSION
   value: 5.1.1
 
