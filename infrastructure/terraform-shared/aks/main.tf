@@ -9,24 +9,11 @@ resource "random_id" "workspace" {
   byte_length = 8
 }
 
-resource "azurerm_log_analytics_workspace" "aks" {
-  name                = "k8s-workspace-${random_id.workspace.hex}"
+resource "azurerm_application_insights" "aks" {
+  name                = "appi-${var.appname}-${var.environment}-aks"
   location            = var.location
   resource_group_name = var.resource_group_name
-  sku                 = "PerGB2018"
-}
-
-resource "azurerm_log_analytics_solution" "aks" {
-  solution_name         = "ContainerInsights"
-  location              = var.location
-  resource_group_name   = var.resource_group_name
-  workspace_resource_id = azurerm_log_analytics_workspace.aks.id
-  workspace_name        = azurerm_log_analytics_workspace.aks.name
-
-  plan {
-    publisher = "Microsoft"
-    product   = "OMSGallery/ContainerInsights"
-  }
+  application_type    = "other"
 }
 
 # Subnet permission
@@ -67,7 +54,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   addon_profile {
    oms_agent {
      enabled                    = true
-     log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
+     log_analytics_workspace_id = azurerm_application_insights.aks.id
     }
   }
 
