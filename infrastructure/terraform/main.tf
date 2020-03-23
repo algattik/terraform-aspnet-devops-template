@@ -14,6 +14,11 @@ resource "kubernetes_namespace" "build" {
   }
 }
 
+data "helm_repository" "stable" {
+  name = "stable"
+  url  = "https://kubernetes-charts.storage.googleapis.com"
+}
+
 resource "helm_release" "prometheus" {
   name       = "prometheus-operator"
   chart      = "stable/prometheus-operator"
