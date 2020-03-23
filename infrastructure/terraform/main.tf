@@ -31,7 +31,7 @@ resource "helm_release" "ingress" {
     name  = "controller.replicaCount"
     value = 2
   }
-  values [
+  values = [
     file("internal-ingress.yaml")
   ]
 }
