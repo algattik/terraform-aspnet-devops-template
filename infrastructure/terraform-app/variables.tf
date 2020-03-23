@@ -36,3 +36,8 @@ variable "kusto_database_name" {
   type = string
   description = "Name of the Kusto database to connect to."
 }
+
+variable "instrumentation_key" {
+  type = string
+  description = "App Insights instrumentation key to send metrics to."
+}

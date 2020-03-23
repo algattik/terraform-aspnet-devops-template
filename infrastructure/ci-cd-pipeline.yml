@@ -248,6 +248,7 @@ jobs:
     KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
     KUSTO_URI: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_uri'] ]
+    INSTRUMENTATION_KEY: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.instrumentation_key'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-app
   steps:
 
@@ -267,6 +268,7 @@ jobs:
         TF_VAR_client_secret: $(AKS_SP_CLIENT_SECRET)
         TF_VAR_kusto_cluster_url: $(KUSTO_URI)
         TF_VAR_kusto_database_name: not_yet_implemented
+        TF_VAR_instrumentation_key: $(INSTRUMENTATION_KEY)
 
 - job: Start_agents
   displayName: Start agents
@@ -402,5 +404,4 @@ jobs:
         docker pull "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION"
         docker tag \
           "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION" \
-          "$ACR_NAME.azurecr.io/contoso:latest"
-        docker push "$ACR_NAME.azurecr.io/contoso:latest"
+          "$ACR_NAME.azurecr.io/contoso:latest" docker push "$ACR_NAME.azurecr.io/contoso:latest"

@@ -42,4 +42,8 @@ resource "helm_release" "build" {
     name  = "settings.aadTenantId"
     value = var.tenant_id
   }
+  set {
+    name  = "settings.instrumentationKey"
+    value = var.instrumentation_key
+  }
 }
