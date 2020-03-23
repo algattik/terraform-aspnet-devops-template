@@ -2,6 +2,7 @@
 <RuleSet Name="Rules" Description="Code analysis rules" ToolsVersion="16.0">
   <Include Path="AllRulesDefault.ruleset" Action="Default" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <Rule Id="CA2007" Action="None" />
     <Rule Id="CS1591" Action="None" />
     <Rule Id="SA1600" Action="None" />
   </Rules>
