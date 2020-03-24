@@ -7,7 +7,9 @@ namespace Contoso
     using System;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.ApplicationInsights;
+    using Microsoft.ApplicationInsights.Channel;
     using Microsoft.ApplicationInsights.Extensibility;
+    using Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -136,6 +138,10 @@ namespace Contoso
             var hasGuid = Guid.TryParse(this.Configuration["instrumentationKey"], out Guid instrumentationKey);
             if (hasGuid)
             {
+                // This sets up ServerTelemetryChannel with StorageFolder set to a custom location.
+                using var telemetryChannel = new ServerTelemetryChannel() { StorageFolder = this.Configuration["appInsightsStorageFolder"] };
+                services.AddSingleton(typeof(ITelemetryChannel), telemetryChannel);
+
                 services.AddApplicationInsightsTelemetry(instrumentationKey.ToString());
                 var telemetryIdentifier = "Contoso";
 

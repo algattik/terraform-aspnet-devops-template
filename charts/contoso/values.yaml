@@ -11,6 +11,7 @@ image:
 
 settings:
   computeServiceAddress: "http://contoso:80/"
+  appInsightsStorageFolder: "/tmp"
   adxClusterUrl: "https://myadxinstance.region.kusto.windows.net"
   adxDefaultDatabaseName: "myadxdatabase"
   aadClientId: "00000000-0000-0000-0000-000000000000"

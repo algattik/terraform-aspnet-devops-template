@@ -51,12 +51,15 @@ namespace Contoso
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var sumUpToValueMinusOne = await this.client.SumNumbersUpTo(value - 1);
+            var result = value + sumUpToValueMinusOne;
             stopwatch.Stop();
             var duration = stopwatch.Elapsed;
 
+            this.logger.LogInformation("Sum of numbers from 0 to {value} was {result}, computed in {duration}s", value, result, duration);
+
             this.metrics?.SumComputationAPICallDuration?.Observe(duration.TotalSeconds);
 
-            return value + sumUpToValueMinusOne;
+            return result;
         }
     }
 }
