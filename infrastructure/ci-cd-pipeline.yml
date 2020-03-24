@@ -13,7 +13,6 @@ jobs:
 
 - job: security_analysis
   displayName: Security analysis
-  condition: false
 
   pool:
     # CredScan only runs on Windows
