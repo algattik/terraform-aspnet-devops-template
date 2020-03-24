@@ -358,6 +358,19 @@ jobs:
           ramp-up: 30s
           hold-for: 1m
           throughput: 20
+        reporting:
+        - module: junit-xml
+          filename: taurus-output/TEST-Taurus.xml
+
+  - task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
+    displayName: 'Run Taurus'
+    inputs:
+      taurusConfig: |
+        modules:
+          jmeter:
+            properties:
+              jmeter.reportgenerator.overall_granularity: 5000
+        execution:
         - scenario:
             requests:
             - url: $(SERVICE_URL)/sample/sumNumbersUpTo?value=100
@@ -377,7 +390,8 @@ jobs:
         #  iterations: 5
         reporting:
         - module: junit-xml
-          filename: taurus-output/TEST-Taurus.xml
+          filename: taurus-output2/TEST-Taurus.xml
+
 
   - task: PublishTestResults@2
     displayName: Publish test results
