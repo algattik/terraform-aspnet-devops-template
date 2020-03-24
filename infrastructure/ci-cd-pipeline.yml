@@ -360,7 +360,7 @@ jobs:
           throughput: 20
         - scenario:
             requests:
-            - url: $(SERVICE_URL)/sample/sumNumbersUpTo?value=10
+            - url: $(SERVICE_URL)/sample/sumNumbersUpTo?value=100
               assert:
               - contains:
                 - 5050
