@@ -338,6 +338,8 @@ jobs:
       echo "$url"
     displayName: Get Service URL
 
+  # FIXME: JUnit report generation fails if merging multiple scenarios in a single Task, so splitting across multiple Taurus runs.
+
   - task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
     displayName: 'Run Taurus'
     inputs:
