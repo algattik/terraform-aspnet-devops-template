@@ -338,9 +338,13 @@ jobs:
       echo "$url"
     displayName: Get Service URL
 
+  # FIXME: JUnit report generation fails if merging multiple scenarios in a single Task, so splitting across multiple Taurus runs.
+
   - task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
     displayName: 'Run Taurus'
     inputs:
+      outputDir: 'taurus-output'
+      reportName: 'Test Prometheus Endpoint'
       taurusConfig: |
         modules:
           jmeter:
@@ -358,6 +362,21 @@ jobs:
           ramp-up: 30s
           hold-for: 1m
           throughput: 20
+        reporting:
+        - module: junit-xml
+          filename: taurus-output/TEST-Taurus.xml
+
+  - task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
+    displayName: 'Run Taurus'
+    inputs:
+      outputDir: 'taurus-output2'
+      reportName: 'Test Sum Computation Endpoint'
+      taurusConfig: |
+        modules:
+          jmeter:
+            properties:
+              jmeter.reportgenerator.overall_granularity: 5000
+        execution:
         - scenario:
             requests:
             - url: $(SERVICE_URL)/sample/sumNumbersUpTo?value=100
@@ -377,7 +396,7 @@ jobs:
         #  iterations: 5
         reporting:
         - module: junit-xml
-          filename: taurus-output/TEST-Taurus.xml
+          filename: taurus-output2/TEST-Taurus.xml
 
   - task: PublishTestResults@2
     displayName: Publish test results
