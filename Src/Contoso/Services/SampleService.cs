@@ -42,21 +42,31 @@ namespace Contoso
                 throw new SumComputationException("Can't sum numbers up to a negative value");
             }
 
+            // Timer to be used to report the duration of a query to.
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var result = await this.SumNumbersUpToInternalAsync(value);
+            stopwatch.Stop();
+            var duration = stopwatch.Elapsed;
+
+            this.logger.LogInformation("Sum of numbers from 0 to {value} was {result}, computed in {duration}s", value, result, duration);
+
+            this.metrics?.SumComputationAPICallDuration?.Observe(duration.TotalSeconds);
+
+            return result;
+        }
+
+        private async Task<int> SumNumbersUpToInternalAsync(int value)
+        {
             if (value <= 1)
             {
                 return value;
             }
-
-            // Timer to be used to report the duration of a query to.
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            var sumUpToValueMinusOne = await this.client.SumNumbersUpTo(value - 1);
-            stopwatch.Stop();
-            var duration = stopwatch.Elapsed;
-
-            this.metrics?.SumComputationAPICallDuration?.Observe(duration.TotalSeconds);
-
-            return value + sumUpToValueMinusOne;
+            else
+            {
+                var sumUpToValueMinusOne = await this.client.SumNumbersUpTo(value - 1);
+                return value + sumUpToValueMinusOne;
+            }
         }
     }
 }

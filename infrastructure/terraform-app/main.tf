@@ -43,6 +43,10 @@ resource "helm_release" "build" {
     value = var.tenant_id
   }
   set {
+    name  = "settings.instrumentationAppId"
+    value = var.release_name
+  }
+  set {
     name  = "settings.instrumentationKey"
     value = var.instrumentation_key
   }
