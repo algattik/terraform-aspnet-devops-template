@@ -351,9 +351,18 @@ jobs:
             requests:
             - $(SERVICE_URL)/metrics
           concurrency: 10
-          ramp-up: 15s
-          hold-for: 2m
-          iterations: 10000
+          ramp-up: 30s
+          hold-for: 1m
+          throughput: 20
+        - scenario:
+            requests:
+            - $(SERVICE_URL)/sample/sumNumbersUpTo?value=10
+          hold-for: 20s
+          throughput: 1
+        - scenario:
+            requests:
+            - $(SERVICE_URL)/sample/sumNumbersUpTo?value=-10
+          iterations: 5
         reporting:
         - module: junit-xml
           filename: taurus-output/TEST-Taurus.xml
