@@ -8,11 +8,11 @@ The sample application shows how a microservice application can integrate with t
 
 The CI/CD pipeline is heavily optimized for speed and full automation, with the deployment of managed build agents to quickly build docker images and run multiple parallel jobs. The sample solution can be adapted to almost any stack by switching the Azure components and implementing application logic as required.
 
-![Architecture.png](images/Architecture.png)
-
 The architecture contains an Virtual Network with a subnet containing Azure DevOps self-hosted build agents managed as a
 Virtual Machine Scale Set, and a subnet containing an Azure Kubernetes Service cluster. A Cosmos DB Database serves as backend
 for the application.
+
+![Architecture.png](images/Architecture.png)
 
 *Note: deploying Cosmos DB is not yet implemented, currently an Azure Data Explorer instance is deployed instead.*
 
@@ -22,10 +22,10 @@ Registry. The pipeline then deploys an "area" for the build including a separate
 runs integration tests within the area, and destroys the area infrastructure. This allows multiple pipeline runs to execute
 concurrently, reusing core infrastructure while largely avoiding testability issues with shared application-level resources.
 
-![Build pipeline.png](images/Build%20pipeline.png)
-
 The [build pipeline](../infrastructure/ci-cd-pipeline.yml) is highly optimized for speed, and achieves high task parallelism by breaking down the process into 10 jobs
 that can partly run concurrently.
+
+![Build pipeline.png](images/Build%20pipeline.png)
 
 - **Deploy shared infrastructure**: Uses Terraform to deploy core infrastructure shared between builds. This job is skipped by
   default on PR builds, to maximize build speed. The sample solution deploys:
@@ -63,8 +63,6 @@ concurrently with build & integration testing.
 You can be customized it for your particular needs, such as triggering a production deployment, and/or pushing the image
 to a separate container registry or repository. 
 
-![IaC layers.png](images/IaC%20layers.png)
-
 This image shows the three layers corresponding to three distinct Terraform jobs that each deploy part of the infrastructure.
 Separating the deployment into such layers enable:
 - high concurrency of builds, without deadlocks on Terraform state (as the *shared infrastructure* is not run on PR builds).
@@ -72,10 +70,12 @@ Separating the deployment into such layers enable:
   or retained e.g. for demos or manual testing.
 - high speed of builds, as the *infrastructure* components are deployed while the app is built.
 
-![Data flows.png](images/Data%20flows.png)
+![IaC layers.png](images/IaC%20layers.png)
 
 The [sample ASP.NET Core application](../Src) is a dummy Web API application exposing a single service. The service accepts a positive
 number N and returns the sum of integers from 1 to N. It is implemented recursively, and calls itself with the value N-1 and sums the result with N.
+
+![Data flows.png](images/Data%20flows.png)
 
 The application demonstrates observability patterns:
 - Health and liveness probes using [ASP.NET Core Health Checks Middleware](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.1)
