@@ -158,8 +158,8 @@ namespace Contoso
             var hasKey = Guid.TryParse(this.Configuration["instrumentationKey"], out Guid instrumentationKey);
             if (hasKey)
             {
-                var telemetryIdentifier = this.Configuration["instrumentationAppId"] ?? "App";
-                Log.Information("***** Configuring Application Insights telemetry with Id {identifier} *****", telemetryIdentifier);
+                var telemetryAppId = this.Configuration["instrumentationAppId"] ?? "App";
+                Log.Information("***** Configuring Application Insights telemetry with Id {identifier} *****", telemetryAppId);
 
                 // This sets up ServerTelemetryChannel with StorageFolder set to a custom location.
                 this.TelemetryChannel = new ServerTelemetryChannel() { StorageFolder = this.Configuration["appInsightsStorageFolder"] };
@@ -168,7 +168,7 @@ namespace Contoso
                 services.AddApplicationInsightsTelemetry(instrumentationKey.ToString());
 
                 services.AddSingleton<ITelemetryInitializer>(s =>
-                    new TelemetryInitializer(s.GetRequiredService<IHttpContextAccessor>(), telemetryIdentifier, HealthCheckRoute));
+                    new TelemetryInitializer(s.GetRequiredService<IHttpContextAccessor>(), telemetryAppId, HealthCheckRoute));
             }
             else
             {

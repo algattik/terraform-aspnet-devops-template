@@ -14,14 +14,6 @@ namespace Contoso
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MetricsService"/> class.
-        /// Constructor for mocking.
-        /// </summary>
-        public MetricsService()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MetricsService"/> class.
         /// </summary>
         /// <param name="telemetryClient">The ApplicationInsights telemetry client (null if AppInsights is off).</param>
         public MetricsService(TelemetryClient? telemetryClient)
