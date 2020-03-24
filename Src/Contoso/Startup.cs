@@ -42,13 +42,18 @@ namespace Contoso
         /// </summary>
         public IConfiguration Configuration { get; }
 
+        private ServerTelemetryChannel? TelemetryChannel { get; set; }
+
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app">Application builder.</param>
         /// <param name="env">Host environment.</param>
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        /// <param name="lt">Application lifetime.</param>
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime lt)
         {
+            lt?.ApplicationStopping.Register(this.OnShutdown);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -115,6 +120,21 @@ namespace Contoso
             services.AddHealthChecks();
         }
 
+        private void OnShutdown()
+        {
+            if (this.TelemetryChannel == null)
+            {
+                return;
+            }
+
+            Log.Information("***** Flushing telemetry *****");
+
+            this.TelemetryChannel?.Flush();
+
+            // Wait while the data is flushed
+            System.Threading.Thread.Sleep(1000);
+        }
+
         /// <summary>
         /// Configures all telemetry services - internal (like Prometheus endpoint) and external (Application Insights).
         /// </summary>
@@ -135,18 +155,24 @@ namespace Contoso
         {
             // verify we got a valid instrumentation key, if we didn't, we just skip AppInsights
             // we do not log this, as at this point we still don't have a logger
-            var hasGuid = Guid.TryParse(this.Configuration["instrumentationKey"], out Guid instrumentationKey);
-            if (hasGuid)
+            var hasKey = Guid.TryParse(this.Configuration["instrumentationKey"], out Guid instrumentationKey);
+            if (hasKey)
             {
+                var telemetryIdentifier = this.Configuration["instrumentationAppId"] ?? "App";
+                Log.Information("***** Configuring Application Insights telemetry with Id {identifier} *****", telemetryIdentifier);
+
                 // This sets up ServerTelemetryChannel with StorageFolder set to a custom location.
-                using var telemetryChannel = new ServerTelemetryChannel() { StorageFolder = this.Configuration["appInsightsStorageFolder"] };
-                services.AddSingleton(typeof(ITelemetryChannel), telemetryChannel);
+                this.TelemetryChannel = new ServerTelemetryChannel() { StorageFolder = this.Configuration["appInsightsStorageFolder"] };
+                services.AddSingleton(typeof(ITelemetryChannel), this.TelemetryChannel);
 
                 services.AddApplicationInsightsTelemetry(instrumentationKey.ToString());
-                var telemetryIdentifier = "Contoso";
 
                 services.AddSingleton<ITelemetryInitializer>(s =>
                     new TelemetryInitializer(s.GetRequiredService<IHttpContextAccessor>(), telemetryIdentifier, HealthCheckRoute));
+            }
+            else
+            {
+                Log.Information("***** Not configuring Application Insights telemetry *****");
             }
         }
     }
