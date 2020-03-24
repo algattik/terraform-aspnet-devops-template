@@ -29,7 +29,12 @@ resource "helm_release" "ingress" {
 
   set {
     name  = "controller.replicaCount"
-    value = 2
+    value = 1
+  }
+  # Only apply to current namespace
+  set {
+    name  = "controller.scope.enabled"
+    value = true
   }
   values = [
     file("internal-ingress.yaml")
