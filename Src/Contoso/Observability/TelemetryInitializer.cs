@@ -17,20 +17,20 @@ namespace Contoso
     {
         private const string SyntheticSourceHeaderValue = "Availability Monitoring";
 
-        private const string K2IdentifierPropertyName = "k2-identifier";
-        private readonly string identifier;
+        private const string AppNamePropertyName = "app-name";
+        private readonly string telemetryAppId;
         private readonly string healthCheckRoute;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TelemetryInitializer"/> class.
         /// </summary>
         /// <param name="httpContextAccessor">The <see cref="IHttpContextAccessor"/> class.</param>
-        /// <param name="identifier">The id representing this application deployment.</param>
+        /// <param name="telemetryAppId">The id representing this application deployment.</param>
         /// <param name="healthCheckRoute">The route used to check if the application is alive (to marked as synthetic).</param>
-        public TelemetryInitializer(IHttpContextAccessor httpContextAccessor, string identifier, string healthCheckRoute)
+        public TelemetryInitializer(IHttpContextAccessor httpContextAccessor, string telemetryAppId, string healthCheckRoute)
             : base(httpContextAccessor)
         {
-            this.identifier = identifier;
+            this.telemetryAppId = telemetryAppId;
             this.healthCheckRoute = healthCheckRoute;
         }
 
@@ -44,7 +44,7 @@ namespace Contoso
         {
             if (telemetry is ISupportProperties itemProperties)
             {
-                itemProperties.Properties[K2IdentifierPropertyName] = this.identifier;
+                itemProperties.Properties[AppNamePropertyName] = this.telemetryAppId;
             }
 
             if (platformContext != null && string.IsNullOrEmpty(telemetry?.Context?.Operation?.SyntheticSource))
