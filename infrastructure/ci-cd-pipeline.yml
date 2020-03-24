@@ -349,15 +349,35 @@ jobs:
         execution:
         - scenario:
             requests:
-            - $(SERVICE_URL)/metrics
+            - url: $(SERVICE_URL)/metrics
+              assert:
+              - contains:
+                - process_virtual_memory_bytes
+                subject: body
           concurrency: 10
-          ramp-up: 15s
-          hold-for: 2m
-          iterations: 10000
+          ramp-up: 30s
+          hold-for: 1m
+          throughput: 20
+        - scenario:
+            requests:
+            - url: $(SERVICE_URL)/sample/sumNumbersUpTo?value=100
+              assert:
+              - contains:
+                - 5050
+                subject: body
+          hold-for: 20s
+          throughput: 1
+        #- scenario:
+        #    requests:
+        #    - url: $(SERVICE_URL)/sample/sumNumbersUpTo?value=-10
+        #      assert:
+        #      - contains:
+        #        - 500
+        #        subject: status-code
+        #  iterations: 5
         reporting:
         - module: junit-xml
           filename: taurus-output/TEST-Taurus.xml
-
 
   - task: PublishTestResults@2
     displayName: Publish test results
