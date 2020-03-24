@@ -365,6 +365,7 @@ jobs:
   - task: AlexandreGattiker.jmeter-tasks.custom-taurus-runner-task.TaurusRunner@0
     displayName: 'Run Taurus'
     inputs:
+      outputDir: 'taurus-output2'
       taurusConfig: |
         modules:
           jmeter:
