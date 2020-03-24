@@ -390,6 +390,7 @@ jobs:
   dependsOn:
   - integration_tests
   - Terraform_shared_outputs
+  - Terraform
   pool: $(AGENT_POOL_NAME)
   variables:
     AREA_NAME: $[ dependencies.Terraform.outputs['area.AREA_NAME'] ]
