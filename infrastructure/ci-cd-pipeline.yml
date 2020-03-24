@@ -367,14 +367,14 @@ jobs:
                 subject: body
           hold-for: 20s
           throughput: 1
-        - scenario:
-            requests:
-            - url: $(SERVICE_URL)/sample/sumNumbersUpTo?value=-10
-              assert:
-              - contains:
-                - 500
-                subject: status-code
-          iterations: 5
+#       - scenario:
+#           requests:
+#           - url: $(SERVICE_URL)/sample/sumNumbersUpTo?value=-10
+#             assert:
+#             - contains:
+#               - 500
+#               subject: status-code
+#         iterations: 5
         reporting:
         - module: junit-xml
           filename: taurus-output/TEST-Taurus.xml
