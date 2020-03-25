@@ -1,4 +1,4 @@
-resource "azurerm_eventhubs_namespace" "evh" {
+resource "azurerm_eventhub_namespace" "evh" {
   name                = "evh-${var.appname}-${var.environment}"
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -7,22 +7,22 @@ resource "azurerm_eventhubs_namespace" "evh" {
 }
 
 resource "azurerm_role_assignment" "app_eventhubs" {
-  scope                = azurerm_eventhubs_namespace.evh.id
+  scope                = azurerm_eventhub_namespace.evh.id
   role_definition_name = "Reader"
   principal_id         = var.app_sp_object_id
 }
 
-resource "azurerm_eventhubs_namespace_authorization_rule" "listen" {
+resource "azurerm_eventhub_namespace_authorization_rule" "listen" {
   name                = "listen"
-  namespace_name      = azurerm_eventhubs_namespace.evh.name
+  namespace_name      = azurerm_eventhub_namespace.evh.name
   resource_group_name = var.resource_group_name
 
   listen = true
 }
 
-resource "azurerm_eventhubs_namespace_authorization_rule" "send" {
+resource "azurerm_eventhub_namespace_authorization_rule" "send" {
   name                = "send"
-  namespace_name      = azurerm_eventhubs_namespace.evh.name
+  namespace_name      = azurerm_eventhub_namespace.evh.name
   resource_group_name = var.resource_group_name
 
   send   = true
