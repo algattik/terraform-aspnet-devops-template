@@ -9,17 +9,7 @@ variable "resource_group" {
   description = "Resource group to deploy in."
 }
 
-variable "kusto_cluster_name" {
+variable "area_name" {
   type = string
-  description = "Name of the existing Kusto cluster."
-}
-
-variable "kusto_database_name" {
-  type = string
-  description = "Name of the Kusto database to create."
-}
-
-variable "kubernetes_namespace" {
-  type = string
-  description = "Kubernetes namespace to create."
+  description = "'Area' name to create, name from which resource names and Kubernetes namespace are derived."
 }
