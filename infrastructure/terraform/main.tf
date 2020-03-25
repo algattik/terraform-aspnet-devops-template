@@ -9,7 +9,7 @@ resource "kubernetes_namespace" "build" {
 
 resource "azurerm_eventhub" "build" {
   name                = "providers"
-  namespace_name      = var.eventhub_namespace
+  namespace_name      = var.eventhubs_namespace
   resource_group_name = var.resource_group
   partition_count     = 32
   message_retention   = 1 # days (1-7)

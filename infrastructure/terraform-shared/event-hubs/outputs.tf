@@ -1,3 +1,3 @@
-output "eventhub_namespace" {
-  value = azurerm_eventhub_namespace.evh.name
+output "eventhubs_namespace" {
+  value = azurerm_eventhubs_namespace.evh.name
 }

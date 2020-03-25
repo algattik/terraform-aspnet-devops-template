@@ -31,8 +31,8 @@ output "kubernetes_version" {
   value = module.aks.kubernetes_version
 }
 
-output "eventhub_namespace" {
-  value = module.event-hubs.eventhub_namespace
+output "eventhubs_namespace" {
+  value = module.event-hubs.eventhubs_namespace
 }
 
 output "instrumentation_key" {
