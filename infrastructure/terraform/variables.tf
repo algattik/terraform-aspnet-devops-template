@@ -18,3 +18,8 @@ variable "area_name" {
   type = string
   description = "'Area' name to create, name from which resource names and Kubernetes namespace are derived."
 }
+
+variable "eventhubs_namespace" {
+  type = string
+  description = "The EventHubs namespace name in which to deploy EventHub topics."
+}

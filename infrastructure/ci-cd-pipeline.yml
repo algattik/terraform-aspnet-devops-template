@@ -204,6 +204,7 @@ jobs:
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
     KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
+    EVENTHUBS_NAMESPACE: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.eventhubs_namespace'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform
   steps:
 
@@ -236,6 +237,7 @@ jobs:
         TF_VAR_appname: $(APP_NAME)
         TF_VAR_resource_group: $(RESOURCE_GROUP)
         TF_VAR_area_name: $(area.AREA_NAME)
+        TF_VAR_eventhubs_namespace: $(EVENTHUBS_NAMESPACE)
 
 - job: Terraform_app
   displayName: Deploy application

@@ -7,17 +7,9 @@ resource "kubernetes_namespace" "build" {
   }
 }
 
-resource "azurerm_eventhub_namespace" "build" {
-  name                = "evh-${var.appname}-${var.area_name}-providers"
-  location            = var.location
-  resource_group_name = var.resource_group
-  sku                 = "Standard"
-  capacity            = 1
-}
-
 resource "azurerm_eventhub" "build" {
   name                = "providers"
-  namespace_name      = azurerm_eventhub_namespace.build.name
+  namespace_name      = var.eventhub_namespace
   resource_group_name = var.resource_group
   partition_count     = 32
   message_retention   = 1 # days (1-7)

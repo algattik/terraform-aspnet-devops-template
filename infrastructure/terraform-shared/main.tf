@@ -45,13 +45,12 @@ module "aks" {
   aks_sp_client_secret = var.aks_sp_client_secret
 }
 
-module "kusto" {
-  source = "./kusto"
+module "event-hubs" {
+  source = "./event-hubs"
   appname = var.appname
   environment = var.environment
   resource_group_name = var.resource_group
   location = var.location
-  kusto_admin_sp_object_id = var.kusto_admin_sp_object_id
 }
 
 module "app-insights" {
