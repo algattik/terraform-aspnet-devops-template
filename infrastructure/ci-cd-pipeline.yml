@@ -20,3 +20,34 @@ jobs:
       pwd
       du -sm
       df -H
+
+- job: disk
+  displayName: Build and unit tests
+  pool: $(AGENT_POOL_NAME)
+  steps:
+
+  - bash: |
+      pwd
+      du -sm
+      df -H
+
+- job: disk
+  displayName: Build and unit tests
+  pool: $(AGENT_POOL_NAME)
+  steps:
+
+  - bash: |
+      pwd
+      du -sm
+      df -H
+
+- job: disk
+  displayName: Build and unit tests
+  pool: $(AGENT_POOL_NAME)
+  steps:
+
+  - bash: |
+      pwd
+      du -sm
+      df -H
+
