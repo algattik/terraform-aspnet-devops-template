@@ -39,7 +39,7 @@ namespace Contoso
                 clientId,
                 clientSecret,
                 tenantId,
-                producerHubAuthorizationRuleResourceId,
+                producerHubSendAuthorizationRuleResourceId,
                 producerHubTopic);
 
             services.AddSingleton(typeof(KafkaProducerService), kafkaProducer);
