@@ -36,3 +36,13 @@ variable "instrumentation_key" {
   type = string
   description = "App Insights instrumentation key to send metrics to."
 }
+
+variable "provider_hub" {
+  type = string
+  description = "ARM authorization rule resource ID for sending messages to Provider Events Hub."
+}
+
+variable "provider_hub_topic" {
+  type = string
+  description = "Provider Events Hub topic to send messages to."
+}
