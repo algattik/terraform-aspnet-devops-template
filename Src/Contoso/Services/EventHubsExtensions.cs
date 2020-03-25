@@ -32,14 +32,14 @@ namespace Contoso
             var clientId = configuration["aadClientId"];
             var clientSecret = configuration["aadClientSecret"];
             var tenantId = configuration["aadTenantId"];
-            var producerHub = configuration["providerHub"];
+            var producerHubAuthorizationRuleResourceId = configuration["providerHub"];
             var producerHubTopic = configuration["providerHubTopic"];
 
             var kafkaProducer = CreateProducer(
                 clientId,
                 clientSecret,
                 tenantId,
-                producerHub,
+                producerHubAuthorizationRuleResourceId,
                 producerHubTopic);
 
             services.AddSingleton(typeof(KafkaProducerService), kafkaProducer);
@@ -51,7 +51,7 @@ namespace Contoso
             string clientId,
             string clientSecret,
             string tenantId,
-            string producerHub,
+            string producerHubAuthorizationRuleResourceId,
             string producerHubTopic)
         {
             var credentials = SdkContext.AzureCredentialsFactory
@@ -69,7 +69,7 @@ namespace Contoso
             var eventHubNamespaceRule = azure
                 .EventHubNamespaces
                 .AuthorizationRules
-                .GetById(producerHub);
+                .GetById(producerHubAuthorizationRuleResourceId);
 
             var ns = eventHubNamespaceRule.NamespaceName;
             var brokerList = $"{ns}.servicebus.windows.net:9093";
