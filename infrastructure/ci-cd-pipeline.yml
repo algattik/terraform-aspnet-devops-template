@@ -21,7 +21,7 @@ jobs:
       du -sm
       df -H
 
-- job: disk
+- job: disk1
   displayName: Build and unit tests
   pool: $(AGENT_POOL_NAME)
   steps:
@@ -31,7 +31,7 @@ jobs:
       du -sm
       df -H
 
-- job: disk
+- job: disk2
   displayName: Build and unit tests
   pool: $(AGENT_POOL_NAME)
   steps:
@@ -41,7 +41,7 @@ jobs:
       du -sm
       df -H
 
-- job: disk
+- job: disk3
   displayName: Build and unit tests
   pool: $(AGENT_POOL_NAME)
   steps:
