@@ -5,3 +5,9 @@ resource "azurerm_eventhub_namespace" "evh" {
   sku                 = "Standard"
   capacity            = 1
 }
+
+resource "azurerm_role_assignment" "app_eventhubs" {
+  scope                = azurerm_eventhub_namespace.evh.id
+  role_definition_name = "Reader"
+  principal_id         = var.app_sp_object_id
+}

@@ -174,7 +174,7 @@ jobs:
         TF_VAR_aks_sp_client_id: $(AKS_SP_CLIENT_ID)
         TF_VAR_aks_sp_client_secret: $(AKS_SP_CLIENT_SECRET)
         TF_VAR_aks_sp_object_id: $(AKS_SP_OBJECT_ID)
-        TF_VAR_kusto_admin_sp_object_id: $(AKS_SP_OBJECT_ID)
+        TF_VAR_app_sp_object_id: $(AKS_SP_OBJECT_ID)
         TF_VAR_az_devops_agent_pool: $(AGENT_POOL_NAME)
         TF_VAR_az_devops_url: $(System.CollectionUri)
         TF_VAR_az_devops_pat: $(AGENT_POOL_MANAGEMENT_TOKEN)
@@ -203,7 +203,6 @@ jobs:
   - Terraform_shared_outputs
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
     EVENTHUBS_NAMESPACE: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.eventhubs_namespace'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform
   steps:
@@ -249,7 +248,7 @@ jobs:
   variables:
     KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    KUSTO_URI: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_uri'] ]
+    EVENTHUBS_NAMESPACE: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.eventhubs_namespace'] ]
     INSTRUMENTATION_KEY: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.instrumentation_key'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-app
   steps:
@@ -268,8 +267,7 @@ jobs:
         TF_VAR_client_id: $(AKS_SP_CLIENT_ID)
         TF_VAR_tenant_id: $(ARM_TENANT_ID)
         TF_VAR_client_secret: $(AKS_SP_CLIENT_SECRET)
-        TF_VAR_kusto_cluster_url: $(KUSTO_URI)
-        TF_VAR_kusto_database_name: not_yet_implemented
+        TF_VAR_eventhubs_namespace: $(EVENTHUBS_NAMESPACE)
         TF_VAR_instrumentation_key: $(INSTRUMENTATION_KEY)
 
 - job: Start_agents

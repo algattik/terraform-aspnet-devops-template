@@ -23,12 +23,8 @@ resource "helm_release" "build" {
     value = "NodePort"
   }
   set {
-    name  = "settings.adxClusterUrl"
-    value = var.kusto_cluster_url
-  }
-  set {
-    name  = "settings.adxDefaultDatabaseName"
-    value = var.kusto_database_name
+    name  = "settings.eventHubsNamespace"
+    value = var.eventhubs_namespace
   }
   set {
     name  = "settings.aadClientId"

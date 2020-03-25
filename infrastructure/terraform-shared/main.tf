@@ -51,6 +51,7 @@ module "event-hubs" {
   environment = var.environment
   resource_group_name = var.resource_group
   location = var.location
+  app_sp_object_id = var.app_sp_object_id
 }
 
 module "app-insights" {
