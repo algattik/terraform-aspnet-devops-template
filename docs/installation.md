@@ -26,6 +26,7 @@ In Azure DevOps:
     - Secure dev tools: https://marketplace.visualstudio.com/acquisition?itemName=securedevelopmentteam.vss-secure-development-tools
     - Terraform: https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
     - JMeter: https://marketplace.visualstudio.com/items?itemName=AlexandreGattiker.jmeter-tasks
+  - Create a new Azure Resource Manager Service Connection $(TERRAFORM_SERVICE_CONNECTION) with access to the $(RESOURCE_GROUP) resource group.
   - Run the pipeline azure-pipelines.yml
   - On the first run some of the jobs will fail with error
   
