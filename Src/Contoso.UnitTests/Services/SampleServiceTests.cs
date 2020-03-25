@@ -23,7 +23,7 @@ namespace Contoso.UnitTests
                 controller.Object,
                 new Mock<ILogger<SampleService>>().Object,
                 new Mock<MetricsService>(null).Object,
-                new Mock<IKafkaProducerService>()).Object);
+                new Mock<IKafkaProducerService>().Object);
             var returnedString = await service.SumNumbersUpToAsync(3);
             Assert.Equal(6, returnedString);
         }
