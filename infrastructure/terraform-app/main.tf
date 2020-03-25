@@ -46,4 +46,12 @@ resource "helm_release" "build" {
     name  = "settings.instrumentationKey"
     value = var.instrumentation_key
   }
+  set {
+    name  = "settings.providerHub"
+    value = var.provider_hub
+  }
+  set {
+    name  = "settings.providerHubTopic"
+    value = var.provider_hub_topic
+  }
 }

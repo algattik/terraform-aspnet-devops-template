@@ -7,7 +7,7 @@ resource "kubernetes_namespace" "build" {
   }
 }
 
-resource "azurerm_eventhub" "build" {
+resource "azurerm_eventhub" "provider_hub_topic" {
   name                = "providers"
   namespace_name      = var.eventhubs_namespace
   resource_group_name = var.resource_group

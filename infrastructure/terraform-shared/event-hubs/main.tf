@@ -12,7 +12,7 @@ resource "azurerm_role_assignment" "app_eventhubs" {
   principal_id         = var.app_sp_object_id
 }
 
-resource "azurerm_eventhub_namespace_authorization_rule" "listen" {
+resource "azurerm_eventhub_namespace_authorization_rule" "providerhub_listen" {
   name                = "listen"
   namespace_name      = azurerm_eventhub_namespace.evh.name
   resource_group_name = var.resource_group_name
@@ -20,7 +20,7 @@ resource "azurerm_eventhub_namespace_authorization_rule" "listen" {
   listen = true
 }
 
-resource "azurerm_eventhub_namespace_authorization_rule" "send" {
+resource "azurerm_eventhub_namespace_authorization_rule" "providerhub_send" {
   name                = "send"
   namespace_name      = azurerm_eventhub_namespace.evh.name
   resource_group_name = var.resource_group_name

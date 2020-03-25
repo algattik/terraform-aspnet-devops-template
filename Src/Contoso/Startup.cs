@@ -94,6 +94,8 @@ namespace Contoso
         {
             this.ConfigureTelemetryServices(services);
 
+            services.AddEventHubsProducer(this.Configuration);
+
             services.AddControllers();
 
             services.AddTransient<ISampleService>(

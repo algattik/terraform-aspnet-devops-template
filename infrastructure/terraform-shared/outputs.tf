@@ -38,3 +38,11 @@ output "eventhubs_namespace" {
 output "instrumentation_key" {
   value = module.app-insights.instrumentation_key
 }
+
+output "provider_hub_listen" {
+  value = module.event-hubs.provider_hub_listen
+}
+
+output "provider_hub_send" {
+  value = module.event-hubs.provider_hub_send
+}
