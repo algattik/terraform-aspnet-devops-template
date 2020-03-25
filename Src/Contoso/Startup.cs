@@ -102,7 +102,8 @@ namespace Contoso
                 s => new SampleService(
                     s.GetRequiredService<ISumComputationAPI>(),
                     s.GetRequiredService<ILogger<SampleService>>(),
-                    s.GetRequiredService<MetricsService>()));
+                    s.GetRequiredService<MetricsService>(),
+                    s.GetRequiredService<KafkaProducerService>()));
 
             services.AddHeaderPropagation(options =>
             {

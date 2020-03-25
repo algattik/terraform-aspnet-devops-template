@@ -16,7 +16,7 @@ namespace Contoso
         private readonly ISumComputationAPI client;
         private readonly ILogger logger;
         private readonly MetricsService metrics;
-        private readonly KafkaProducer providerHub;
+        private readonly KafkaProducerService providerHub;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SampleService"/> class.
@@ -24,7 +24,8 @@ namespace Contoso
         /// <param name="client">Remote controller.</param>
         /// <param name="logger">Logger.</param>
         /// <param name="metrics">Metrics service.</param>
-        public SampleService(ISumComputationAPI client, ILogger<SampleService> logger, MetricsService metrics, KafkaProducer providerHub)
+        /// <param name="providerHub">Provider hub Kafka publisher.</param>
+        public SampleService(ISumComputationAPI client, ILogger<SampleService> logger, MetricsService metrics, KafkaProducerService providerHub)
         {
             this.client = client;
             this.logger = logger;
@@ -44,7 +45,7 @@ namespace Contoso
                 throw new SumComputationException("Can't sum numbers up to a negative value");
             }
 
-            await providerHub.ProduceAsync(value.ToString());
+            await this.providerHub.ProduceAsync("Got a value");
 
             // Timer to be used to report the duration of a query to.
             var stopwatch = new Stopwatch();
