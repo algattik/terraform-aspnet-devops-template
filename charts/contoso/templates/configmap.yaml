@@ -16,7 +16,7 @@ data:
   aadTenantId: "{{ .Values.settings.aadTenantId }}"
   instrumentationAppId: "{{ .Values.settings.instrumentationAppId }}"
   instrumentationKey: "{{ .Values.settings.instrumentationKey }}"
-  providerHub: "{{ .Values.settings.providerHub }}"
+  providerHubSend: "{{ .Values.settings.providerHubSend }}"
   providerHubTopic: "{{ .Values.settings.providerHubTopic }}"
 
 ---

@@ -32,7 +32,7 @@ namespace Contoso
             var clientId = configuration["aadClientId"];
             var clientSecret = configuration["aadClientSecret"];
             var tenantId = configuration["aadTenantId"];
-            var producerHubAuthorizationRuleResourceId = configuration["providerHub"];
+            var producerHubSendAuthorizationRuleResourceId = configuration["providerHubSend"];
             var producerHubTopic = configuration["providerHubTopic"];
 
             var kafkaProducer = CreateProducer(
@@ -51,7 +51,7 @@ namespace Contoso
             string clientId,
             string clientSecret,
             string tenantId,
-            string producerHubAuthorizationRuleResourceId,
+            string producerHubSendAuthorizationRuleResourceId,
             string producerHubTopic)
         {
             var credentials = SdkContext.AzureCredentialsFactory
@@ -69,7 +69,7 @@ namespace Contoso
             var eventHubNamespaceRule = azure
                 .EventHubNamespaces
                 .AuthorizationRules
-                .GetById(producerHubAuthorizationRuleResourceId);
+                .GetById(producerHubSendAuthorizationRuleResourceId);
 
             var ns = eventHubNamespaceRule.NamespaceName;
             var brokerList = $"{ns}.servicebus.windows.net:9093";
