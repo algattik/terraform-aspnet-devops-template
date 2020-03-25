@@ -271,7 +271,7 @@ jobs:
         TF_VAR_client_secret: $(AKS_SP_CLIENT_SECRET)
         TF_VAR_eventhubs_namespace: $(EVENTHUBS_NAMESPACE)
         TF_VAR_instrumentation_key: $(INSTRUMENTATION_KEY)
-        TF_VAR_provider_hub: $(PROVIDER_HUB_SEND)
+        TF_VAR_provider_hub_send: $(PROVIDER_HUB_SEND)
         TF_VAR_provider_hub_topic: $(PROVIDER_HUB_TOPIC)
 
 - job: Start_agents
