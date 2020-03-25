@@ -6,7 +6,7 @@ high deployment speed and high branch concurrency.
 ![Jobs.png](docs/images/Jobs.png)
 *Build that completed in 8 minutes with parallel jobs, building and deploying application and transient cloud infrastructure in 4 minutes, running integration/load tests for 2 minutes, and producing unit test, coverage and integration test reports.*
 
-This sample is used by the Microsoft [Customer Software Engineering](https://microsoft.github.io/code-with-engineering-playbook/CSE.html) teams to bootstrap agile DevOps projects. It enables entire teams of developers to submit multiple Pull Requests (PRs)
+This sample is used by the Microsoft [Commercial Software Engineering](https://microsoft.github.io/code-with-engineering-playbook/CSE.html) teams to bootstrap agile DevOps projects. It enables entire teams of developers to submit multiple Pull Requests (PRs)
 per day, maintaining the integrity of the master branch by ensuring full deployment and integration tests are performed
 before code is merged. It has for example been used to build the [K2Bridge](https://github.com/microsoft/K2Bridge) open-source project.
 
