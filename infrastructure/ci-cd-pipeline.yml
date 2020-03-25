@@ -18,6 +18,7 @@ jobs:
 
   - bash: |
       pwd
+      du -sm /home/azuredevopsuser/agent/agent-*/_work/1/s /home/azuredevopsuser/agent/agent-*/_work/1/ /home/azuredevopsuser/agent/agent-*/_work/ /home/azuredevopsuser/agent/agent-*
       du -sm
       df -H
 
@@ -28,6 +29,7 @@ jobs:
 
   - bash: |
       pwd
+      du -sm /home/azuredevopsuser/agent/agent-*/_work/1/s /home/azuredevopsuser/agent/agent-*/_work/1/ /home/azuredevopsuser/agent/agent-*/_work/ /home/azuredevopsuser/agent/agent-*
       du -sm
       df -H
 
@@ -38,6 +40,7 @@ jobs:
 
   - bash: |
       pwd
+      du -sm /home/azuredevopsuser/agent/agent-*/_work/1/s /home/azuredevopsuser/agent/agent-*/_work/1/ /home/azuredevopsuser/agent/agent-*/_work/ /home/azuredevopsuser/agent/agent-*
       du -sm
       df -H
 
@@ -48,6 +51,7 @@ jobs:
 
   - bash: |
       pwd
+      du -sm /home/azuredevopsuser/agent/agent-*/_work/1/s /home/azuredevopsuser/agent/agent-*/_work/1/ /home/azuredevopsuser/agent/agent-*/_work/ /home/azuredevopsuser/agent/agent-*
       du -sm
       df -H
 
