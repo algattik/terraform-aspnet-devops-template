@@ -9,6 +9,11 @@ variable "resource_group" {
   description = "Resource group to deploy in."
 }
 
+variable "appname" {
+  type = string
+  description = "Application name. Use only lowercase letters and numbers"
+}
+
 variable "area_name" {
   type = string
   description = "'Area' name to create, name from which resource names and Kubernetes namespace are derived."
