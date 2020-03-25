@@ -97,6 +97,9 @@ jobs:
   pool: $(AGENT_POOL_NAME)
   steps:
 
+  - bash: docker system prune -a --filter "until=24h"
+    displayName: Prune old Docker images
+
   - bash: |
       set -eux  # fail on error
       # Only build first stage of Dockerfile (build and unit test)
@@ -434,6 +437,9 @@ jobs:
   condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), variables['RUN_FLAG_PROMOTE']))
   steps:
 
+  - bash: docker system prune -a --filter "until=24h"
+    displayName: Prune old Docker images
+
   - task: AzureCLI@1
     displayName: Tag Docker image as latest
     inputs:
@@ -443,6 +449,7 @@ jobs:
         set -eux  # fail on error
         az configure --defaults acr="$ACR_NAME"
         az acr login
+        docker system prune -a --filter "until=24h"
         docker pull "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION"
         docker tag \
           "$ACR_NAME.azurecr.io/contoso:$SEMANTIC_VERSION" \
