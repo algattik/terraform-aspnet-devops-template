@@ -14,7 +14,7 @@ In Azure:
   - Grant TERRAFORM_SP_CLIENT_ID *Owner* permission on the RG
   - Create the storage account $(TERRAFORM_STORAGE_ACCOUNT) within the RG
   - Create the container "terraformstate" within the storage account
-  - Enter the subscription ID and tenant ID of the resourge group respectively in $(ARM_SUBSCRIPTION_ID) and $(ARM_TENANT_ID)
+  - Enter the subscription ID and tenant ID of the resource group respectively in $(ARM_SUBSCRIPTION_ID) and $(ARM_TENANT_ID)
 
 In Azure DevOps:
   - Create an ADO agent pool named $(AGENT_POOL_NAME)
@@ -28,7 +28,7 @@ In Azure DevOps:
     - Terraform: https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
     - JMeter: https://marketplace.visualstudio.com/items?itemName=AlexandreGattiker.jmeter-tasks
   - Create a new Azure Resource Manager Service Connection $(TERRAFORM_SERVICE_CONNECTION) with access to the $(RESOURCE_GROUP) resource group.
-  - Create a new pipeline azure-pipelines.yml
+  - Run the pipeline azure-pipelines.yml
   - On the first run some of the jobs will fail with error
   
           ##[error]No agents were found in pool $AGENT_POOL_NAME. Configure an agent for the pool and try again.
