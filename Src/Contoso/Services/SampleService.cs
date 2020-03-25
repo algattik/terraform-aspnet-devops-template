@@ -16,7 +16,7 @@ namespace Contoso
         private readonly ISumComputationAPI client;
         private readonly ILogger logger;
         private readonly MetricsService metrics;
-        private readonly KafkaProducerService providerHub;
+        private readonly IKafkaProducerService providerHub;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SampleService"/> class.
@@ -25,7 +25,7 @@ namespace Contoso
         /// <param name="logger">Logger.</param>
         /// <param name="metrics">Metrics service.</param>
         /// <param name="providerHub">Provider hub Kafka publisher.</param>
-        public SampleService(ISumComputationAPI client, ILogger<SampleService> logger, MetricsService metrics, KafkaProducerService providerHub)
+        public SampleService(ISumComputationAPI client, ILogger<SampleService> logger, MetricsService metrics, IKafkaProducerService providerHub)
         {
             this.client = client;
             this.logger = logger;

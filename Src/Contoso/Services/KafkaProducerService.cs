@@ -13,7 +13,7 @@ namespace Contoso
     ///
     /// The methods in this class are thread-safe.
     /// </summary>
-    public class KafkaProducerService
+    public class KafkaProducerService : IKafkaProducerService
     {
         private readonly IProducer<long, string> producer;
 
@@ -24,7 +24,7 @@ namespace Contoso
         /// </summary>
         /// <param name="producer">Wrapped Confluent.Kafka.IProducer instance.</param>
         /// <param name="topic">Kafka topic to publish messages into.</param>
-        internal KafkaProducerService(IProducer<long, string> producer, string topic)
+        public KafkaProducerService(IProducer<long, string> producer, string topic)
         {
             {
                 this.producer = producer;
