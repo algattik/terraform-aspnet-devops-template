@@ -14,7 +14,6 @@ namespace Contoso
     /// </summary>
     public interface IKafkaProducerService
     {
-
         /// <summary>
         /// Produce a message into Kafka.
         /// </summary>
