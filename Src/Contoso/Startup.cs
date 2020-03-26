@@ -32,9 +32,11 @@ namespace Contoso
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
         /// <param name="configuration">The configuration for the app.</param>
-        public Startup(IConfiguration configuration)
+        /// <param name="logFactory">The logger factory for the app.</param>
+        public Startup(IConfiguration configuration, ILoggerFactory logFactory)
         {
             this.Configuration = configuration;
+            ApplicationLogging.LoggerFactory = logFactory;
         }
 
         /// <summary>

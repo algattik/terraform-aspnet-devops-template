@@ -6,9 +6,11 @@ namespace Contoso
 {
     using System;
     using Confluent.Kafka;
+    using Microsoft.Azure.Management.EventHub.Fluent.Models;
     using Microsoft.Azure.Management.ResourceManager.Fluent;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Extension methods for Microsoft.Extensions.DependencyInjection.IServiceCollection
@@ -16,6 +18,8 @@ namespace Contoso
     /// </summary>
     public static class EventHubsExtensions
     {
+        private static ILogger log = ApplicationLogging.CreateLogger(nameof(EventHubsExtensions));
+
         /// <summary>
         /// Register KafkaProducerService.
         /// </summary>
@@ -73,7 +77,19 @@ namespace Contoso
 
             var ns = eventHubNamespaceRule.NamespaceName;
             var brokerList = $"{ns}.servicebus.windows.net:9093";
-            var connStr = eventHubNamespaceRule.GetKeys().PrimaryConnectionString;
+            string connStr;
+            try
+            {
+                connStr = eventHubNamespaceRule.GetKeys().PrimaryConnectionString;
+            }
+            catch (ErrorResponseException e)
+            {
+                log.LogCritical(
+                    e,
+                    "Couldn't retrieve authorization keys for rule {producerHubSendAuthorizationRuleResourceId}",
+                    producerHubSendAuthorizationRuleResourceId);
+                throw;
+            }
 
             var config = new ProducerConfig
             {
