@@ -1,7 +1,7 @@
 # CI/CD Azure DevOps deployment pipeline.
 # The following variables can be optionally set for each pipeline run:
-# - RUN_FLAG_TERRAFORM: Set to 1 to have `terraform apply`. By default
-#   `terraform apply` only runs on the master branch.
+# - RUN_FLAG_TERRAFORM: Set to 1 to deploy shared infrastructure with Terraform.
+#   By default this step only runs on the master branch.
 # - RUN_FLAG_PROMOTE: Set to 1 to promote the Docker image to `latest` tag if
 #   tests are successful. By default this is only done on the master branch.
 # - RUN_SET_NAMEBASE: Set to a string to deploy to the given AKS namespace,
