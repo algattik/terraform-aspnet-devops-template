@@ -4,6 +4,10 @@ resource "azurerm_cosmosdb_account" "db" {
   resource_group_name = var.resource_group_name
   offer_type          = "Standard"
 
+  consistency_policy {
+    consistency_level       = "BoundedStaleness"
+  }
+
   geo_location {
     location          = var.location
     failover_priority = 0
