@@ -95,7 +95,7 @@ namespace Contoso
         {
             var e = new ComputedSum
             {
-                Id = value.ToString(CultureInfo.InvariantCulture),
+                id = value.ToString(CultureInfo.InvariantCulture),
                 Sum = sum,
             };
             return await this.container.UpsertItemAsync(e);
