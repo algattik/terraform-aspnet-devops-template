@@ -32,7 +32,7 @@ output "kubernetes_version" {
 }
 
 output "cosmosdb_account_name" {
-  value = module.event-hubs.eventhubs_namespace
+  value = module.cosmosdb.cosmosdb_account_name
 }
 
 output "instrumentation_key" {
