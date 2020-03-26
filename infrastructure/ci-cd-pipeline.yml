@@ -203,7 +203,7 @@ jobs:
   - Terraform_shared_outputs
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    COSMOSDB_ACCOUNT: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.cosmosdb_account'] ]
+    COSMOSDB_ACCOUNT_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.cosmosdb_account_name'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform
   steps:
 
@@ -236,7 +236,7 @@ jobs:
         TF_VAR_appname: $(APP_NAME)
         TF_VAR_resource_group: $(RESOURCE_GROUP)
         TF_VAR_area_name: $(area.AREA_NAME)
-        TF_VAR_cosmosdb_account: $(COSMOSDB_ACCOUNT)
+        TF_VAR_cosmosdb_account_name: $(COSMOSDB_ACCOUNT_NAME)
 
 - job: Terraform_app
   displayName: Deploy application
@@ -248,7 +248,7 @@ jobs:
   variables:
     KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    COSMOSDB_ACCOUNT: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.cosmosdb_account'] ]
+    COSMOSDB_ACCOUNT_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.cosmosdb_account_name'] ]
     INSTRUMENTATION_KEY: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.instrumentation_key'] ]
     COSMOS_DB_ACCOUNT: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.cosmos_db_account'] ]
     COSMOS_DB_COLLECTION: $[ dependencies.Terraform.outputs['Outputs.cosmos_db_collection'] ]
@@ -269,7 +269,7 @@ jobs:
         TF_VAR_client_id: $(AKS_SP_CLIENT_ID)
         TF_VAR_tenant_id: $(ARM_TENANT_ID)
         TF_VAR_client_secret: $(AKS_SP_CLIENT_SECRET)
-        TF_VAR_cosmosdb_account: $(COSMOSDB_ACCOUNT)
+        TF_VAR_cosmosdb_account: $(COSMOSDB_ACCOUNT_NAME)
         TF_VAR_instrumentation_key: $(INSTRUMENTATION_KEY)
         TF_VAR_cosmos_db_account: $(COSMOS_DB_ACCOUNT)
         TF_VAR_cosmos_db_collection: $(COSMOS_DB_COLLECTION)
