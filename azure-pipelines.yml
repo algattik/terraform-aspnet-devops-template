@@ -25,7 +25,7 @@ variables:
 - name: SEMANTIC_VERSION
   value: "$(MAJOR_MINOR_VERSION).$(Build.BuildId)"
 - name: ACR_NAME
-  value: $(APP_NAME)aspnetmplt
+  value: $(APP_NAME)acr
 - name: TERRAFORM_SP_CLIENT_ID
   value: df9df564-e889-4852-9bb2-aa912d990c93
 - name: AKS_SP_CLIENT_ID
@@ -41,7 +41,7 @@ variables:
 - name: HELM_RELEASE_NAME
   value: contoso
 - name: RESOURCE_GROUP
-  value: aspnetmplt
+  value: rg-$(APP_NAME)
 - name: ARM_SUBSCRIPTION_ID
   value: a4ed7b9a-b128-49b4-a6ee-fd07ff6e296d
 - name: ARM_TENANT_ID
