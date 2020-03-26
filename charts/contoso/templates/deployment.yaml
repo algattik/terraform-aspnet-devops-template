@@ -53,7 +53,7 @@ spec:
             - name: aadClientSecret
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "contoso.fullname" . }}-kusto-credentials
+                  name: {{ include "contoso.fullname" . }}-credentials
                   key: aadClientSecret
           volumeMounts:
             - name: appsettings-volume
