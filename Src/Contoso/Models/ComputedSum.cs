@@ -5,6 +5,7 @@
 namespace Contoso
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Threading.Tasks;
     using Microsoft.Azure.Cosmos;
@@ -20,7 +21,8 @@ namespace Contoso
         /// <summary>
         /// Gets or sets the value up to which the sum is computed.
         /// </summary>
-        public string? Id { get; set; }
+        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Format required by Cosmos DB.")]
+        public string? id { get; set; }
 
         /// <summary>
         /// Gets or sets the sum of numbers from 0 to Id.
