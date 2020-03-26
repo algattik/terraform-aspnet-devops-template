@@ -1,19 +1,86 @@
 # Installation
 
-Pick and update the $() values in azure-pipelines.yml as needed.
+The variables referenced in the following guide refer to the [azure-pipelines.yml](../azure-pipelines.yml) file. To edit them, change the value there, e.g.:
 
-In Azure AD:
-  - Create a service principal $(TERRAFORM_SP_CLIENT_ID)
-  - Create a service principal $(AKS_SP_CLIENT_ID)
-  - Enter the SP Object ID in $(AKS_SP_OBJECT_ID)
-    *Should be object IDs of service principals, not object IDs of the application nor application IDs.
-    To retrieve, navigate in the AAD portal from an App registration to "Managed application in local directory", or use Azure Cloud Shell / Azure CLI command `az ad sp show --id $AKS_SP_CLIENT_ID --query objectId`*
+  ```yml
+  - name: TERRAFORM_SP_CLIENT_ID
+    value: y0ur-v4lue-f0r-TERRAFORM_SP_CLIENT_ID
+  ```
 
-In Azure:
-  - Create the RG $(RESOURCE_GROUP)
-  - Grant TERRAFORM_SP_CLIENT_ID *Owner* permission on the RG
-  - Create the storage account $(TERRAFORM_STORAGE_ACCOUNT) within the RG
-  - Create the container "terraformstate" within the storage account
+## Azure Active Directory configuration
+
+1. Create service principals for Terraform & AKS:
+    - Info: An Azure service principal is a security identity used by user-created apps, services, and automation tools to access specific Azure resources. Think of it as a 'user identity' (login and password or certificate) with a specific role, and tightly controlled permissions to access your resources. We use these to grant access to Azure DevOps and Terraform to deploy and manage resources within our Azure subscription.
+    
+    - Navigate to the Azure Portal & open the [Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview). You need to create two service principals (Azure Active Directory App registrations) for Terraform and AKS by entering the following commands:
+
+      ```
+      az ad sp create-for-rbac --name "OneAir_Azure_DevOps_Terraform_SP" --role owner
+
+      az ad sp create-for-rbac --name "OneAir_AKS_SP" --skip-assignment
+      ```
+
+    - Save the outputs of these commands as you'll need these details during the installation. The output comes in the following format:
+
+      ```json
+      {
+        "appId": "bd5581f4-40ba-4e33-aa2e-a1b8e520b42f",
+        "displayName": "OneAir_Azure_DevOps_Terraform_SP",
+        "name": "http://OneAir_Azure_DevOps_Terraform_SP",
+        "password": "a3781f70-b68c-1f6c-974a-f2b6fas0bdb6",
+        "tenant": "13f988bf-56f1-41af-11ab-4e7bc011bd68"
+      }
+      ```
+
+2. Retrieve and save the object_id for each of the Service principals by using the Cloud Shell: 
+      
+    - Replace XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX with the appID each of the Service Principals
+
+      ```bash
+      az ad sp show --id XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX | jq -r .objectId
+      ```
+
+3. Replace the values of the following variables in the [azure-pipelines.yml](../azure-pipelines.yml):
+
+    | name | value |
+    |--|--|
+    | TERRAFORM_SP_CLIENT_ID | The appId of the Terraform Service Principal |
+    | AKS_SP_CLIENT_ID | The appId of the AKS Service Principal |
+    | AKS_SP_OBJECT_ID| The objectId of the AKS Service Principal - from the previous step |
+
+## Azure configuration
+
+1. Create the resource group for your project in Azure by running the following command:
+
+    ```bash
+    az group create --name One_Air_RG --location westeurope
+    ```
+
+1. Grant TERRAFORM_SP_CLIENT_ID *Owner* permission on the RG. To do this, replace the values in assignee and scope parameters accordingly. The scope parameter is the id parameter from your previously created resource group.
+
+    ```bash
+    az role assignment create --assignee TERRAFORM_SP_CLIENT_ID --role Owner --scope /subscriptions/YourSubscriptionId/resourceGroups/One_Air_RG
+    ```
+
+1. Create the storage account $(TERRAFORM_STORAGE_ACCOUNT) within the RG. Info: Storage account name must be between 3 and 24 characters in length and use numbers and lower-case letters only.
+
+    ```bash
+    az storage account create --name oneairstorageaccount --resource-group One_Air_RG
+    ```
+
+1. Create the container "terraformstate" within the storage account
+
+    ```bash
+    az storage container create --name terraformstate --account-name oneairstorageaccount
+    ```
+
+1. Replace the values of the following variables in the [azure-pipelines.yml](../azure-pipelines.yml):
+
+    | name | value |
+    |---|---|
+    | RESOURCE_GROUP | The name of the resource group |
+    | TERRAFORM_STORAGE_ACCOUNT | The name of the storage account |
+
 
 In Azure DevOps:
   - Create an ADO agent pool named $(AGENT_POOL_NAME)
@@ -27,6 +94,17 @@ In Azure DevOps:
     - Terraform: https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
     - JMeter: https://marketplace.visualstudio.com/items?itemName=AlexandreGattiker.jmeter-tasks
   - Create a new Azure Resource Manager Service Connection $(TERRAFORM_SERVICE_CONNECTION) with access to the $(RESOURCE_GROUP) resource group.
+    
+    1. Go to Azure DevOps Project settings
+    2. Select Service Connections (if you want to learn more about this, got to [Service connections in Azure docs](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml))
+    3. Create a new Service connection
+    4. Pick Azure Resource Manager (which gives access to Azure Resources commands)
+    5. Create a new Azure service connection:
+      - Select Service Principal (automatic)
+      - Don't select a resource group, as we don't have one yet - this allows the SP to access all Resource Groups
+      - Give the Service connection a name - we will need that name for Terraform later (e.g. Terraform_SP)
+      - Check the "Grant access permission to all pipelines" box
+
   - Run the pipeline azure-pipelines.yml
   - On the first run some of the jobs will fail with error
   
