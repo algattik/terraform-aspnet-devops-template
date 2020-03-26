@@ -23,14 +23,6 @@ resource "helm_release" "build" {
     value = "NodePort"
   }
   set {
-    name  = "settings.adxClusterUrl"
-    value = var.kusto_cluster_url
-  }
-  set {
-    name  = "settings.adxDefaultDatabaseName"
-    value = var.kusto_database_name
-  }
-  set {
     name  = "settings.aadClientId"
     value = var.client_id
   }
@@ -49,5 +41,9 @@ resource "helm_release" "build" {
   set {
     name  = "settings.instrumentationKey"
     value = var.instrumentation_key
+  }
+  set {
+    name  = "settings.cosmosDBContainer"
+    value = var.cosmosdb_container_id
   }
 }

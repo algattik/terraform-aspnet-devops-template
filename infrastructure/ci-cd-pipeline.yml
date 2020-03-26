@@ -174,7 +174,7 @@ jobs:
         TF_VAR_aks_sp_client_id: $(AKS_SP_CLIENT_ID)
         TF_VAR_aks_sp_client_secret: $(AKS_SP_CLIENT_SECRET)
         TF_VAR_aks_sp_object_id: $(AKS_SP_OBJECT_ID)
-        TF_VAR_kusto_admin_sp_object_id: $(AKS_SP_OBJECT_ID)
+        TF_VAR_app_sp_object_id: $(APP_SP_OBJECT_ID)
         TF_VAR_az_devops_agent_pool: $(AGENT_POOL_NAME)
         TF_VAR_az_devops_url: $(System.CollectionUri)
         TF_VAR_az_devops_pat: $(AGENT_POOL_MANAGEMENT_TOKEN)
@@ -203,7 +203,7 @@ jobs:
   - Terraform_shared_outputs
   variables:
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    KUSTO_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_name'] ]
+    COSMOSDB_ACCOUNT_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.cosmosdb_account_name'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform
   steps:
 
@@ -233,10 +233,10 @@ jobs:
       TerraformVariables:
         ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
         ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+        TF_VAR_appname: $(APP_NAME)
         TF_VAR_resource_group: $(RESOURCE_GROUP)
-        TF_VAR_kusto_cluster_name: $(KUSTO_NAME)
-        TF_VAR_kusto_database_name: build$(Build.BuildId)
-        TF_VAR_kubernetes_namespace: $(area.AREA_NAME)
+        TF_VAR_area_name: $(area.AREA_NAME)
+        TF_VAR_cosmosdb_account_name: $(COSMOSDB_ACCOUNT_NAME)
 
 - job: Terraform_app
   displayName: Deploy application
@@ -248,8 +248,8 @@ jobs:
   variables:
     KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    KUSTO_URI: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kusto_uri'] ]
     INSTRUMENTATION_KEY: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.instrumentation_key'] ]
+    COSMOS_DB_CONTAINER_ID: $[ dependencies.Terraform.outputs['Outputs.cosmosdb_container_id'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-app
   steps:
 
@@ -264,12 +264,11 @@ jobs:
         TF_VAR_release_name: $(HELM_RELEASE_NAME)
         TF_VAR_image_repository: $(ACR_NAME).azurecr.io/contoso
         TF_VAR_image_tag: $(SEMANTIC_VERSION)
-        TF_VAR_client_id: $(AKS_SP_CLIENT_ID)
+        TF_VAR_client_id: $(APP_SP_CLIENT_ID)
         TF_VAR_tenant_id: $(ARM_TENANT_ID)
-        TF_VAR_client_secret: $(AKS_SP_CLIENT_SECRET)
-        TF_VAR_kusto_cluster_url: $(KUSTO_URI)
-        TF_VAR_kusto_database_name: not_yet_implemented
+        TF_VAR_client_secret: $(APP_SP_CLIENT_SECRET)
         TF_VAR_instrumentation_key: $(INSTRUMENTATION_KEY)
+        TF_VAR_cosmosdb_container_id: $(COSMOS_DB_CONTAINER_ID)
 
 - job: Start_agents
   displayName: Start agents

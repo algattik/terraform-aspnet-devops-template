@@ -45,13 +45,13 @@ module "aks" {
   aks_sp_client_secret = var.aks_sp_client_secret
 }
 
-module "kusto" {
-  source = "./kusto"
+module "cosmosdb" {
+  source = "./cosmosdb"
   appname = var.appname
   environment = var.environment
   resource_group_name = var.resource_group
   location = var.location
-  kusto_admin_sp_object_id = var.kusto_admin_sp_object_id
+  app_sp_object_id = var.app_sp_object_id
 }
 
 module "app-insights" {

@@ -19,8 +19,6 @@ for the application.
 
 ![Architecture.png](images/Architecture.png)
 
-*Note: deploying Cosmos DB is not yet implemented, currently an Azure Data Explorer instance is deployed instead.*
-
 An Azure DevOps pipeline creates
 the entire infrastructure, builds the application Docker container on the build agents, and pushes the image to Azure Container
 Registry. The pipeline then deploys an "area" for the build including a separate Cosmos DB collection and Kubernetes namespace,

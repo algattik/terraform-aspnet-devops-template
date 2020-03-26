@@ -94,13 +94,25 @@ namespace Contoso
         {
             this.ConfigureTelemetryServices(services);
 
+            services.AddSingleton(
+                s => new AzureService(
+                    this.Configuration,
+                    s.GetService<ILogger<AzureService>>()));
+
+            services.AddSingleton(
+                s => new CosmosDBService(
+                    this.Configuration,
+                    s.GetService<AzureService>(),
+                    s.GetService<ILogger<CosmosDBService>>()));
+
             services.AddControllers();
 
             services.AddTransient<ISampleService>(
                 s => new SampleService(
                     s.GetRequiredService<ISumComputationAPI>(),
                     s.GetRequiredService<ILogger<SampleService>>(),
-                    s.GetRequiredService<MetricsService>()));
+                    s.GetRequiredService<MetricsService>(),
+                    s.GetRequiredService<CosmosDBService>()));
 
             services.AddHeaderPropagation(options =>
             {

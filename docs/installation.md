@@ -44,9 +44,11 @@ The variables referenced in the following guide refer to the [azure-pipelines.ym
 
     | name | value |
     |--|--|
-    | TERRAFORM_SP_CLIENT_ID | The appId of the Terraform Service Principal |
-    | AKS_SP_CLIENT_ID | The appId of the AKS Service Principal |
-    | AKS_SP_OBJECT_ID| The objectId of the AKS Service Principal - from the previous step |
+    | TERRAFORM_SP_CLIENT_ID | The appId of the Terraform Service Principal. Used by Terraform to deploy resources and assign permissions to the other service principals. |
+    | AKS_SP_CLIENT_ID | The appId of the AKS Service Principal. AKS uses it to deploy infrastructure such as network interfaces in VNET subnet. |
+    | AKS_SP_OBJECT_ID | The objectId of the AKS Service Principal - from the previous step |
+    | APP_SP_CLIENT_ID | Service principal used by the deployed ASP.NET Core application, to access Azure services. |
+    | APP_SP_OBJECT_ID | The objectId of the App Service Principal - from the previous step |
 
 ## Azure configuration
 
@@ -81,6 +83,8 @@ The variables referenced in the following guide refer to the [azure-pipelines.ym
     | RESOURCE_GROUP | The name of the resource group |
     | TERRAFORM_STORAGE_ACCOUNT | The name of the storage account |
 
+
+## Create Azure DevOps pipeline
 
 In Azure DevOps:
   - Create an ADO agent pool named $(AGENT_POOL_NAME)

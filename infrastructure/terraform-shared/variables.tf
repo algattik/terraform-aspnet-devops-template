@@ -79,7 +79,7 @@ variable "aks_sp_client_secret" {
   description = "Service principal client secret for the Azure Kubernetes Service cluster identity."
 }
 
-variable "kusto_admin_sp_object_id" {
+variable "app_sp_object_id" {
   type = string
-  description = "Service principal object ID for the principal to be granted Contributor permissions on the Kusto cluster."
+  description = "Service principal object ID for the application principal to be granted permissions on Aure resources."
 }

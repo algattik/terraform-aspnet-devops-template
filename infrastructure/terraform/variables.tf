@@ -9,17 +9,17 @@ variable "resource_group" {
   description = "Resource group to deploy in."
 }
 
-variable "kusto_cluster_name" {
+variable "appname" {
   type = string
-  description = "Name of the existing Kusto cluster."
+  description = "Application name. Use only lowercase letters and numbers"
 }
 
-variable "kusto_database_name" {
+variable "area_name" {
   type = string
-  description = "Name of the Kusto database to create."
+  description = "'Area' name to create, name from which resource names and Kubernetes namespace are derived."
 }
 
-variable "kubernetes_namespace" {
+variable "cosmosdb_account_name" {
   type = string
-  description = "Kubernetes namespace to create."
+  description = "The Cosmos DB Account name in which to save results."
 }

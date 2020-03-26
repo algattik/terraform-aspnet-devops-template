@@ -22,10 +22,6 @@ output "aks_name" {
   value = module.aks.name
 }
 
-output "kusto_name" {
-  value = module.kusto.name
-}
-
 output "kube_config_base64" {
   value     = base64encode(module.aks.kube_config_raw)
   sensitive = true
@@ -35,8 +31,8 @@ output "kubernetes_version" {
   value = module.aks.kubernetes_version
 }
 
-output "kusto_uri" {
-  value = module.kusto.uri
+output "cosmosdb_account_name" {
+  value = module.cosmosdb.cosmosdb_account_name
 }
 
 output "instrumentation_key" {

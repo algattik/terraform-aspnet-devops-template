@@ -16,6 +16,7 @@ namespace Contoso
         private readonly ISumComputationAPI client;
         private readonly ILogger logger;
         private readonly MetricsService metrics;
+        private readonly ICosmosDBService cosmosDB;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SampleService"/> class.
@@ -23,11 +24,13 @@ namespace Contoso
         /// <param name="client">Remote controller.</param>
         /// <param name="logger">Logger.</param>
         /// <param name="metrics">Metrics service.</param>
-        public SampleService(ISumComputationAPI client, ILogger<SampleService> logger, MetricsService metrics)
+        /// <param name="cosmosDB">Cosmos DB persistence service.</param>
+        public SampleService(ISumComputationAPI client, ILogger<SampleService> logger, MetricsService metrics, ICosmosDBService cosmosDB)
         {
             this.client = client;
             this.logger = logger;
             this.metrics = metrics;
+            this.cosmosDB = cosmosDB;
         }
 
         /// <summary>
@@ -50,6 +53,8 @@ namespace Contoso
             var duration = stopwatch.Elapsed;
 
             this.logger.LogInformation("Sum of numbers from 0 to {value} was {result}, computed in {duration}s", value, result, duration);
+
+            await this.cosmosDB.PersistSum(value, result);
 
             this.metrics?.SumComputationAPICallDuration?.Observe(duration.TotalSeconds);
 

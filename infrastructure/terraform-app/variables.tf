@@ -27,17 +27,12 @@ variable "tenant_id" {
   type = string
 }
 
-variable "kusto_cluster_url" {
-  type = string
-  description = "Kusto cluster URL to connect to."
-}
-
-variable "kusto_database_name" {
-  type = string
-  description = "Name of the Kusto database to connect to."
-}
-
 variable "instrumentation_key" {
   type = string
   description = "App Insights instrumentation key to send metrics to."
+}
+
+variable "cosmosdb_container_id" {
+  type = string
+  description = "Cosmos DB account in which to save data."
 }

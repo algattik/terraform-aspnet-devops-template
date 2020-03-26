@@ -10,12 +10,11 @@ metadata:
 data:
   computeServiceAddress: "{{ .Values.settings.computeServiceAddress }}"
   appInsightsStorageFolder: "{{ .Values.settings.appInsightsStorageFolder }}"
-  adxClusterUrl: "{{ .Values.settings.adxClusterUrl }}"
-  adxDefaultDatabaseName: "{{ .Values.settings.adxDefaultDatabaseName }}"
   aadClientId: "{{ .Values.settings.aadClientId }}"
   aadTenantId: "{{ .Values.settings.aadTenantId }}"
   instrumentationAppId: "{{ .Values.settings.instrumentationAppId }}"
   instrumentationKey: "{{ .Values.settings.instrumentationKey }}"
+  cosmosDBContainer: "{{ .Values.settings.cosmosDBContainer }}"
 
 ---
 
