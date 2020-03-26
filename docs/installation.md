@@ -24,11 +24,11 @@ The variables referenced in the following guide refer to the [azure-pipelines.ym
 
       ```json
       {
-        "appId": "bd5581f4-40ba-4e33-aa2e-a1b8e520b42f",
+        "appId": "***",
         "displayName": "YOUR_PROJECT_Azure_DevOps_Terraform_SP",
         "name": "http://YOUR_PROJECT_Azure_DevOps_Terraform_SP",
-        "password": "a3781f70-b68c-1f6c-974a-f2b6fas0bdb6",
-        "tenant": "13f988bf-56f1-41af-11ab-4e7bc011bd68"
+        "password": "***",
+        "tenant": "***"
       }
       ```
 
