@@ -19,8 +19,7 @@ settings:
   aadTenantId: "00000000-0000-0000-0000-000000000000"
   instrumentationAppId: "contoso"
   instrumentationKey: "00000000-0000-0000-0000-000000000000"
-  cosmosDBAccount: "mycosmosdb"
-  cosmosDBCollection: "mycollection"
+  cosmosDBContainer: "/subscriptions/0000/resourceGroups/rg/providers/Microsoft.DocumentDB/databaseAccounts/ACC/apis/sql/databases/DB/containers/CONTAINER"
 
 service:
   type: ClusterIP

@@ -9,6 +9,7 @@ namespace Contoso
     using System.Threading.Tasks;
     using Microsoft.Azure.Cosmos;
     using Microsoft.Azure.Cosmos.Fluent;
+    using Microsoft.Azure.Management.CosmosDB.Fluent;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
 
@@ -19,10 +20,6 @@ namespace Contoso
     /// </summary>
     public class CosmosDBService : ICosmosDBService
     {
-        private readonly Container container;
-
-        private readonly string topic;
-
         private readonly ILogger<CosmosDBService> logger;
 
         /// <summary>
@@ -43,36 +40,11 @@ namespace Contoso
                 throw new ArgumentNullException(nameof(azure));
             }
 
-            var producerHubSendAuthorizationRuleResourceId = configuration["providerHubSend"];
-            this.topic = configuration["providerHubTopic"];
+            var containerId = configuration["cosmosDBContainer"];
 
-            logger.LogInformation(
-                "Initializing connection to Event Hub {producerHubSendAuthorizationRuleResourceId} topic {topic}",
-                producerHubSendAuthorizationRuleResourceId,
-                this.topic);
-
-            var cosmosDB = azure
-                .Azure
-                .CosmosDBAccounts
-                .GetById(producerHubSendAuthorizationRuleResourceId)
-                ;
-
-            try
-            {
-                var client = new CosmosClientBuilder(
-                    cosmosDB.DocumentEndpoint,
-                    cosmosDB.ListKeys().PrimaryMasterKey)
-                    .Build();
-                this.container = client.GetDatabase("DB").GetContainer("Co");
-            }
-            catch (Exception e)
-            {
-                logger.LogCritical(
-                    e,
-                    "Couldn't retrieve authorization keys for rule {producerHubSendAuthorizationRuleResourceId}",
-                    producerHubSendAuthorizationRuleResourceId);
-                throw;
-            }
+            logger.LogWarning(
+                "Skipping connection to Cosmos DB container {containerId} (not yet implemented)",
+                containerId);
 
             this.logger = logger;
         }

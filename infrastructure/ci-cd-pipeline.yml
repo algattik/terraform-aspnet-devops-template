@@ -248,10 +248,8 @@ jobs:
   variables:
     KUBERNETES_NAMESPACE: $[ dependencies.Terraform.outputs['Outputs.kubernetes_namespace'] ]
     KUBE_CONFIG_BASE64: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.kube_config_base64'] ]
-    COSMOSDB_ACCOUNT_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.cosmosdb_account_name'] ]
     INSTRUMENTATION_KEY: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.instrumentation_key'] ]
-    COSMOS_DB_ACCOUNT_NAME: $[ dependencies.Terraform_shared_outputs.outputs['Outputs.cosmosdb_account_name'] ]
-    COSMOS_DB_COLLECTION: $[ dependencies.Terraform.outputs['Outputs.cosmosdb_collection'] ]
+    COSMOS_DB_CONTAINER_ID: $[ dependencies.Terraform.outputs['Outputs.cosmosdb_container_id'] ]
     TERRAFORM_DIRECTORY: infrastructure/terraform-app
   steps:
 
@@ -270,8 +268,7 @@ jobs:
         TF_VAR_tenant_id: $(ARM_TENANT_ID)
         TF_VAR_client_secret: $(APP_SP_CLIENT_SECRET)
         TF_VAR_instrumentation_key: $(INSTRUMENTATION_KEY)
-        TF_VAR_cosmosdb_account_name: $(COSMOS_DB_ACCOUNT_NAME)
-        TF_VAR_cosmosdb_collection: $(COSMOS_DB_COLLECTION)
+        TF_VAR_cosmosdb_container_id: $(COSMOS_DB_CONTAINER_ID)
 
 - job: Start_agents
   displayName: Start agents

@@ -25,6 +25,6 @@ namespace Contoso
         /// <param name="value">Value up to which the sum is computed.</param>
         /// <param name="sum">Sum of numbers from 0 to value.</param>
         /// <returns>Cosmos DB operation result.</returns>
-        public Task<ItemResponse<ComputedSum>> PersistSum(long value, long sum);
+        public Task PersistSum(long value, long sum);
     }
 }

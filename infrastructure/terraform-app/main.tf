@@ -47,11 +47,7 @@ resource "helm_release" "build" {
     value = var.instrumentation_key
   }
   set {
-    name  = "settings.cosmosDBAccount"
-    value = var.cosmosdb_account_name
-  }
-  set {
-    name  = "settings.cosmosDBCollection"
-    value = var.cosmosdb_collection
+    name  = "settings.cosmosDBContainer"
+    value = var.cosmosdb_container_id
   }
 }
