@@ -174,7 +174,7 @@ jobs:
         TF_VAR_aks_sp_client_id: $(AKS_SP_CLIENT_ID)
         TF_VAR_aks_sp_client_secret: $(AKS_SP_CLIENT_SECRET)
         TF_VAR_aks_sp_object_id: $(AKS_SP_OBJECT_ID)
-        TF_VAR_kusto_admin_sp_object_id: $(AKS_SP_OBJECT_ID)
+        TF_VAR_kusto_admin_sp_object_id: $(APP_SP_OBJECT_ID)
         TF_VAR_az_devops_agent_pool: $(AGENT_POOL_NAME)
         TF_VAR_az_devops_url: $(System.CollectionUri)
         TF_VAR_az_devops_pat: $(AGENT_POOL_MANAGEMENT_TOKEN)
@@ -264,9 +264,9 @@ jobs:
         TF_VAR_release_name: $(HELM_RELEASE_NAME)
         TF_VAR_image_repository: $(ACR_NAME).azurecr.io/contoso
         TF_VAR_image_tag: $(SEMANTIC_VERSION)
-        TF_VAR_client_id: $(AKS_SP_CLIENT_ID)
+        TF_VAR_client_id: $(APP_SP_CLIENT_ID)
         TF_VAR_tenant_id: $(ARM_TENANT_ID)
-        TF_VAR_client_secret: $(AKS_SP_CLIENT_SECRET)
+        TF_VAR_client_secret: $(APP_SP_CLIENT_SECRET)
         TF_VAR_kusto_cluster_url: $(KUSTO_URI)
         TF_VAR_kusto_database_name: not_yet_implemented
         TF_VAR_instrumentation_key: $(INSTRUMENTATION_KEY)

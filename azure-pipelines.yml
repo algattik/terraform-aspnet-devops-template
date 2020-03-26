@@ -32,6 +32,10 @@ variables:
   value: cd0ad856-af8e-424e-b935-ce7ad6da5c9d
 - name: AKS_SP_OBJECT_ID
   value: ddf63018-48fb-4738-a3f5-0062fb16dbb0
+- name: APP_SP_CLIENT_ID
+  value: cd0ad856-af8e-424e-b935-ce7ad6da5c9d
+- name: APP_SP_OBJECT_ID
+  value: ddf63018-48fb-4738-a3f5-0062fb16dbb0
 - name: AKS_VERSION
   value: 1.15.7
 - name: HELM_RELEASE_NAME

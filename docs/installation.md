@@ -8,6 +8,17 @@ In Azure AD:
   - Enter the SP Object ID in $(AKS_SP_OBJECT_ID)
     *Should be object IDs of service principals, not object IDs of the application nor application IDs.
     To retrieve, navigate in the AAD portal from an App registration to "Managed application in local directory", or use Azure Cloud Shell / Azure CLI command `az ad sp show --id $AKS_SP_CLIENT_ID --query objectId`*
+  - Do the same for service principal $(APP_SP_CLIENT_ID) and SP Object ID in $(APP_SP_OBJECT_ID).
+
+|------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| Service principal      | Purpose                                                                                                                    |
+|------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| TERRAFORM_SP_CLIENT_ID | Owner on the Resource Group, used by Terraform to deploy resources and assign permissions to the other service principals. |
+| AKS_SP_CLIENT_ID       | Service principal for AKS itself. AKS uses it to deploy infrastructure such as network interfaces in VNET subnet.          |
+| APP_SP_CLIENT_ID       | Service principal used by the deployed ASP.NET Core application, to access Azure services.                                 |
+|------------------------|----------------------------------------------------------------------------------------------------------------------------|
+
+
 
 In Azure:
   - Create the RG $(RESOURCE_GROUP)
