@@ -55,14 +55,11 @@ namespace Contoso
         /// <param name="value">Value up to which the sum is computed.</param>
         /// <param name="sum">Sum of numbers from 0 to value.</param>
         /// <returns>Cosmos DB operation result.</returns>
-        public async Task<ItemResponse<ComputedSum>> PersistSum(long value, long sum)
+        public Task PersistSum(long value, long sum)
         {
-            var e = new ComputedSum
-            {
-                Id = value.ToString(CultureInfo.InvariantCulture),
-                Sum = sum,
-            };
-            return await this.container.ReplaceItemAsync(e, e.Id);
+            this.logger.LogWarning(
+                "Saving to Cosmos DB not yet implemented");
+            return Task.FromResult(0);
         }
     }
 }
