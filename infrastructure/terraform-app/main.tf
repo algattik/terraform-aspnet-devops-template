@@ -23,10 +23,6 @@ resource "helm_release" "build" {
     value = "NodePort"
   }
   set {
-    name  = "settings.cosmosDBAccount"
-    value = var.cosmosdb_account_name
-  }
-  set {
     name  = "settings.aadClientId"
     value = var.client_id
   }
