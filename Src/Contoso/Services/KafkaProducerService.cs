@@ -7,6 +7,9 @@ namespace Contoso
     using System;
     using System.Threading.Tasks;
     using Confluent.Kafka;
+    using Microsoft.Azure.Management.EventHub.Fluent.Models;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Service wrapping Confluent.Kafka.IProducer.
@@ -22,14 +25,60 @@ namespace Contoso
         /// <summary>
         /// Initializes a new instance of the <see cref="KafkaProducerService"/> class.
         /// </summary>
-        /// <param name="producer">Wrapped Confluent.Kafka.IProducer instance.</param>
-        /// <param name="topic">Kafka topic to publish messages into.</param>
-        public KafkaProducerService(IProducer<long, string> producer, string topic)
+        /// <param name="configuration">Configuration.</param>
+        /// <param name="azure">Azure management connection.</param>
+        /// <param name="logger">Logger.</param>
+        public KafkaProducerService(IConfiguration configuration, AzureService azure, ILogger<KafkaProducerService> logger)
         {
+            if (configuration == null)
             {
-                this.producer = producer;
-                this.topic = topic;
+                throw new ArgumentNullException(nameof(configuration));
             }
+
+            if (azure == null)
+            {
+                throw new ArgumentNullException(nameof(azure));
+            }
+
+            var producerHubSendAuthorizationRuleResourceId = configuration["providerHubSend"];
+            this.topic = configuration["providerHubTopic"];
+
+            var eventHubNamespaceRule = azure
+                .Azure
+                .EventHubNamespaces
+                .AuthorizationRules
+                .GetById(producerHubSendAuthorizationRuleResourceId);
+
+            var ns = eventHubNamespaceRule.NamespaceName;
+            var brokerList = $"{ns}.servicebus.windows.net:9093";
+            string connStr;
+            try
+            {
+                connStr = eventHubNamespaceRule.GetKeys().PrimaryConnectionString;
+            }
+            catch (ErrorResponseException e)
+            {
+                logger.LogCritical(
+                    e,
+                    "Couldn't retrieve authorization keys for rule {producerHubSendAuthorizationRuleResourceId}",
+                    producerHubSendAuthorizationRuleResourceId);
+                throw;
+            }
+
+            var config = new ProducerConfig
+            {
+                BootstrapServers = brokerList,
+                SecurityProtocol = SecurityProtocol.SaslSsl,
+                SaslMechanism = SaslMechanism.Plain,
+                SaslUsername = "$ConnectionString",
+                SaslPassword = connStr,
+
+                // Debug = "security,broker,protocol"        //Uncomment for librdkafka debugging information
+            };
+            this.producer = new ProducerBuilder<long, string>(config)
+                .SetKeySerializer(Serializers.Int64)
+                .SetValueSerializer(Serializers.Utf8)
+                .Build();
         }
 
         /// <summary>

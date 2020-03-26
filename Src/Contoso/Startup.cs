@@ -32,11 +32,9 @@ namespace Contoso
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
         /// <param name="configuration">The configuration for the app.</param>
-        /// <param name="logFactory">The logger factory for the app.</param>
-        public Startup(IConfiguration configuration, ILoggerFactory logFactory)
+        public Startup(IConfiguration configuration)
         {
             this.Configuration = configuration;
-            ApplicationLogging.LoggerFactory = logFactory;
         }
 
         /// <summary>
@@ -96,7 +94,14 @@ namespace Contoso
         {
             this.ConfigureTelemetryServices(services);
 
-            services.AddEventHubsProducer(this.Configuration);
+            services.AddSingleton(
+                s => new AzureService(this.Configuration));
+
+            services.AddSingleton(
+                s => new KafkaProducerService(
+                    this.Configuration,
+                    s.GetService<AzureService>(),
+                    s.GetService<ILogger<KafkaProducerService>>()));
 
             services.AddControllers();
 
