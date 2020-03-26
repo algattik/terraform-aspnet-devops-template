@@ -98,7 +98,7 @@ namespace Contoso
                 Id = value.ToString(CultureInfo.InvariantCulture),
                 Sum = sum,
             };
-            return await this.container.ReplaceItemAsync(e, e.Id);
+            return await this.container.UpsertItemAsync(e);
         }
 
         private ICosmosDBAccount ConnectToCosmosDBAccount(AzureService azure, string cosmosDBResourceId)

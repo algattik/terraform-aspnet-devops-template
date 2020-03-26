@@ -42,6 +42,7 @@ variables:
   value: contoso
 - name: RESOURCE_GROUP
   value: $(APP_NAME)
+# Terraform Azure storage backend reads ARM_SUBSCRIPTION_ID, ARM_TENANT_ID env variables
 - name: ARM_SUBSCRIPTION_ID
   value: a4ed7b9a-b128-49b4-a6ee-fd07ff6e296d
 - name: ARM_TENANT_ID
