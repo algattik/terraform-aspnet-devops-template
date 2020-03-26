@@ -83,8 +83,7 @@ jobs:
       TerraformApply: true
       TerraformStateKey: cd
       TerraformVariables:
-        ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
-        ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
         TF_VAR_appname: $(APP_NAME)
         TF_VAR_environment: cd
         TF_VAR_resource_group: $(RESOURCE_GROUP)
@@ -112,8 +111,7 @@ jobs:
     parameters:
       TerraformStateKey: cd
       TerraformVariables:
-        ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
-        ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
 
 - job: Terraform
   displayName: Deploy infrastructure
@@ -150,8 +148,7 @@ jobs:
       TerraformApply: true
       TerraformStateKey: infra/$(area.AREA_NAME)
       TerraformVariables:
-        ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
-        ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
         TF_VAR_appname: $(APP_NAME)
         TF_VAR_resource_group: $(RESOURCE_GROUP)
         TF_VAR_area_name: $(area.AREA_NAME)
@@ -177,8 +174,7 @@ jobs:
       TerraformApply: true
       TerraformStateKey: app/build-$(Build.BuildId)
       TerraformVariables:
-        ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
-        ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
         TF_VAR_kubernetes_namespace: $(KUBERNETES_NAMESPACE)
         TF_VAR_release_name: $(HELM_RELEASE_NAME)
         TF_VAR_image_repository: $(ACR_NAME).azurecr.io/contoso
@@ -343,8 +339,7 @@ jobs:
       TerraformDestroy: true
       TerraformStateKey: infra/$(AREA_NAME)
       TerraformVariables:
-        ARM_CLIENT_ID: $(TERRAFORM_SP_CLIENT_ID)
-        ARM_CLIENT_SECRET: $(TERRAFORM_SP_CLIENT_SECRET)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
 
 - job: Promote
   displayName: Promote latest image
