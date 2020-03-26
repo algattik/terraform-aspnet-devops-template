@@ -8,6 +8,7 @@ namespace Contoso
     using Microsoft.Azure.Management.Fluent;
     using Microsoft.Azure.Management.ResourceManager.Fluent;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Interface to Azure management operations.
@@ -18,7 +19,8 @@ namespace Contoso
         /// Initializes a new instance of the <see cref="AzureService"/> class.
         /// </summary>
         /// <param name="configuration">Configuration for service.</param>
-        public AzureService(IConfiguration configuration)
+        /// <param name="logger">Logger.</param>
+        public AzureService(IConfiguration configuration, ILogger<AzureService> logger)
         {
             if (configuration == null)
             {
@@ -36,10 +38,22 @@ namespace Contoso
                 tenantId,
                 AzureEnvironment.AzureGlobalCloud);
 
-            this.Azure = Microsoft.Azure.Management.Fluent.Azure
-                .Configure()
-                .Authenticate(credentials)
-                .WithDefaultSubscription();
+            try
+            {
+                this.Azure = Microsoft.Azure.Management.Fluent.Azure
+                    .Configure()
+                    .Authenticate(credentials)
+                    .WithDefaultSubscription();
+            }
+            catch (Exception e)
+            {
+                logger.LogCritical(
+                    e,
+                    "Couldn't authenticate to Azure with client {clientId} in tenant {tenantId}",
+                    clientId,
+                    tenantId);
+                throw;
+            }
         }
 
         /// <summary>

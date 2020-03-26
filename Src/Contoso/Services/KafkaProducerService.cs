@@ -22,6 +22,8 @@ namespace Contoso
 
         private readonly string topic;
 
+        private readonly ILogger<KafkaProducerService> logger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="KafkaProducerService"/> class.
         /// </summary>
@@ -42,6 +44,11 @@ namespace Contoso
 
             var producerHubSendAuthorizationRuleResourceId = configuration["providerHubSend"];
             this.topic = configuration["providerHubTopic"];
+
+            logger.LogInformation(
+                "Initializing connection to Event Hub {producerHubSendAuthorizationRuleResourceId} topic {topic}",
+                producerHubSendAuthorizationRuleResourceId,
+                this.topic);
 
             var eventHubNamespaceRule = azure
                 .Azure
@@ -79,6 +86,8 @@ namespace Contoso
                 .SetKeySerializer(Serializers.Int64)
                 .SetValueSerializer(Serializers.Utf8)
                 .Build();
+
+            this.logger = logger;
         }
 
         /// <summary>

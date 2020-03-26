@@ -95,7 +95,9 @@ namespace Contoso
             this.ConfigureTelemetryServices(services);
 
             services.AddSingleton(
-                s => new AzureService(this.Configuration));
+                s => new AzureService(
+                    this.Configuration,
+                    s.GetService<ILogger<AzureService>>()));
 
             services.AddSingleton(
                 s => new KafkaProducerService(
