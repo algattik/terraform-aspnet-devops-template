@@ -9,7 +9,6 @@ namespace Contoso
     using System.Threading.Tasks;
     using Microsoft.Azure.Cosmos;
     using Microsoft.Azure.Cosmos.Fluent;
-    using Microsoft.Azure.Management.EventHub.Fluent.Models;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
 

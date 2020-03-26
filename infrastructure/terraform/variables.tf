@@ -21,5 +21,5 @@ variable "area_name" {
 
 variable "cosmosdb_account_name" {
   type = string
-  description = "The EventHubs namespace name in which to deploy EventHub topics."
+  description = "The Cosmos DB Account name in which to save results."
 }

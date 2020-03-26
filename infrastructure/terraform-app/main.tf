@@ -24,7 +24,7 @@ resource "helm_release" "build" {
   }
   set {
     name  = "settings.cosmosDBAccount"
-    value = var.cosmosdb_account
+    value = var.cosmosdb_account_name
   }
   set {
     name  = "settings.aadClientId"

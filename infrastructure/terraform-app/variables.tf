@@ -27,11 +27,6 @@ variable "tenant_id" {
   type = string
 }
 
-variable "cosmosdb_account" {
-  type = string
-  description = "Event Hubs namespace to connect to."
-}
-
 variable "instrumentation_key" {
   type = string
   description = "App Insights instrumentation key to send metrics to."
@@ -39,10 +34,10 @@ variable "instrumentation_key" {
 
 variable "cosmos_db_account" {
   type = string
-  description = "ARM authorization rule resource ID for sending messages to Provider Events Hub."
+  description = "Cosmos DB account in which to save data."
 }
 
 variable "cosmos_db_collection" {
   type = string
-  description = "Provider Events Hub topic to send messages to."
+  description = "Cosmos DB collection in which to save data."
 }

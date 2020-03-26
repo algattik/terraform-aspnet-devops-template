@@ -16,8 +16,8 @@ resource "azurerm_cosmosdb_sql_database" "sums" {
 
 resource "azurerm_cosmosdb_sql_container" "sums" {
   name                = "ComputedSums"
-  resource_group_name = azurerm_cosmosdb_account.sums.resource_group_name
-  account_name        = azurerm_cosmosdb_account.sums.name
+  resource_group_name = var.resource_group
+  account_name        = var.cosmosdb_account_name
   database_name       = azurerm_cosmosdb_sql_database.sums.name
   throughput          = 400
 }
