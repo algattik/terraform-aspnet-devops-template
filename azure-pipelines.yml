@@ -41,7 +41,7 @@ variables:
 - name: HELM_RELEASE_NAME
   value: contoso
 - name: RESOURCE_GROUP
-  value: rg-$(APP_NAME)
+  value: $(APP_NAME)
 - name: ARM_SUBSCRIPTION_ID
   value: a4ed7b9a-b128-49b4-a6ee-fd07ff6e296d
 - name: ARM_TENANT_ID
