@@ -48,10 +48,10 @@ resource "helm_release" "build" {
   }
   set {
     name  = "settings.cosmosDBAccount"
-    value = var.cosmos_db_account_name
+    value = var.cosmosdb_account_name
   }
   set {
     name  = "settings.cosmosDBCollection"
-    value = var.cosmos_db_collection
+    value = var.cosmosdb_collection
   }
 }

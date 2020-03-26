@@ -32,12 +32,12 @@ variable "instrumentation_key" {
   description = "App Insights instrumentation key to send metrics to."
 }
 
-variable "cosmos_db_account_name" {
+variable "cosmosdb_account_name" {
   type = string
   description = "Cosmos DB account in which to save data."
 }
 
-variable "cosmos_db_collection" {
+variable "cosmosdb_collection" {
   type = string
   description = "Cosmos DB collection in which to save data."
 }
