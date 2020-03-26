@@ -16,6 +16,8 @@ data:
   aadTenantId: "{{ .Values.settings.aadTenantId }}"
   instrumentationAppId: "{{ .Values.settings.instrumentationAppId }}"
   instrumentationKey: "{{ .Values.settings.instrumentationKey }}"
+  cosmosDBAccount: "{{ .Values.settings.cosmosDBAccount }}"
+  cosmosDBCollection: "{{ .Values.settings.cosmosDBCollection }}"
 
 ---
 

@@ -19,6 +19,8 @@ settings:
   aadTenantId: "00000000-0000-0000-0000-000000000000"
   instrumentationAppId: "contoso"
   instrumentationKey: "00000000-0000-0000-0000-000000000000"
+  cosmosDBAccount: "mycosmosdb"
+  cosmosDBCollection: "mycollection"
 
 service:
   type: ClusterIP

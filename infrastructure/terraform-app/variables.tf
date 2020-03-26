@@ -27,17 +27,22 @@ variable "tenant_id" {
   type = string
 }
 
-variable "kusto_cluster_url" {
+variable "cosmosdb_account" {
   type = string
-  description = "Kusto cluster URL to connect to."
-}
-
-variable "kusto_database_name" {
-  type = string
-  description = "Name of the Kusto database to connect to."
+  description = "Event Hubs namespace to connect to."
 }
 
 variable "instrumentation_key" {
   type = string
   description = "App Insights instrumentation key to send metrics to."
+}
+
+variable "cosmos_db_account" {
+  type = string
+  description = "ARM authorization rule resource ID for sending messages to Provider Events Hub."
+}
+
+variable "cosmos_db_collection" {
+  type = string
+  description = "Provider Events Hub topic to send messages to."
 }
