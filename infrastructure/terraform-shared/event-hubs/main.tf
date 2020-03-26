@@ -8,7 +8,7 @@ resource "azurerm_eventhub_namespace" "evh" {
 
 resource "azurerm_role_assignment" "app_eventhubs" {
   scope                = azurerm_eventhub_namespace.evh.id
-  role_definition_name = "Reader"
+  role_definition_name = "Azure Event Hubs Data Owner"
   principal_id         = var.app_sp_object_id
 }
 
