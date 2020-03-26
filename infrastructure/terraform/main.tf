@@ -8,7 +8,7 @@ resource "kubernetes_namespace" "build" {
 }
 
 resource "azurerm_cosmosdb_sql_database" "sums" {
-  name                = "ComputedSums"
+  name                = var.area_name
   resource_group_name = var.resource_group
   account_name        = var.cosmosdb_account_name
   throughput          = 400
