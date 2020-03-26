@@ -7,7 +7,7 @@ In Azure AD:
   - Create a service principal $(AKS_SP_CLIENT_ID)
   - Enter the SP Object ID in $(AKS_SP_OBJECT_ID)
     *Should be object IDs of service principals, not object IDs of the application nor application IDs.
-    To retrieve, navigate in the AAD portal from an App registration to "Managed application in local directory".*
+    To retrieve, navigate in the AAD portal from an App registration to "Managed application in local directory", or use Azure Cloud Shell / Azure CLI command `az ad sp show --id $AKS_SP_CLIENT_ID --query objectId`*
 
 In Azure:
   - Create the RG $(RESOURCE_GROUP)
