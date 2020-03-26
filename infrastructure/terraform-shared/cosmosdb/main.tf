@@ -3,6 +3,11 @@ resource "azurerm_cosmosdb_account" "db" {
   location            = var.location
   resource_group_name = var.resource_group_name
   offer_type          = "Standard"
+
+  geo_location {
+    location          = var.location
+    failover_priority = 0
+  }
 }
 
 resource "azurerm_role_assignment" "app_cosmosdb" {
