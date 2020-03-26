@@ -65,7 +65,7 @@ namespace Contoso
                     .Build();
                 this.container = client.GetDatabase("DB").GetContainer("Co");
             }
-            catch (ErrorResponseException e)
+            catch (Exception e)
             {
                 logger.LogCritical(
                     e,
