@@ -25,7 +25,7 @@ variables:
 - name: SEMANTIC_VERSION
   value: "$(MAJOR_MINOR_VERSION).$(Build.BuildId)"
 - name: ACR_NAME
-  value: aspnetmplt
+  value: $(APP_NAME)aspnetmplt
 - name: TERRAFORM_SP_CLIENT_ID
   value: df9df564-e889-4852-9bb2-aa912d990c93
 - name: AKS_SP_CLIENT_ID
