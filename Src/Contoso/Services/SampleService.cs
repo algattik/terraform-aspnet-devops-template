@@ -54,7 +54,7 @@ namespace Contoso
 
             this.logger.LogInformation("Sum of numbers from 0 to {value} was {result}, computed in {duration}s", value, result, duration);
 
-            await cosmosDB.persist(value, result);
+            await this.cosmosDB.PersistSum(value, result);
 
             this.metrics?.SumComputationAPICallDuration?.Observe(duration.TotalSeconds);
 

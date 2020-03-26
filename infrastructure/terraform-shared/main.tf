@@ -45,8 +45,8 @@ module "aks" {
   aks_sp_client_secret = var.aks_sp_client_secret
 }
 
-module "event-hubs" {
-  source = "./event-hubs"
+module "cosmosdb" {
+  source = "./cosmosdb"
   appname = var.appname
   environment = var.environment
   resource_group_name = var.resource_group

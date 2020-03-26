@@ -62,8 +62,7 @@ namespace Contoso
             {
                 var client = new CosmosClientBuilder(
                     cosmosDB.DocumentEndpoint,
-                    cosmosDB.ListKeys().PrimaryMasterKey
-                    )
+                    cosmosDB.ListKeys().PrimaryMasterKey)
                     .Build();
                 this.container = client.GetDatabase("DB").GetContainer("Co");
             }
@@ -82,15 +81,17 @@ namespace Contoso
         /// <summary>
         ///  Persist a message to Cosmos DB.
         /// </summary>
-        /// <returns>Cosmos DB response.</returns>
-        public async Task<ItemResponse<ComputedSum>> persist(long value, long sum)
+        /// <param name="value">Value up to which the sum is computed.</param>
+        /// <param name="sum">Sum of numbers from 0 to value.</param>
+        /// <returns>Cosmos DB operation result.</returns>
+        public async Task<ItemResponse<ComputedSum>> PersistSum(long value, long sum)
         {
             var e = new ComputedSum
             {
                 Id = value.ToString(CultureInfo.InvariantCulture),
-                sum = sum
+                Sum = sum,
             };
-            return await container.ReplaceItemAsync(e, e.Id);
+            return await this.container.ReplaceItemAsync(e, e.Id);
         }
     }
 }

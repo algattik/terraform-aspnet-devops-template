@@ -22,9 +22,10 @@ namespace Contoso
         /// Gets or sets the value up to which the sum is computed.
         /// </summary>
         public string? Id { get; set; }
+
         /// <summary>
         /// Gets or sets the sum of numbers from 0 to Id.
         /// </summary>
-        public long? sum { get; set; }
+        public long? Sum { get; set; }
     }
 }
