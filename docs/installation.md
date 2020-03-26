@@ -4,7 +4,7 @@ The variables referenced in the following guide refer to the [azure-pipelines.ym
 
   ```yml
   - name: TERRAFORM_SP_CLIENT_ID
-    value: y0ur-v4lue-f0r-TERRAFORM_SP_CLIENT_ID
+    value: <YOUR VALUE>
   ```
 
 ## Azure Active Directory configuration
@@ -15,9 +15,9 @@ The variables referenced in the following guide refer to the [azure-pipelines.ym
     - Navigate to the Azure Portal & open the [Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview). You need to create two service principals (Azure Active Directory App registrations) for Terraform and AKS by entering the following commands:
 
       ```
-      az ad sp create-for-rbac --name "OneAir_Azure_DevOps_Terraform_SP" --role owner
+      az ad sp create-for-rbac --name "YOUR_PROJECT_Azure_DevOps_Terraform_SP" --role owner
 
-      az ad sp create-for-rbac --name "OneAir_AKS_SP" --skip-assignment
+      az ad sp create-for-rbac --name "YOUR_PROJECT_AKS_SP" --skip-assignment
       ```
 
     - Save the outputs of these commands as you'll need these details during the installation. The output comes in the following format:
@@ -25,8 +25,8 @@ The variables referenced in the following guide refer to the [azure-pipelines.ym
       ```json
       {
         "appId": "bd5581f4-40ba-4e33-aa2e-a1b8e520b42f",
-        "displayName": "OneAir_Azure_DevOps_Terraform_SP",
-        "name": "http://OneAir_Azure_DevOps_Terraform_SP",
+        "displayName": "YOUR_PROJECT_Azure_DevOps_Terraform_SP",
+        "name": "http://YOUR_PROJECT_Azure_DevOps_Terraform_SP",
         "password": "a3781f70-b68c-1f6c-974a-f2b6fas0bdb6",
         "tenant": "13f988bf-56f1-41af-11ab-4e7bc011bd68"
       }
@@ -53,25 +53,25 @@ The variables referenced in the following guide refer to the [azure-pipelines.ym
 1. Create the resource group for your project in Azure by running the following command:
 
     ```bash
-    az group create --name One_Air_RG --location westeurope
+    az group create --name YOUR_PROJECT_RG --location westeurope
     ```
 
 1. Grant TERRAFORM_SP_CLIENT_ID *Owner* permission on the RG. To do this, replace the values in assignee and scope parameters accordingly. The scope parameter is the id parameter from your previously created resource group.
 
     ```bash
-    az role assignment create --assignee TERRAFORM_SP_CLIENT_ID --role Owner --scope /subscriptions/YourSubscriptionId/resourceGroups/One_Air_RG
+    az role assignment create --assignee TERRAFORM_SP_CLIENT_ID --role Owner --scope /subscriptions/YourSubscriptionId/resourceGroups/YOUR_PROJECT_RG
     ```
 
 1. Create the storage account $(TERRAFORM_STORAGE_ACCOUNT) within the RG. Info: Storage account name must be between 3 and 24 characters in length and use numbers and lower-case letters only.
 
     ```bash
-    az storage account create --name oneairstorageaccount --resource-group One_Air_RG
+    az storage account create --name yourprojectstorageaccount --resource-group YOUR_PROJECT_RG
     ```
 
 1. Create the container "terraformstate" within the storage account
 
     ```bash
-    az storage container create --name terraformstate --account-name oneairstorageaccount
+    az storage container create --name terraformstate --account-name yourprojectstorageaccount
     ```
 
 1. Replace the values of the following variables in the [azure-pipelines.yml](../azure-pipelines.yml):
