@@ -5,8 +5,8 @@
 namespace Contoso
 {
     using System;
-    using System.Linq;
     using System.Globalization;
+    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.Azure.Cosmos;
     using Microsoft.Azure.Cosmos.Fluent;
@@ -22,8 +22,6 @@ namespace Contoso
     public class CosmosDBService : ICosmosDBService
     {
         private readonly Container container;
-
-        private readonly string topic;
 
         private readonly ILogger<CosmosDBService> logger;
 
@@ -45,12 +43,13 @@ namespace Contoso
                 throw new ArgumentNullException(nameof(azure));
             }
 
+            this.logger = logger;
+
             var cosmosDBContainerResourceId = configuration["cosmosDBContainer"];
 
             logger.LogInformation(
-                "Initializing connection to Event Hub {cosmosDBContainerResourceId} topic {topic}",
-                cosmosDBContainerResourceId,
-                this.topic);
+                "Initializing connection to Cosmos DB container {cosmosDBContainerResourceId}",
+                cosmosDBContainerResourceId);
 
             ParseCosmosDBContainerResourceId(
                 cosmosDBContainerResourceId,
@@ -58,43 +57,32 @@ namespace Contoso
                 out string cosmosDBDatabase,
                 out string cosmosDBContainer);
 
-            ICosmosDBAccount cosmosDB;
-            try
+            var cosmosDB = this.ConnectToCosmosDBAccount(azure, cosmosDBResourceId);
+            this.container = this.ConnectToCosmosDBContainer(cosmosDB, cosmosDBDatabase, cosmosDBContainer);
+        }
+
+        /// <summary>
+        /// Parse a Cosmos DB container ARM Resource ID into its component parts.
+        /// </summary>
+        /// <param name="cosmosDBContainerResourceId">Cosmos DB container ARM Resource ID.</param>
+        /// <param name="cosmosDBResourceId">Cosmos DB account ARM Resource ID.</param>
+        /// <param name="cosmosDBDatabase">Cosmos DB database name.</param>
+        /// <param name="cosmosDBContainer">Cosmos DB container name.</param>
+        public static void ParseCosmosDBContainerResourceId(
+                string cosmosDBContainerResourceId,
+                out string cosmosDBResourceId,
+                out string cosmosDBDatabase,
+                out string cosmosDBContainer)
+        {
+            if (cosmosDBContainerResourceId == null)
             {
-                cosmosDB = azure
-                    .Azure
-                    .CosmosDBAccounts
-                    .GetById(cosmosDBResourceId);
-            }
-            catch (Exception e)
-            {
-                logger.LogCritical(
-                    e,
-                    "Couldn't retrieve Cosmos DB account keys for rule {cosmosDBResourceId}",
-                    cosmosDBResourceId);
-                throw;
+                throw new ArgumentNullException(nameof(cosmosDBContainerResourceId));
             }
 
-            try
-            {
-                var client = new CosmosClientBuilder(
-                    cosmosDB.DocumentEndpoint,
-                    cosmosDB.ListKeys().PrimaryMasterKey)
-                    .Build();
-                this.container = client
-                    .GetDatabase(cosmosDBDatabase)
-                    .GetContainer(cosmosDBContainer);
-            }
-            catch (Exception e)
-            {
-                logger.LogCritical(
-                    e,
-                    "Couldn't retrieve authorization keys for rule {cosmosDBContainerResourceId}",
-                    cosmosDBContainerResourceId);
-                throw;
-            }
-
-            this.logger = logger;
+            var items = cosmosDBContainerResourceId.Split('/');
+            cosmosDBResourceId = string.Join('/', items.Take(9));
+            cosmosDBDatabase = items[12];
+            cosmosDBContainer = items[14];
         }
 
         /// <summary>
@@ -113,16 +101,45 @@ namespace Contoso
             return await this.container.ReplaceItemAsync(e, e.Id);
         }
 
-        public static void ParseCosmosDBContainerResourceId(
-                string cosmosDBContainerResourceId,
-                        out string cosmosDBResourceId,
-                        out string cosmosDBDatabase,
-                        out string cosmosDBContainer)
+        private ICosmosDBAccount ConnectToCosmosDBAccount(AzureService azure, string cosmosDBResourceId)
         {
-            var items = cosmosDBContainerResourceId.Split('/');
-            cosmosDBResourceId = string.Join('/', items.Take(4));
-            cosmosDBDatabase = items[5];
-            cosmosDBContainer = items[6];
+            try
+            {
+                return azure
+                    .Azure
+                    .CosmosDBAccounts
+                    .GetById(cosmosDBResourceId);
+            }
+            catch (Exception e)
+            {
+                this.logger.LogCritical(
+                    e,
+                    "Couldn't retrieve Cosmos DB account keys for rule {cosmosDBResourceId}",
+                    cosmosDBResourceId);
+                throw;
+            }
+        }
+
+        private Container ConnectToCosmosDBContainer(ICosmosDBAccount cosmosDB, string cosmosDBDatabase, string cosmosDBContainer)
+        {
+            try
+            {
+                var client = new CosmosClientBuilder(
+                    cosmosDB.DocumentEndpoint,
+                    cosmosDB.ListKeys().PrimaryMasterKey)
+                    .Build();
+                return client
+                    .GetDatabase(cosmosDBDatabase)
+                    .GetContainer(cosmosDBContainer);
+            }
+            catch (Exception e)
+            {
+                this.logger.LogCritical(
+                    e,
+                    "Couldn't retrieve Cosmos DB container {cosmosDBContainer}",
+                    cosmosDBContainer);
+                throw;
+            }
         }
     }
 }
