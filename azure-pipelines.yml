@@ -42,10 +42,9 @@ variables:
   value: contoso
 - name: RESOURCE_GROUP
   value: $(APP_NAME)
-# Terraform Azure storage backend reads ARM_SUBSCRIPTION_ID, ARM_TENANT_ID env variables
-- name: ARM_SUBSCRIPTION_ID
+- name: SUBSCRIPTION_ID
   value: a4ed7b9a-b128-49b4-a6ee-fd07ff6e296d
-- name: ARM_TENANT_ID
+- name: TENANT_ID
   value: 72f988bf-86f1-41af-91ab-2d7cd011db47
 - name: TERRAFORM_SERVICE_CONNECTION
   value: Terraform
@@ -58,6 +57,15 @@ variables:
 # Enable buildkit to speed up multi-stage pipeline builds (avoid running unit tests twice)
 - name: DOCKER_BUILDKIT
   value: 1
+# Variables for Terraform Azure storage backend provider
+- name: ARM_SUBSCRIPTION_ID
+  value: $(SUBSCRIPTION_ID)
+- name: ARM_TENANT_ID
+  value: $(TENANT_ID)
+- name: ARM_CLIENT_ID
+  value: $(TERRAFORM_SP_CLIENT_ID)
+- name: ARM_CLIENT_SECRET
+  value: $(TERRAFORM_SP_CLIENT_SECRET)
 
 pool:
   vmImage: ubuntu-latest
