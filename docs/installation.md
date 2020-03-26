@@ -2,18 +2,33 @@
 
 Pick and update the $() values in azure-pipelines.yml as needed.
 
-In Azure AD:
+## Create service principals
+
+Start by creating the following service principals:
+
+| Service principal      | Purpose                                                                                                                    |
+|------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| TERRAFORM_SP_CLIENT_ID | Owner on the Resource Group, used by Terraform to deploy resources and assign permissions to the other service principals. |
+| AKS_SP_CLIENT_ID       | Service principal for AKS itself. AKS uses it to deploy infrastructure such as network interfaces in VNET subnet.          |
+| APP_SP_CLIENT_ID       | Service principal used by the deployed ASP.NET Core application, to access Azure services.                                 |
+
+Steps:
   - Create a service principal $(TERRAFORM_SP_CLIENT_ID)
   - Create a service principal $(AKS_SP_CLIENT_ID)
   - Enter the SP Object ID in $(AKS_SP_OBJECT_ID)
     *Should be object IDs of service principals, not object IDs of the application nor application IDs.
-    To retrieve, navigate in the AAD portal from an App registration to "Managed application in local directory".*
+    To retrieve, navigate in the AAD portal from an App registration to "Managed application in local directory", or use Azure Cloud Shell / Azure CLI command `az ad sp show --id $AKS_SP_CLIENT_ID --query objectId`*
+  - Do the same for service principal $(APP_SP_CLIENT_ID) and SP Object ID in $(APP_SP_OBJECT_ID).
+
+## Create Azure resource group and Terraform state backend storage account
 
 In Azure:
   - Create the RG $(RESOURCE_GROUP)
   - Grant TERRAFORM_SP_CLIENT_ID *Owner* permission on the RG
   - Create the storage account $(TERRAFORM_STORAGE_ACCOUNT) within the RG
   - Create the container "terraformstate" within the storage account
+
+## Create Azure DevOps pipeline
 
 In Azure DevOps:
   - Create an ADO agent pool named $(AGENT_POOL_NAME)
