@@ -153,7 +153,7 @@ When creating the Terraform Service principal, a password was created which is n
 | name | value |
 |---|---|
 | AGENT_POOL_NAME | The name of the created Agent Pool in step 1 of the Azure DevOps configuration |
-| TERRAFORM_SERVICE_CONNECTION | The name of the storage account |
+| TERRAFORM_SERVICE_CONNECTION | The name of the service connection |
 | ACR_NAME | Pick the name of the Azure Container Registry, e.g. yourprojectacr |
 | HELM_RELEASE_NAME | Pick a name for the Helm release |
 | SUBSCRIPTION_ID | The id of your Azure Subscription. See 5.1. |
