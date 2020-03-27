@@ -18,6 +18,33 @@ set -euo pipefail
 
 echo "start"
 
+
+if test ! -e /dev/sdc1; then
+
+(
+echo n # Add a new partition
+echo p # Primary partition
+echo 1 # Partition number
+echo   # First sector (Accept default)
+echo   # Last sector (Accept default)
+echo p # Print partition table
+echo w # Write changes
+) | fdisk
+
+partprobe
+
+mkfs -t ext4 /dev/sdc1
+
+mkdir /var/lib/docker
+mount /dev/sdc1 /var/lib/docker
+
+var=$(blkid /dev/sdc1 -s UUID | awk -F'UUID="|"' '{print $2}')
+echo >> /etc/fstab "UUID=$var /var/lib/docker ext4 defaults,nofail 1 2"
+
+fi
+
+
+
 echo "install Ubuntu packages"
 
 # To make it easier for build and release pipelines to run apt-get,
