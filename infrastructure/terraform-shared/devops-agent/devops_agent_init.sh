@@ -64,7 +64,7 @@ apt-get install -y --no-install-recommends \
         unzip
 
 cat > /etc/cron.d/delete_old_docker_images << EOF
-01 * * * * root docker system prune -a --filter "until=1h"
+01 * * * * root docker system prune --all --force --filter "until=1h"
 EOF
 
 
