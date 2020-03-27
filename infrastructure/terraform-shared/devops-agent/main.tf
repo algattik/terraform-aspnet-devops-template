@@ -98,7 +98,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "devops" {
     version   = "latest"
   }
 
-  admin_username = "azuredevopsuser"
+  admin_username = var.az_devops_agent_admin_user
   admin_password = random_password.agent_vms.result
 
   disable_password_authentication = false
