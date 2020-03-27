@@ -63,6 +63,10 @@ apt-get install -y --no-install-recommends \
         curl \
         unzip
 
+cat > /etc/cron.d/delete_old_docker_images << EOF
+01 * * * * root docker system prune -a --filter "until=24h"
+EOF
+
 
 echo "Allowing agent to run docker"
 
