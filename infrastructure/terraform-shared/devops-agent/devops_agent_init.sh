@@ -29,17 +29,17 @@ echo   # First sector (Accept default)
 echo   # Last sector (Accept default)
 echo p # Print partition table
 echo w # Write changes
-) | fdisk
+) | fdisk /dev/sdc
 
 partprobe
 
-mkfs -t ext4 /dev/sdc1
+mkfs -t xfs /dev/sdc1
 
 mkdir /var/lib/docker
 mount /dev/sdc1 /var/lib/docker
 
 var=$(blkid /dev/sdc1 -s UUID | awk -F'UUID="|"' '{print $2}')
-echo >> /etc/fstab "UUID=$var /var/lib/docker ext4 defaults,nofail 1 2"
+echo >> /etc/fstab "UUID=$var /var/lib/docker xfs defaults,nofail 1 2"
 
 fi
 
@@ -64,7 +64,7 @@ apt-get install -y --no-install-recommends \
         unzip
 
 cat > /etc/cron.d/delete_old_docker_images << EOF
-01 * * * * root docker system prune -a --filter "until=24h"
+01 * * * * root docker system prune -a --filter "until=1h"
 EOF
 
 
