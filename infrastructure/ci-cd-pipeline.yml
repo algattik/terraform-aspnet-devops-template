@@ -197,7 +197,7 @@ jobs:
   - task: AzureCLI@1
     displayName: Start agents
     inputs:
-      azureSubscription: Terraform
+      azureSubscription: $(TERRAFORM_SERVICE_CONNECTION)
       scriptLocation: inlineScript
       inlineScript: |
         set -eux  # fail on error

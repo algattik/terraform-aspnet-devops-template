@@ -10,7 +10,7 @@ resource "random_id" "workspace" {
 }
 
 resource "azurerm_log_analytics_workspace" "aks" {
-  name                = "k8s-ws-${var.appname}-${random_id.workspace.hex}"
+  name                = "log-${var.appname}-${var.environment}-${random_id.workspace.hex}"
   location            = var.location
   resource_group_name = var.resource_group_name
   sku                 = "PerGB2018"
