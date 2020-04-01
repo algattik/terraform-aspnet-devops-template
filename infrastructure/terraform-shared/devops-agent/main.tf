@@ -84,6 +84,13 @@ resource "azurerm_linux_virtual_machine_scale_set" "devops" {
     storage_account_type = "Premium_LRS"
   }
 
+  data_disk {
+    caching              = "ReadWrite"
+    disk_size_gb         = 128
+    lun                  = 0
+    storage_account_type = "Premium_LRS"
+  }
+
   source_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
@@ -91,7 +98,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "devops" {
     version   = "latest"
   }
 
-  admin_username = "azuredevopsuser"
+  admin_username = var.az_devops_agent_admin_user
   admin_password = random_password.agent_vms.result
 
   disable_password_authentication = false

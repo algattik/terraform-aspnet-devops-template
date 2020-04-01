@@ -31,7 +31,12 @@ variable "az_devops_pat" {
 variable "az_devops_agent_pool" {
   type = string
   description = "Specify the name of the agent pool - must exist before. Create it at https://dev.azure.com/[Organization]/_settings/agentpools"
-  default = "pool001"
+}
+
+variable "az_devops_agent_admin_user" {
+  type        = string
+  default     = "azuredevopsuser"
+  description = "Username of the admin user on the agent VMs"
 }
 
 variable "az_devops_agent_sshkeys" {
@@ -42,7 +47,6 @@ variable "az_devops_agent_sshkeys" {
 variable "az_devops_agent_vm_size" {
   type    = string
   description = "Specify the size of the VM"
-  default = "Standard_D2s_v3"
 }
 
 variable "az_devops_agents_per_vm" {

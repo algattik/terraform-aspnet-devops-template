@@ -12,7 +12,7 @@ variable "environment" {
 variable "location" {
   type    = string
   description = "Azure region where to create resources."
-  default = "North Europe"
+  default = "East US"
 }
 
 variable "resource_group" {
@@ -45,7 +45,7 @@ variable "az_devops_agent_sshkeys" {
 variable "az_devops_agent_vm_size" {
   type    = string
   description = "Specify the size of the VM"
-  default = "Standard_D2s_v3"
+  default = "Standard_B2ms"
 }
 
 variable "az_devops_agents_per_vm" {
