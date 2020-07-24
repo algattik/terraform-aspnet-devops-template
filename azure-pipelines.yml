@@ -37,7 +37,7 @@ variables:
 - name: APP_SP_OBJECT_ID
   value: ddf63018-48fb-4738-a3f5-0062fb16dbb0
 - name: AKS_VERSION
-  value: 1.15.7
+  value: 1.18.1
 - name: HELM_RELEASE_NAME
   value: contoso
 - name: RESOURCE_GROUP
