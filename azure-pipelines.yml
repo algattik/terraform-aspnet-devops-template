@@ -27,11 +27,11 @@ variables:
 - name: ACR_NAME
   value: $(APP_NAME)aspnetmplt
 - name: TERRAFORM_SP_CLIENT_ID
-  value: df9df564-e889-4852-9bb2-aa912d990c93
+  value: 1816220a-a94c-4bba-87f2-474af739adcc
 - name: AKS_SP_CLIENT_ID
-  value: cd0ad856-af8e-424e-b935-ce7ad6da5c9d
+  value: 41ac1793-51bf-4dba-823a-53d708f3e7f5
 - name: AKS_SP_OBJECT_ID
-  value: ddf63018-48fb-4738-a3f5-0062fb16dbb0
+  value: a6edfb42-2d98-4777-9a09-8ff0d15de02b
 - name: APP_SP_CLIENT_ID
   value: cd0ad856-af8e-424e-b935-ce7ad6da5c9d
 - name: APP_SP_OBJECT_ID
@@ -41,15 +41,15 @@ variables:
 - name: HELM_RELEASE_NAME
   value: contoso
 - name: RESOURCE_GROUP
-  value: $(APP_NAME)
+  value: terraform_aspnet_rg
 - name: SUBSCRIPTION_ID
-  value: a4ed7b9a-b128-49b4-a6ee-fd07ff6e296d
+  value: f3414c2e-c479-484b-b19e-1787de6e0140
 - name: TENANT_ID
   value: 72f988bf-86f1-41af-91ab-2d7cd011db47
 - name: TERRAFORM_SERVICE_CONNECTION
-  value: Terraform
+  value: aspsc
 - name: TERRAFORM_STORAGE_ACCOUNT
-  value: $(APP_NAME)terraform
+  value: asmictfstorage
 - name: AGENT_POOL_NAME
   value: aspnetmplt
 - name: JMETER_VERSION
