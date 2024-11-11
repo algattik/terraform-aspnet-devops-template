@@ -12,6 +12,7 @@ WORKDIR /app
 COPY Src/*.sln .
 COPY Src/Contoso/*.csproj ./Contoso/
 COPY Src/Contoso.UnitTests/*.csproj ./Contoso.UnitTests/
+COPY Src/Contoso.LoadTests/*.csproj ./Contoso.LoadTests/
 RUN dotnet restore
 
 # copy everything else and build app
@@ -20,14 +21,21 @@ WORKDIR /app/Contoso
 RUN dotnet build -c Release /p:VersionPrefix=${VersionPrefix} /p:TreatWarningsAsErrors=true -warnaserror
 
 
-FROM build AS testrunner
+FROM build AS unittestrunner
 WORKDIR /app/Contoso.UnitTests
 ENTRYPOINT ["dotnet", "test", "--logger:trx", "--collect:XPlat Code Coverage"]
 
-
-FROM build AS test
+FROM build AS unittest
 WORKDIR /app/Contoso.UnitTests
 RUN dotnet test --collect:"XPlat Code Coverage"
+
+FROM build AS loadtestrunner
+WORKDIR /app/Contoso.LoadTests
+ENTRYPOINT ["dotnet", "test", "--logger:trx", "--results-directory", "/loadTestResults"]
+
+FROM build AS loadtest
+WORKDIR /app/Contoso.LoadTests
+RUN dotnet test
 
 FROM build AS publish
 WORKDIR /app/Contoso
